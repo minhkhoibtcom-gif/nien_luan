@@ -2,6 +2,8 @@
 
 Phân khúc khách hàng bằng thuật toán **K-Prototypes** (4 cụm) trên bộ dữ liệu *Online Food Delivery*, kèm giao diện demo viết bằng Streamlit.
 
+**Demo trực tuyến:** https://phan-khuc-khach-hang.streamlit.app/ (không cần cài đặt; nếu app đang "ngủ", bấm nút đánh thức và chờ khoảng 1 phút)
+
 ## Cấu trúc thư mục
 
 | File | Nội dung |
