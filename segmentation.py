@@ -6,7 +6,7 @@ import pandas as pd
 from kmodes.kprototypes import KPrototypes
 from sklearn.preprocessing import StandardScaler
 
-DATA_FILE = Path(__file__).parent / "online food delivery dataset.csv"
+DATA_FILE = Path(__file__).parent / "online food delivery dataset 1000.csv"  # sinh bởi generate_dataset.py
 
 K = 4
 NUM_COLS = ["Age", "Family size"]
