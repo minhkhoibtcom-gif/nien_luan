@@ -1,362 +1,354 @@
 TÂM CỤM QUA TỪNG VÒNG LẶP CỦA K-PROTOTYPES
-Dữ liệu: online food delivery dataset 1000.csv (1000 mẫu sau làm sạch)
+Dữ liệu: online food delivery dataset 3000.csv (3000 mẫu sau làm sạch)
 Tham số: K = 4, init = 'Cao', n_init = 5, random_state = 42, gamma = 0.500
 Biến số (Age, Family size) được chuẩn hóa khi huấn luyện; bảng dưới ghi giá trị ở thang đo gốc, kèm giá trị chuẩn hóa trong ngoặc.
 Vòng 0 là tâm ban đầu sau bước khởi tạo. moves = số điểm đổi cụm trong vòng đó; thuật toán dừng khi moves = 0 hoặc cost không giảm.
-Lần chạy được chọn: lần 5 (cost thấp nhất = 1539.3, 4 vòng lặp).
+Lần chạy được chọn: lần 1 (cost thấp nhất = 4734.9, 6 vòng lặp).
 
 ====================================================================================================
-LẦN CHẠY 1/5   |   số vòng lặp = 9   |   cost cuối = 1557.0
+LẦN CHẠY 1/5  <== ĐƯỢC CHỌN   |   số vòng lặp = 6   |   cost cuối = 4734.9
 ====================================================================================================
 
-Vòng 0 (khởi tạo)   cost = 1848.4
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    323       28.16 (+1.091)  3.76 (+0.369)  Male    Married         Employee    Graduate                    Yes     Positive
-1    328       24.37 (-0.115)  2.85 (-0.289)  Female  Single          Student     Post Graduate               Yes     Positive
-2    171       20.86 (-1.230)  3.68 (+0.312)  Male    Single          Student     Graduate                    Yes     Positive
-3    178       22.89 (-0.585)  2.64 (-0.437)  Male    Single          Student     Graduate                    Yes     Positive
-
-Vòng 1   moves = 359   cost = 1643.3
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    251       28.70 (+1.263)  4.19 (+0.676)  Male    Married         Employee    Graduate                    Yes     Positive
-1    287       25.05 (+0.103)  2.66 (-0.424)  Female  Single          Student     Post Graduate               Yes     Positive
-2    169       22.08 (-0.841)  4.69 (+1.035)  Male    Single          Student     Graduate                    Yes     Positive
-3    293       22.54 (-0.697)  2.19 (-0.760)  Male    Single          Student     Graduate                    Yes     Positive
-
-Vòng 2   moves = 90   cost = 1612.9
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    218       28.99 (+1.353)  4.35 (+0.792)  Male    Married         Employee    Graduate                    No      Positive
-1    295       25.44 (+0.226)  2.51 (-0.532)  Female  Single          Student     Post Graduate               Yes     Positive
-2    187       22.55 (-0.692)  4.74 (+1.068)  Male    Single          Student     Graduate                    Yes     Positive
-3    300       22.29 (-0.774)  2.25 (-0.718)  Male    Single          Student     Graduate                    Yes     Positive
-
-Vòng 3   moves = 65   cost = 1599.5
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    200       29.12 (+1.396)  4.46 (+0.868)  Male    Married         Employee    Graduate                    No      Positive
-1    320       25.54 (+0.258)  2.37 (-0.632)  Female  Single          Student     Post Graduate               Yes     Positive
-2    202       22.75 (-0.630)  4.72 (+1.057)  Male    Single          Student     Post Graduate               Yes     Positive
-3    278       22.08 (-0.843)  2.32 (-0.665)  Male    Single          Student     Graduate                    Yes     Positive
-
-Vòng 4   moves = 64   cost = 1574.1
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    190       29.12 (+1.394)  4.56 (+0.942)  Male    Married         Employee    Graduate                    No      Positive
-1    289       25.89 (+0.368)  2.34 (-0.656)  Female  Single          Employee    Post Graduate               Yes     Positive
-2    211       22.87 (-0.592)  4.70 (+1.038)  Male    Single          Student     Post Graduate               Yes     Positive
-3    310       22.23 (-0.795)  2.31 (-0.673)  Male    Single          Student     Graduate                    Yes     Positive
-
-Vòng 5   moves = 48   cost = 1560.1
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    183       29.08 (+1.382)  4.64 (+1.001)  Male    Married         Employee    Graduate                    No      Positive
-1    269       26.19 (+0.464)  2.30 (-0.684)  Male    Single          Employee    Post Graduate               Yes     Positive
-2    214       22.92 (-0.576)  4.69 (+1.031)  Male    Single          Student     Post Graduate               Yes     Positive
-3    334       22.33 (-0.762)  2.33 (-0.659)  Male    Single          Student     Graduate                    Yes     Positive
-
-Vòng 6   moves = 33   cost = 1559.0
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    178       29.12 (+1.395)  4.69 (+1.030)  Male    Married         Employee    Graduate                    No      Positive
-1    260       26.35 (+0.514)  2.28 (-0.693)  Male    Single          Employee    Post Graduate               Yes     Positive
-2    215       22.93 (-0.573)  4.68 (+1.029)  Male    Single          Student     Post Graduate               Yes     Positive
-3    347       22.38 (-0.746)  2.35 (-0.647)  Male    Single          Student     Graduate                    Yes     Positive
-
-Vòng 7   moves = 16   cost = 1557.6
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    174       29.09 (+1.385)  4.74 (+1.070)  Male    Married         Employee    Graduate                    No      Positive
-1    255       26.49 (+0.559)  2.29 (-0.686)  Male    Single          Employee    Post Graduate               Yes     Positive
-2    214       22.91 (-0.578)  4.68 (+1.025)  Male    Single          Student     Post Graduate               Yes     Positive
-3    357       22.44 (-0.728)  2.35 (-0.646)  Male    Single          Student     Graduate                    Yes     Positive
-
-Vòng 8   moves = 8   cost = 1557.0
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    175       29.01 (+1.359)  4.79 (+1.108)  Male    Married         Employee    Graduate                    No      Positive
-1    257       26.53 (+0.572)  2.30 (-0.679)  Male    Single          Employee    Post Graduate               Yes     Positive
-2    210       22.85 (-0.597)  4.66 (+1.010)  Male    Single          Student     Post Graduate               Yes     Positive
-3    358       22.45 (-0.725)  2.35 (-0.647)  Male    Single          Student     Graduate                    Yes     Positive
-
-Vòng 9   moves = 0   cost = 1557.0
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    175       29.01 (+1.359)  4.79 (+1.108)  Male    Married         Employee    Graduate                    No      Positive
-1    257       26.53 (+0.572)  2.30 (-0.679)  Male    Single          Employee    Post Graduate               Yes     Positive
-2    210       22.85 (-0.597)  4.66 (+1.010)  Male    Single          Student     Post Graduate               Yes     Positive
-3    358       22.45 (-0.725)  2.35 (-0.647)  Male    Single          Student     Graduate                    Yes     Positive
-
-====================================================================================================
-LẦN CHẠY 2/5   |   số vòng lặp = 6   |   cost cuối = 1554.0
-====================================================================================================
-
-Vòng 0 (khởi tạo)   cost = 2022.4
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    167       28.01 (+1.044)  2.89 (-0.261)  Male    Single          Student     Graduate                    Yes     Positive
-1    583       23.67 (-0.338)  3.11 (-0.097)  Male    Single          Student     Post Graduate               Yes     Positive
-2    127       22.62 (-0.670)  5.28 (+1.459)  Male    Single          Student     Graduate                    Yes     Positive
-3    123       27.49 (+0.877)  2.28 (-0.693)  Male    Married         Employee    Graduate                    Yes     Positive
-
-Vòng 1   moves = 309   cost = 1586.5
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    175       29.22 (+1.427)  4.41 (+0.834)  Male    Married         Employee    Graduate                    Yes     Positive
-1    480       22.96 (-0.562)  2.65 (-0.432)  Male    Single          Student     Post Graduate               Yes     Positive
-2    167       23.08 (-0.523)  5.10 (+1.325)  Female  Single          Student     Graduate                    Yes     Positive
-3    178       26.63 (+0.604)  2.00 (-0.897)  Male    Married         Employee    Graduate                    Yes     Positive
-
-Vòng 2   moves = 90   cost = 1562.6
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    168       29.15 (+1.405)  4.79 (+1.102)  Male    Married         Employee    Graduate                    Yes     Positive
-1    447       22.88 (-0.589)  2.56 (-0.493)  Male    Single          Student     Post Graduate               Yes     Positive
-2    175       22.79 (-0.615)  4.85 (+1.145)  Female  Single          Student     Graduate                    Yes     Positive
-3    210       26.75 (+0.642)  2.15 (-0.788)  Male    Married         Employee    Graduate                    Yes     Positive
-
-Vòng 3   moves = 23   cost = 1559.6
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    170       28.95 (+1.341)  4.89 (+1.176)  Male    Married         Employee    Graduate                    Yes     Positive
-1    450       22.88 (-0.589)  2.55 (-0.502)  Male    Single          Student     Post Graduate               Yes     Positive
-2    167       22.65 (-0.660)  4.81 (+1.118)  Female  Single          Student     Graduate                    Yes     Positive
-3    213       26.91 (+0.692)  2.20 (-0.756)  Male    Married         Employee    Graduate                    Yes     Positive
-
-Vòng 4   moves = 21   cost = 1554.7
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    163       28.91 (+1.328)  4.96 (+1.230)  Male    Married         Employee    Graduate                    No      Positive
-1    456       22.89 (-0.583)  2.54 (-0.507)  Male    Single          Student     Post Graduate               Yes     Positive
-2    165       22.61 (-0.673)  4.81 (+1.117)  Female  Single          Student     Graduate                    Yes     Positive
-3    216       27.06 (+0.742)  2.26 (-0.711)  Male    Married         Employee    Graduate                    Yes     Positive
-
-Vòng 5   moves = 13   cost = 1554.0
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    158       28.89 (+1.323)  5.01 (+1.265)  Male    Married         Employee    Graduate                    No      Positive
-1    462       22.94 (-0.570)  2.53 (-0.518)  Male    Single          Student     Post Graduate               Yes     Positive
-2    166       22.59 (-0.680)  4.80 (+1.113)  Female  Single          Student     Graduate                    Yes     Positive
-3    214       27.19 (+0.781)  2.30 (-0.679)  Male    Married         Employee    Graduate                    Yes     Positive
-
-Vòng 6   moves = 0   cost = 1554.0
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    158       28.89 (+1.323)  5.01 (+1.265)  Male    Married         Employee    Graduate                    No      Positive
-1    462       22.94 (-0.570)  2.53 (-0.518)  Male    Single          Student     Post Graduate               Yes     Positive
-2    166       22.59 (-0.680)  4.80 (+1.113)  Female  Single          Student     Graduate                    Yes     Positive
-3    214       27.19 (+0.781)  2.30 (-0.679)  Male    Married         Employee    Graduate                    Yes     Positive
-
-====================================================================================================
-LẦN CHẠY 3/5   |   số vòng lặp = 8   |   cost cuối = 1547.1
-====================================================================================================
-
-Vòng 0 (khởi tạo)   cost = 1819.5
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    414       24.43 (-0.095)  2.93 (-0.228)  Male    Single          Student     Graduate                    Yes     Positive
-1    227       23.10 (-0.517)  1.86 (-0.998)  Female  Single          Student     Post Graduate               Yes     Positive
-2    210       27.96 (+1.026)  3.91 (+0.473)  Female  Married         Employee    Post Graduate               Yes     Positive
-3    149       23.49 (-0.394)  5.32 (+1.487)  Male    Single          Student     Graduate                    Yes     Positive
-
-Vòng 1   moves = 290   cost = 1711.4
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    341       24.37 (-0.114)  2.88 (-0.268)  Male    Single          Student     Graduate                    Yes     Positive
-1    275       23.04 (-0.537)  1.96 (-0.923)  Female  Single          Student     Post Graduate               Yes     Positive
-2    214       29.10 (+1.390)  4.09 (+0.605)  Male    Married         Employee    Graduate                    Yes     Positive
-3    170       22.68 (-0.652)  5.02 (+1.269)  Male    Single          Student     Graduate                    Yes     Positive
-
-Vòng 2   moves = 83   cost = 1696.5
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    327       24.53 (-0.065)  2.77 (-0.346)  Male    Single          Student     Graduate                    Yes     Positive
-1    274       23.08 (-0.523)  1.97 (-0.915)  Female  Single          Student     Post Graduate               Yes     Positive
-2    207       29.26 (+1.439)  4.30 (+0.753)  Male    Married         Employee    Graduate                    Yes     Positive
-3    192       22.54 (-0.695)  4.76 (+1.084)  Male    Single          Student     Graduate                    Yes     Positive
-
-Vòng 3   moves = 75   cost = 1669.9
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    326       25.03 (+0.097)  2.68 (-0.408)  Male    Single          Student     Graduate                    Yes     Positive
-1    285       22.75 (-0.628)  2.10 (-0.827)  Female  Single          Student     Post Graduate               Yes     Positive
-2    200       29.24 (+1.435)  4.44 (+0.854)  Male    Married         Employee    Graduate                    No      Positive
-3    189       22.40 (-0.740)  4.71 (+1.047)  Male    Single          Student     Graduate                    Yes     Positive
-
-Vòng 4   moves = 126   cost = 1562.5
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    287       25.95 (+0.387)  2.49 (-0.545)  Male    Single          Employee    Graduate                    Yes     Positive
-1    334       22.51 (-0.705)  2.27 (-0.702)  Male    Single          Student     Post Graduate               Yes     Positive
-2    185       29.10 (+1.389)  4.67 (+1.019)  Male    Married         Employee    Graduate                    No      Positive
-3    194       22.58 (-0.684)  4.70 (+1.041)  Male    Single          Student     Post Graduate               Yes     Positive
-
-Vòng 5   moves = 104   cost = 1547.5
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    255       26.51 (+0.566)  2.33 (-0.658)  Male    Single          Employee    Graduate                    Yes     Positive
-1    365       22.53 (-0.698)  2.35 (-0.649)  Male    Single          Student     Post Graduate               Yes     Positive
-2    173       29.02 (+1.365)  4.82 (+1.123)  Male    Married         Employee    Graduate                    No      Positive
-3    207       22.82 (-0.606)  4.67 (+1.017)  Male    Single          Student     Post Graduate               Yes     Positive
-
-Vòng 6   moves = 10   cost = 1547.1
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    246       26.60 (+0.594)  2.30 (-0.681)  Male    Single          Employee    Graduate                    Yes     Positive
-1    372       22.56 (-0.691)  2.36 (-0.641)  Male    Single          Student     Post Graduate               Yes     Positive
-2    172       29.04 (+1.371)  4.82 (+1.127)  Male    Married         Employee    Graduate                    No      Positive
-3    210       22.86 (-0.595)  4.66 (+1.010)  Male    Single          Student     Post Graduate               Yes     Positive
-
-Vòng 7   moves = 2   cost = 1547.1
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    244       26.61 (+0.599)  2.29 (-0.688)  Male    Single          Employee    Graduate                    Yes     Positive
-1    373       22.56 (-0.689)  2.36 (-0.639)  Male    Single          Student     Post Graduate               Yes     Positive
-2    172       29.04 (+1.371)  4.82 (+1.127)  Male    Married         Employee    Graduate                    No      Positive
-3    211       22.87 (-0.592)  4.65 (+1.008)  Male    Single          Student     Post Graduate               Yes     Positive
-
-Vòng 8   moves = 0   cost = 1547.1
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    244       26.61 (+0.599)  2.29 (-0.688)  Male    Single          Employee    Graduate                    Yes     Positive
-1    373       22.56 (-0.689)  2.36 (-0.639)  Male    Single          Student     Post Graduate               Yes     Positive
-2    172       29.04 (+1.371)  4.82 (+1.127)  Male    Married         Employee    Graduate                    No      Positive
-3    211       22.87 (-0.592)  4.65 (+1.008)  Male    Single          Student     Post Graduate               Yes     Positive
-
-====================================================================================================
-LẦN CHẠY 4/5   |   số vòng lặp = 10   |   cost cuối = 1563.3
-====================================================================================================
-
-Vòng 0 (khởi tạo)   cost = 2022.1
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    512       25.83 (+0.349)  4.16 (+0.653)  Male    Single          Student     Graduate                    Yes     Positive
-1    154       23.03 (-0.541)  2.66 (-0.426)  Female  Single          Employee    Graduate                    No      Positive
-2    254       22.83 (-0.605)  2.03 (-0.874)  Male    Single          Student     Post Graduate               Yes     Positive
-3    80        27.02 (+0.730)  2.44 (-0.583)  Male    Married         Employee    Graduate                    Yes     Negative
-
-Vòng 1   moves = 375   cost = 1793.9
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    295       25.29 (+0.178)  4.91 (+1.190)  Male    Single          Student     Graduate                    Yes     Positive
-1    132       22.87 (-0.591)  2.92 (-0.239)  Female  Single          Employee    Graduate                    Yes     Positive
-2    364       22.88 (-0.588)  2.34 (-0.653)  Male    Single          Student     Post Graduate               Yes     Positive
-3    209       28.33 (+1.146)  2.70 (-0.392)  Male    Married         Employee    Graduate                    Yes     Positive
-
-Vòng 2   moves = 113   cost = 1772.4
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    241       24.85 (+0.040)  5.08 (+1.315)  Male    Single          Student     Graduate                    Yes     Positive
-1    177       22.95 (-0.564)  2.82 (-0.305)  Female  Single          Employee    Graduate                    Yes     Positive
-2    348       22.99 (-0.551)  2.36 (-0.637)  Male    Single          Student     Post Graduate               Yes     Positive
-3    234       28.52 (+1.205)  3.00 (-0.176)  Male    Married         Employee    Graduate                    Yes     Positive
-
-Vòng 3   moves = 42   cost = 1755.8
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    231       24.44 (-0.091)  5.05 (+1.293)  Male    Single          Student     Graduate                    Yes     Positive
-1    175       23.02 (-0.544)  2.79 (-0.327)  Female  Single          Employee    Graduate                    Yes     Positive
-2    361       23.15 (-0.501)  2.34 (-0.653)  Male    Single          Student     Post Graduate               Yes     Positive
-3    233       28.74 (+1.276)  3.21 (-0.025)  Male    Married         Employee    Graduate                    Yes     Positive
-
-Vòng 4   moves = 65   cost = 1719.9
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    229       23.90 (-0.262)  4.93 (+1.209)  Male    Single          Student     Graduate                    Yes     Positive
-1    192       23.53 (-0.381)  2.67 (-0.415)  Female  Single          Employee    Graduate                    Yes     Positive
-2    363       23.23 (-0.478)  2.31 (-0.674)  Male    Single          Student     Post Graduate               Yes     Positive
-3    216       29.19 (+1.419)  3.56 (+0.219)  Male    Married         Employee    Graduate                    Yes     Positive
-
-Vòng 5   moves = 112   cost = 1649.8
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    225       23.34 (-0.442)  4.80 (+1.109)  Male    Single          Student     Post Graduate               Yes     Positive
-1    219       24.36 (-0.117)  2.47 (-0.563)  Female  Single          Employee    Graduate                    Yes     Positive
-2    351       23.15 (-0.502)  2.30 (-0.682)  Male    Single          Student     Post Graduate               Yes     Positive
-3    205       29.35 (+1.469)  4.02 (+0.552)  Male    Married         Employee    Graduate                    Yes     Positive
-
-Vòng 6   moves = 123   cost = 1583.6
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    218       23.04 (-0.538)  4.72 (+1.052)  Male    Single          Student     Post Graduate               Yes     Positive
-1    244       25.50 (+0.244)  2.37 (-0.632)  Female  Single          Employee    Graduate                    Yes     Positive
-2    344       22.63 (-0.666)  2.33 (-0.659)  Male    Single          Student     Post Graduate               Yes     Positive
-3    194       29.38 (+1.479)  4.34 (+0.782)  Male    Married         Employee    Graduate                    No      Positive
-
-Vòng 7   moves = 85   cost = 1564.3
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    216       22.95 (-0.566)  4.69 (+1.030)  Male    Single          Student     Post Graduate               Yes     Positive
-1    244       26.16 (+0.455)  2.25 (-0.718)  Female  Single          Employee    Graduate                    Yes     Positive
-2    356       22.54 (-0.694)  2.36 (-0.637)  Male    Single          Student     Post Graduate               Yes     Positive
-3    184       29.15 (+1.404)  4.61 (+0.975)  Male    Married         Employee    Graduate                    No      Positive
-
-Vòng 8   moves = 22   cost = 1563.3
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    216       22.94 (-0.569)  4.68 (+1.027)  Male    Single          Student     Post Graduate               Yes     Positive
-1    233       26.31 (+0.504)  2.21 (-0.746)  Female  Single          Employee    Graduate                    Yes     Positive
-2    369       22.62 (-0.669)  2.38 (-0.627)  Male    Single          Student     Post Graduate               Yes     Positive
-3    182       29.09 (+1.387)  4.65 (+1.008)  Male    Married         Employee    Graduate                    No      Positive
-
-Vòng 9   moves = 1   cost = 1563.3
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    216       22.94 (-0.569)  4.68 (+1.027)  Male    Single          Student     Post Graduate               Yes     Positive
-1    232       26.32 (+0.505)  2.21 (-0.746)  Female  Single          Employee    Graduate                    Yes     Positive
-2    370       22.63 (-0.667)  2.38 (-0.627)  Male    Single          Student     Post Graduate               Yes     Positive
-3    182       29.09 (+1.387)  4.65 (+1.008)  Male    Married         Employee    Graduate                    No      Positive
-
-Vòng 10   moves = 0   cost = 1563.3
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    216       22.94 (-0.569)  4.68 (+1.027)  Male    Single          Student     Post Graduate               Yes     Positive
-1    232       26.32 (+0.505)  2.21 (-0.746)  Female  Single          Employee    Graduate                    Yes     Positive
-2    370       22.63 (-0.667)  2.38 (-0.627)  Male    Single          Student     Post Graduate               Yes     Positive
-3    182       29.09 (+1.387)  4.65 (+1.008)  Male    Married         Employee    Graduate                    No      Positive
-
-====================================================================================================
-LẦN CHẠY 5/5  <== ĐƯỢC CHỌN   |   số vòng lặp = 4   |   cost cuối = 1539.3
-====================================================================================================
-
-Vòng 0 (khởi tạo)   cost = 1849.1
+Vòng 0 (khởi tạo)   cost = 5725.8
 Cụm                            Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
 -----------------------------  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0 (Sinh viên hộ đông)          386       23.29 (-0.458)  3.53 (+0.204)  Male    Single          Student     Graduate                    Yes     Positive
-1 (Người có gia đình hộ đông)  199       29.25 (+1.436)  3.79 (+0.387)  Female  Married         Employee    Graduate                    No      Positive
-2 (Sinh viên hộ nhỏ)           261       22.41 (-0.736)  2.33 (-0.663)  Female  Single          Student     Post Graduate               Yes     Positive
-3 (Người đi làm trẻ)           154       26.43 (+0.540)  3.41 (+0.114)  Male    Married         Employee    Graduate                    Yes     Positive
+0 (Người có gia đình hộ đông)  932       28.53 (+1.144)  3.80 (+0.368)  Male    Married         Employee    Graduate                    Yes     Positive
+1 (Người đi làm trẻ)           472       25.08 (+0.098)  3.00 (-0.194)  Female  Married         Employee    Post Graduate               No      Positive
+2 (Sinh viên hộ đông)          206       19.76 (-1.513)  4.02 (+0.526)  Male    Single          Student     Graduate                    Yes     Positive
+3 (Sinh viên hộ nhỏ)           1390      22.86 (-0.576)  2.91 (-0.259)  Male    Single          Student     Post Graduate               Yes     Positive
 
-Vòng 1   moves = 313   cost = 1605.0
+Vòng 1   moves = 896   cost = 4905.6
 Cụm                            Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
 -----------------------------  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0 (Sinh viên hộ đông)          277       22.73 (-0.634)  4.20 (+0.681)  Male    Single          Student     Graduate                    Yes     Positive
-1 (Người có gia đình hộ đông)  165       29.39 (+1.481)  4.73 (+1.060)  Female  Married         Employee    Graduate                    No      Positive
-2 (Sinh viên hộ nhỏ)           336       22.85 (-0.597)  2.17 (-0.775)  Female  Single          Student     Post Graduate               Yes     Positive
-3 (Người đi làm trẻ)           222       26.60 (+0.594)  2.60 (-0.464)  Male    Married         Employee    Graduate                    Yes     Positive
+0 (Người có gia đình hộ đông)  681       29.08 (+1.310)  4.33 (+0.740)  Male    Married         Employee    Graduate                    Yes     Positive
+1 (Người đi làm trẻ)           498       26.14 (+0.420)  2.38 (-0.638)  Female  Married         Employee    Post Graduate               Yes     Positive
+2 (Sinh viên hộ đông)          544       22.03 (-0.825)  4.74 (+1.035)  Male    Single          Student     Graduate                    Yes     Positive
+3 (Sinh viên hộ nhỏ)           1277      23.07 (-0.511)  2.45 (-0.587)  Male    Single          Student     Post Graduate               Yes     Positive
 
-Vòng 2   moves = 150   cost = 1540.8
+Vòng 2   moves = 453   cost = 4773.4
 Cụm                            Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
 -----------------------------  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0 (Sinh viên hộ đông)          220       22.83 (-0.604)  4.55 (+0.936)  Male    Single          Student     Post Graduate               Yes     Positive
-1 (Người có gia đình hộ đông)  149       29.04 (+1.370)  5.07 (+1.304)  Female  Married         Employee    Graduate                    No      Positive
-2 (Sinh viên hộ nhỏ)           399       22.82 (-0.606)  2.34 (-0.652)  Male    Single          Student     Post Graduate               Yes     Positive
-3 (Người đi làm trẻ)           232       27.04 (+0.736)  2.41 (-0.603)  Male    Married         Employee    Graduate                    Yes     Positive
+0 (Người có gia đình hộ đông)  527       29.41 (+1.410)  4.69 (+0.996)  Male    Married         Employee    Graduate                    Yes     Positive
+1 (Người đi làm trẻ)           635       26.80 (+0.618)  2.30 (-0.690)  Female  Married         Employee    Post Graduate               Yes     Positive
+2 (Sinh viên hộ đông)          674       22.75 (-0.609)  4.72 (+1.017)  Male    Single          Student     Post Graduate               Yes     Positive
+3 (Sinh viên hộ nhỏ)           1164      22.70 (-0.622)  2.34 (-0.663)  Male    Single          Student     Post Graduate               Yes     Positive
 
-Vòng 3   moves = 38   cost = 1539.3
+Vòng 3   moves = 65   cost = 4768.5
 Cụm                            Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
 -----------------------------  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0 (Sinh viên hộ đông)          212       22.92 (-0.577)  4.64 (+0.999)  Male    Single          Student     Post Graduate               Yes     Positive
-1 (Người có gia đình hộ đông)  146       29.02 (+1.364)  5.08 (+1.310)  Female  Married         Employee    Graduate                    No      Positive
-2 (Sinh viên hộ nhỏ)           415       22.82 (-0.605)  2.37 (-0.633)  Male    Single          Student     Post Graduate               Yes     Positive
-3 (Người đi làm trẻ)           227       27.15 (+0.768)  2.39 (-0.619)  Male    Married         Employee    Graduate                    Yes     Positive
+0 (Người có gia đình hộ đông)  492       29.49 (+1.432)  4.78 (+1.058)  Male    Married         Employee    Graduate                    Yes     Positive
+1 (Người đi làm trẻ)           635       26.97 (+0.670)  2.28 (-0.705)  Female  Married         Employee    Post Graduate               Yes     Positive
+2 (Sinh viên hộ đông)          704       22.88 (-0.570)  4.70 (+1.001)  Male    Single          Student     Post Graduate               Yes     Positive
+3 (Sinh viên hộ nhỏ)           1169      22.70 (-0.624)  2.34 (-0.665)  Male    Single          Student     Post Graduate               Yes     Positive
 
-Vòng 4   moves = 0   cost = 1539.3
+Vòng 4   moves = 94   cost = 4735.6
 Cụm                            Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
 -----------------------------  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0 (Sinh viên hộ đông)          212       22.92 (-0.577)  4.64 (+0.999)  Male    Single          Student     Post Graduate               Yes     Positive
-1 (Người có gia đình hộ đông)  146       29.02 (+1.364)  5.08 (+1.310)  Female  Married         Employee    Graduate                    No      Positive
-2 (Sinh viên hộ nhỏ)           415       22.82 (-0.605)  2.37 (-0.633)  Male    Single          Student     Post Graduate               Yes     Positive
-3 (Người đi làm trẻ)           227       27.15 (+0.768)  2.39 (-0.619)  Male    Married         Employee    Graduate                    Yes     Positive
+0 (Người có gia đình hộ đông)  465       29.49 (+1.434)  4.87 (+1.124)  Male    Married         Employee    Graduate                    Yes     Positive
+1 (Người đi làm trẻ)           662       27.03 (+0.689)  2.32 (-0.676)  Female  Married         Employee    Graduate                    Yes     Positive
+2 (Sinh viên hộ đông)          702       22.88 (-0.570)  4.70 (+1.002)  Male    Single          Student     Post Graduate               Yes     Positive
+3 (Sinh viên hộ nhỏ)           1171      22.72 (-0.617)  2.34 (-0.665)  Male    Single          Student     Post Graduate               Yes     Positive
+
+Vòng 5   moves = 58   cost = 4734.9
+Cụm                            Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+-----------------------------  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0 (Người có gia đình hộ đông)  455       29.53 (+1.444)  4.90 (+1.144)  Male    Married         Employee    Graduate                    Yes     Positive
+1 (Người đi làm trẻ)           676       26.99 (+0.675)  2.35 (-0.654)  Female  Married         Employee    Graduate                    Yes     Positive
+2 (Sinh viên hộ đông)          699       22.87 (-0.573)  4.70 (+1.004)  Male    Single          Student     Post Graduate               Yes     Positive
+3 (Sinh viên hộ nhỏ)           1170      22.75 (-0.610)  2.33 (-0.667)  Male    Single          Student     Post Graduate               Yes     Positive
+
+Vòng 6   moves = 0   cost = 4734.9
+Cụm                            Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+-----------------------------  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0 (Người có gia đình hộ đông)  455       29.53 (+1.444)  4.90 (+1.144)  Male    Married         Employee    Graduate                    Yes     Positive
+1 (Người đi làm trẻ)           676       26.99 (+0.675)  2.35 (-0.654)  Female  Married         Employee    Graduate                    Yes     Positive
+2 (Sinh viên hộ đông)          699       22.87 (-0.573)  4.70 (+1.004)  Male    Single          Student     Post Graduate               Yes     Positive
+3 (Sinh viên hộ nhỏ)           1170      22.75 (-0.610)  2.33 (-0.667)  Male    Single          Student     Post Graduate               Yes     Positive
+
+====================================================================================================
+LẦN CHẠY 2/5   |   số vòng lặp = 9   |   cost cuối = 4851.4
+====================================================================================================
+
+Vòng 0 (khởi tạo)   cost = 5384.1
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    476       29.34 (+1.389)  3.26 (-0.013)  Male    Married         Employee    Graduate                    Yes     Positive
+1    1675      23.52 (-0.376)  3.30 (+0.015)  Male    Single          Student     Post Graduate               Yes     Positive
+2    320       22.78 (-0.598)  5.52 (+1.582)  Male    Single          Student     Graduate                    Yes     Positive
+3    529       25.75 (+0.301)  1.87 (-0.994)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 1   moves = 851   cost = 5027.1
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    628       29.47 (+1.428)  3.91 (+0.443)  Male    Married         Employee    Graduate                    Yes     Positive
+1    1162      22.60 (-0.655)  3.06 (-0.151)  Male    Single          Student     Graduate                    Yes     Positive
+2    431       23.51 (-0.377)  5.46 (+1.543)  Male    Single          Student     Graduate                    Yes     Positive
+3    779       24.87 (+0.035)  1.88 (-0.985)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 2   moves = 159   cost = 4991.0
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    646       29.35 (+1.390)  4.06 (+0.554)  Male    Married         Employee    Graduate                    Yes     Positive
+1    1090      22.41 (-0.712)  3.03 (-0.179)  Male    Single          Student     Graduate                    Yes     Positive
+2    411       23.26 (-0.453)  5.42 (+1.513)  Female  Single          Student     Graduate                    Yes     Positive
+3    853       25.01 (+0.076)  1.98 (-0.920)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 3   moves = 186   cost = 4921.1
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    632       29.38 (+1.400)  4.15 (+0.618)  Male    Married         Employee    Graduate                    Yes     Positive
+1    968       22.17 (-0.784)  2.92 (-0.256)  Male    Single          Student     Graduate                    Yes     Positive
+2    497       23.25 (-0.458)  5.13 (+1.305)  Female  Single          Student     Post Graduate               Yes     Positive
+3    903       25.13 (+0.112)  2.04 (-0.876)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 4   moves = 182   cost = 4882.0
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    629       29.33 (+1.386)  4.23 (+0.674)  Male    Married         Employee    Graduate                    Yes     Positive
+1    926       22.02 (-0.828)  2.74 (-0.380)  Male    Single          Student     Graduate                    Yes     Positive
+2    584       23.26 (-0.453)  4.92 (+1.162)  Female  Single          Student     Post Graduate               Yes     Positive
+3    861       25.37 (+0.185)  2.04 (-0.873)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 5   moves = 152   cost = 4860.9
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    610       29.38 (+1.399)  4.30 (+0.723)  Male    Married         Employee    Graduate                    Yes     Positive
+1    927       22.07 (-0.814)  2.59 (-0.489)  Male    Single          Student     Graduate                    Yes     Positive
+2    638       23.11 (-0.500)  4.83 (+1.098)  Female  Single          Student     Post Graduate               Yes     Positive
+3    825       25.64 (+0.267)  2.10 (-0.835)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 6   moves = 74   cost = 4852.9
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    611       29.28 (+1.371)  4.39 (+0.784)  Male    Married         Employee    Graduate                    Yes     Positive
+1    938       22.09 (-0.807)  2.53 (-0.526)  Male    Single          Student     Graduate                    Yes     Positive
+2    636       22.99 (-0.535)  4.80 (+1.073)  Female  Single          Student     Post Graduate               Yes     Positive
+3    815       25.81 (+0.318)  2.12 (-0.820)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 7   moves = 36   cost = 4851.4
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    614       29.25 (+1.361)  4.41 (+0.797)  Male    Married         Employee    Graduate                    Yes     Positive
+1    929       22.10 (-0.807)  2.49 (-0.556)  Male    Single          Student     Graduate                    Yes     Positive
+2    648       22.95 (-0.547)  4.77 (+1.054)  Female  Single          Student     Post Graduate               Yes     Positive
+3    809       25.85 (+0.331)  2.13 (-0.810)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 8   moves = 2   cost = 4851.4
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    614       29.25 (+1.361)  4.41 (+0.797)  Male    Married         Employee    Graduate                    Yes     Positive
+1    929       22.10 (-0.807)  2.49 (-0.559)  Male    Single          Student     Graduate                    Yes     Positive
+2    649       22.96 (-0.546)  4.77 (+1.053)  Female  Single          Student     Post Graduate               Yes     Positive
+3    808       25.85 (+0.332)  2.13 (-0.809)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 9   moves = 0   cost = 4851.4
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    614       29.25 (+1.361)  4.41 (+0.797)  Male    Married         Employee    Graduate                    Yes     Positive
+1    929       22.10 (-0.807)  2.49 (-0.559)  Male    Single          Student     Graduate                    Yes     Positive
+2    649       22.96 (-0.546)  4.77 (+1.053)  Female  Single          Student     Post Graduate               Yes     Positive
+3    808       25.85 (+0.332)  2.13 (-0.809)  Female  Single          Student     Post Graduate               Yes     Positive
+
+====================================================================================================
+LẦN CHẠY 3/5   |   số vòng lặp = 8   |   cost cuối = 4851.4
+====================================================================================================
+
+Vòng 0 (khởi tạo)   cost = 5147.7
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    1152      24.41 (-0.105)  2.86 (-0.294)  Male    Single          Student     Graduate                    Yes     Positive
+1    703       23.24 (-0.461)  1.84 (-1.015)  Female  Single          Student     Post Graduate               Yes     Positive
+2    569       29.07 (+1.305)  4.06 (+0.554)  Male    Married         Employee    Graduate                    Yes     Positive
+3    576       23.05 (-0.517)  5.09 (+1.279)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 1   moves = 689   cost = 5085.1
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    994       23.94 (-0.249)  2.84 (-0.308)  Male    Single          Student     Graduate                    Yes     Positive
+1    771       23.47 (-0.391)  1.87 (-0.993)  Female  Single          Student     Post Graduate               Yes     Positive
+2    639       29.46 (+1.423)  4.15 (+0.619)  Male    Married         Employee    Graduate                    Yes     Positive
+3    596       22.76 (-0.605)  4.89 (+1.135)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 2   moves = 212   cost = 5020.4
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    932       23.33 (-0.434)  2.87 (-0.290)  Male    Single          Student     Graduate                    Yes     Positive
+1    820       24.14 (-0.188)  1.87 (-0.992)  Female  Single          Student     Post Graduate               Yes     Positive
+2    641       29.45 (+1.422)  4.17 (+0.631)  Male    Married         Employee    Graduate                    Yes     Positive
+3    607       22.84 (-0.582)  4.86 (+1.120)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 3   moves = 271   cost = 4926.8
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    933       22.66 (-0.637)  2.75 (-0.372)  Male    Single          Student     Graduate                    Yes     Positive
+1    783       24.88 (+0.038)  1.90 (-0.972)  Female  Single          Student     Post Graduate               Yes     Positive
+2    643       29.40 (+1.407)  4.17 (+0.630)  Male    Married         Employee    Graduate                    Yes     Positive
+3    641       23.01 (-0.531)  4.83 (+1.096)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 4   moves = 244   cost = 4868.8
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    919       22.24 (-0.764)  2.62 (-0.463)  Male    Single          Student     Graduate                    Yes     Positive
+1    807       25.44 (+0.207)  2.04 (-0.877)  Female  Single          Student     Post Graduate               Yes     Positive
+2    629       29.36 (+1.394)  4.25 (+0.684)  Male    Married         Employee    Graduate                    Yes     Positive
+3    645       23.01 (-0.529)  4.82 (+1.090)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 5   moves = 106   cost = 4855.4
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    927       22.13 (-0.798)  2.56 (-0.508)  Male    Single          Student     Graduate                    Yes     Positive
+1    819       25.71 (+0.287)  2.10 (-0.836)  Female  Single          Student     Post Graduate               Yes     Positive
+2    620       29.28 (+1.368)  4.36 (+0.766)  Male    Married         Employee    Graduate                    Yes     Positive
+3    634       22.97 (-0.543)  4.80 (+1.074)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 6   moves = 60   cost = 4851.5
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    935       22.11 (-0.803)  2.50 (-0.549)  Male    Single          Student     Graduate                    Yes     Positive
+1    809       25.85 (+0.331)  2.13 (-0.810)  Female  Single          Student     Post Graduate               Yes     Positive
+2    614       29.25 (+1.361)  4.41 (+0.797)  Male    Married         Employee    Graduate                    Yes     Positive
+3    642       22.94 (-0.550)  4.78 (+1.059)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 7   moves = 8   cost = 4851.4
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    929       22.10 (-0.807)  2.49 (-0.559)  Male    Single          Student     Graduate                    Yes     Positive
+1    808       25.85 (+0.332)  2.13 (-0.809)  Female  Single          Student     Post Graduate               Yes     Positive
+2    614       29.25 (+1.361)  4.41 (+0.797)  Male    Married         Employee    Graduate                    Yes     Positive
+3    649       22.96 (-0.546)  4.77 (+1.053)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 8   moves = 0   cost = 4851.4
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    929       22.10 (-0.807)  2.49 (-0.559)  Male    Single          Student     Graduate                    Yes     Positive
+1    808       25.85 (+0.332)  2.13 (-0.809)  Female  Single          Student     Post Graduate               Yes     Positive
+2    614       29.25 (+1.361)  4.41 (+0.797)  Male    Married         Employee    Graduate                    Yes     Positive
+3    649       22.96 (-0.546)  4.77 (+1.053)  Female  Single          Student     Post Graduate               Yes     Positive
+
+====================================================================================================
+LẦN CHẠY 4/5   |   số vòng lặp = 6   |   cost cuối = 4836.5
+====================================================================================================
+
+Vòng 0 (khởi tạo)   cost = 6474.6
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    1467      26.15 (+0.421)  4.22 (+0.662)  Male    Single          Student     Graduate                    Yes     Positive
+1    605       22.52 (-0.678)  2.50 (-0.548)  Female  Single          Employee    Graduate                    Yes     Positive
+2    358       22.91 (-0.561)  1.72 (-1.102)  Male    Single          Student     Post Graduate               Yes     Positive
+3    570       24.72 (-0.011)  2.67 (-0.431)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 1   moves = 1151   cost = 5355.2
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    959       27.10 (+0.709)  4.69 (+0.993)  Male    Married         Employee    Graduate                    Yes     Positive
+1    673       21.62 (-0.951)  3.39 (+0.079)  Female  Single          Student     Graduate                    Yes     Positive
+2    606       22.89 (-0.565)  1.81 (-1.037)  Male    Single          Student     Post Graduate               Yes     Positive
+3    762       26.07 (+0.396)  2.58 (-0.495)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 2   moves = 702   cost = 4968.6
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    681       28.22 (+1.047)  4.83 (+1.094)  Male    Married         Employee    Graduate                    Yes     Positive
+1    784       21.96 (-0.849)  4.02 (+0.520)  Female  Single          Student     Graduate                    Yes     Positive
+2    803       22.76 (-0.607)  2.03 (-0.880)  Male    Single          Student     Post Graduate               Yes     Positive
+3    732       26.74 (+0.600)  2.42 (-0.610)  Female  Single          Employee    Post Graduate               Yes     Positive
+
+Vòng 3   moves = 351   cost = 4852.8
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    582       28.85 (+1.239)  4.81 (+1.083)  Male    Married         Employee    Graduate                    Yes     Positive
+1    717       22.42 (-0.708)  4.40 (+0.795)  Female  Single          Student     Graduate                    Yes     Positive
+2    983       22.53 (-0.674)  2.24 (-0.736)  Male    Single          Student     Post Graduate               Yes     Positive
+3    718       26.82 (+0.625)  2.34 (-0.665)  Female  Single          Employee    Post Graduate               Yes     Positive
+
+Vòng 4   moves = 114   cost = 4837.1
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    551       29.20 (+1.346)  4.74 (+1.030)  Male    Married         Employee    Graduate                    Yes     Positive
+1    744       22.65 (-0.640)  4.50 (+0.861)  Female  Single          Student     Graduate                    Yes     Positive
+2    990       22.45 (-0.699)  2.27 (-0.712)  Male    Single          Student     Post Graduate               Yes     Positive
+3    715       26.73 (+0.596)  2.28 (-0.704)  Female  Single          Employee    Post Graduate               Yes     Positive
+
+Vòng 5   moves = 19   cost = 4836.5
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    552       29.25 (+1.361)  4.72 (+1.015)  Male    Married         Employee    Graduate                    Yes     Positive
+1    745       22.69 (-0.627)  4.51 (+0.869)  Female  Single          Student     Graduate                    Yes     Positive
+2    990       22.43 (-0.706)  2.28 (-0.708)  Male    Single          Student     Post Graduate               Yes     Positive
+3    713       26.68 (+0.582)  2.27 (-0.710)  Female  Single          Employee    Post Graduate               Yes     Positive
+
+Vòng 6   moves = 0   cost = 4836.5
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    552       29.25 (+1.361)  4.72 (+1.015)  Male    Married         Employee    Graduate                    Yes     Positive
+1    745       22.69 (-0.627)  4.51 (+0.869)  Female  Single          Student     Graduate                    Yes     Positive
+2    990       22.43 (-0.706)  2.28 (-0.708)  Male    Single          Student     Post Graduate               Yes     Positive
+3    713       26.68 (+0.582)  2.27 (-0.710)  Female  Single          Employee    Post Graduate               Yes     Positive
+
+====================================================================================================
+LẦN CHẠY 5/5   |   số vòng lặp = 7   |   cost cuối = 4786.6
+====================================================================================================
+
+Vòng 0 (khởi tạo)   cost = 5500.7
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    1346      22.74 (-0.611)  3.44 (+0.112)  Male    Single          Student     Graduate                    Yes     Positive
+1    678       29.29 (+1.372)  3.84 (+0.396)  Male    Married         Employee    Graduate                    No      Positive
+2    401       22.01 (-0.833)  2.17 (-0.781)  Male    Single          Student     Post Graduate               Yes     Positive
+3    575       26.05 (+0.392)  3.02 (-0.183)  Female  Single          Student     Post Graduate               Yes     Positive
+
+Vòng 1   moves = 923   cost = 4947.6
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    853       22.42 (-0.707)  4.23 (+0.672)  Male    Single          Student     Graduate                    Yes     Positive
+1    662       29.18 (+1.338)  4.33 (+0.744)  Male    Married         Employee    Graduate                    No      Positive
+2    810       22.54 (-0.671)  2.00 (-0.903)  Male    Single          Student     Post Graduate               Yes     Positive
+3    675       26.03 (+0.386)  2.58 (-0.496)  Female  Single          Employee    Post Graduate               Yes     Positive
+
+Vòng 2   moves = 311   cost = 4904.5
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    828       22.48 (-0.690)  4.34 (+0.748)  Male    Single          Student     Graduate                    Yes     Positive
+1    575       29.28 (+1.370)  4.61 (+0.942)  Male    Married         Employee    Graduate                    No      Positive
+2    805       22.45 (-0.699)  2.09 (-0.841)  Male    Single          Student     Post Graduate               Yes     Positive
+3    792       26.20 (+0.437)  2.41 (-0.611)  Female  Single          Employee    Post Graduate               Yes     Positive
+
+Vòng 3   moves = 241   cost = 4820.3
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    717       22.72 (-0.618)  4.59 (+0.923)  Male    Single          Student     Graduate                    Yes     Positive
+1    548       29.39 (+1.404)  4.66 (+0.976)  Male    Married         Employee    Graduate                    Yes     Positive
+2    975       22.36 (-0.726)  2.25 (-0.724)  Male    Single          Student     Post Graduate               Yes     Positive
+3    760       26.42 (+0.502)  2.36 (-0.646)  Female  Single          Employee    Post Graduate               Yes     Positive
+
+Vòng 4   moves = 141   cost = 4787.0
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    693       22.83 (-0.585)  4.70 (+1.007)  Male    Single          Student     Post Graduate               Yes     Positive
+1    525       29.50 (+1.437)  4.66 (+0.979)  Male    Married         Employee    Graduate                    Yes     Positive
+2    1056      22.41 (-0.712)  2.32 (-0.676)  Male    Single          Student     Post Graduate               Yes     Positive
+3    726       26.59 (+0.556)  2.31 (-0.685)  Female  Single          Employee    Post Graduate               Yes     Positive
+
+Vòng 5   moves = 19   cost = 4786.6
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    704       22.87 (-0.572)  4.70 (+1.003)  Male    Single          Student     Post Graduate               Yes     Positive
+1    523       29.51 (+1.438)  4.66 (+0.975)  Male    Married         Employee    Graduate                    Yes     Positive
+2    1062      22.42 (-0.709)  2.32 (-0.673)  Male    Single          Student     Post Graduate               Yes     Positive
+3    711       26.63 (+0.567)  2.28 (-0.704)  Female  Single          Employee    Post Graduate               Yes     Positive
+
+Vòng 6   moves = 1   cost = 4786.6
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    705       22.88 (-0.570)  4.70 (+1.003)  Male    Single          Student     Post Graduate               Yes     Positive
+1    522       29.51 (+1.440)  4.66 (+0.975)  Male    Married         Employee    Graduate                    Yes     Positive
+2    1062      22.42 (-0.709)  2.32 (-0.673)  Male    Single          Student     Post Graduate               Yes     Positive
+3    711       26.63 (+0.567)  2.28 (-0.704)  Female  Single          Employee    Post Graduate               Yes     Positive
+
+Vòng 7   moves = 0   cost = 4786.6
+Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
+---  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
+0    705       22.88 (-0.570)  4.70 (+1.003)  Male    Single          Student     Post Graduate               Yes     Positive
+1    522       29.51 (+1.440)  4.66 (+0.975)  Male    Married         Employee    Graduate                    Yes     Positive
+2    1062      22.42 (-0.709)  2.32 (-0.673)  Male    Single          Student     Post Graduate               Yes     Positive
+3    711       26.63 (+0.567)  2.28 (-0.704)  Female  Single          Employee    Post Graduate               Yes     Positive

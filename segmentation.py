@@ -6,7 +6,7 @@ import pandas as pd
 from kmodes.kprototypes import KPrototypes
 from sklearn.preprocessing import StandardScaler
 
-DATA_FILE = Path(__file__).parent / "online food delivery dataset 1000.csv"  # sinh bởi generate_dataset.py
+DATA_FILE = Path(__file__).parent / "online food delivery dataset 3000.csv"  # sinh bởi generate_dataset.py
 
 K = 4
 NUM_COLS = ["Age", "Family size"]
@@ -112,6 +112,37 @@ def predict(model, customers):
     X[NUM_COLS] = model.scaler.transform(X[NUM_COLS]).astype(float)
     labels = model.kp.predict(X.to_numpy(dtype=object), categorical=CAT_IDX)
     return [model.segment_names[label] for label in labels]
+
+
+def predict_partial(model, values):
+    """Xếp một khách vào cụm khi có thể thiếu một số thuộc tính (None = bỏ trống).
+
+    Khoảng cách K-Prototypes chỉ tính trên các thuộc tính đã có:
+        tổng (giá trị số chuẩn hóa - tâm)^2 + gamma * số thuộc tính phân loại khác tâm.
+    Đủ cả 8 thuộc tính thì cho đúng kết quả như predict(). Cần ít nhất Age hoặc Family size,
+    vì hai biến này quyết định ranh giới giữa các cụm; thiếu cả hai thì trả về None.
+    Trả về (tên cụm hoặc None, số thuộc tính đã dùng).
+    """
+    kp = model.kp
+    num_centroids = kp._enc_cluster_centroids[0]
+    cat_centroids = kp.cluster_centroids_[:, len(NUM_COLS):]
+    used = [c for c in NUM_COLS + CAT_COLS if values.get(c) is not None]
+    if not any(c in used for c in NUM_COLS):
+        return None, len(used)
+
+    best, best_dist = None, float("inf")
+    for k in range(len(num_centroids)):
+        dist = 0.0
+        for i, col in enumerate(NUM_COLS):
+            if values.get(col) is not None:
+                z = (float(values[col]) - model.scaler.mean_[i]) / model.scaler.scale_[i]
+                dist += (z - num_centroids[k][i]) ** 2
+        mismatch = sum(1 for i, col in enumerate(CAT_COLS)
+                       if values.get(col) is not None and values[col] != cat_centroids[k][i])
+        dist += kp.gamma * mismatch
+        if dist < best_dist:  # bằng nhau thì giữ cụm đứng trước, giống numpy.argmin
+            best, best_dist = k, dist
+    return model.segment_names[best], len(used)
 
 
 def segment_profile(customers):

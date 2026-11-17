@@ -1,4 +1,4 @@
-"""Mở rộng bộ dữ liệu gốc lên 1000 mẫu (sau khi làm sạch) bằng dữ liệu tổng hợp.
+"""Mở rộng bộ dữ liệu gốc lên TARGET mẫu (sau khi làm sạch, mặc định 3000) bằng dữ liệu tổng hợp.
 
 Cách sinh: lấy ngẫu nhiên một khách hàng có thật trong dữ liệu gốc làm "mẫu gốc",
 rồi tạo khách hàng mới gần giống mẫu đó:
@@ -12,8 +12,11 @@ Mẫu mới trùng hoàn toàn với mẫu đã có sẽ bị bỏ, nên sau bư
 trong segmentation.load_customers còn đúng TARGET mẫu.
 
 Toàn bộ 388 dòng gốc được giữ nguyên ở đầu file kết quả.
-Chạy lại: python generate_dataset.py  (random_state cố định nên kết quả không đổi)
+Chạy lại: python generate_dataset.py [số_mẫu]  -> "online food delivery dataset <số_mẫu>.csv"
+Seed cố định nên kết quả không đổi; các mẫu tổng hợp sinh theo cùng một thứ tự, nên bộ nhỏ
+(ví dụ 1000) là phần đầu của bộ lớn (ví dụ 3000).
 """
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -21,8 +24,8 @@ import pandas as pd
 
 HERE = Path(__file__).parent
 SOURCE = HERE / "online food delivery dataset.csv"
-OUTPUT = HERE / "online food delivery dataset 1000.csv"
-TARGET = 1000
+TARGET = int(sys.argv[1]) if len(sys.argv) > 1 else 3000
+OUTPUT = HERE / f"online food delivery dataset {TARGET}.csv"
 SEED = 42
 
 CAT_SWAP = ["Gender", "Marital Status", "Monthly Income", "Educational Qualifications",

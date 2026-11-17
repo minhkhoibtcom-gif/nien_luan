@@ -1,5 +1,14 @@
 [theme]
+# Tông đỏ - vàng của cửa hàng đồ ăn nhanh FASTBITE (giả định cho đồ án); màu dùng chung với ui.py
 base = "light"
+primaryColor = "#d62828"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#fff3e0"
+textColor = "#2b2d42"
+linkColor = "#d62828"
+borderColor = "#f3d6b0"
+baseRadius = "12px"
+chartCategoricalColors = ["#d62828", "#f6aa1c", "#2a9d8f", "#264653", "#e76f51"]
 
 [browser]
 gatherUsageStats = false
