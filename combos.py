@@ -40,9 +40,7 @@ SEGMENT_CODE = {"Sinh viên hộ nhỏ": "SVN", "Sinh viên hộ đông": "SVD",
 SEGMENT_NAME = {"Sinh viên hộ nhỏ": "Sinh Viên", "Sinh viên hộ đông": "Hội Bạn",
                 "Người đi làm trẻ": "Dân Văn Phòng", "Người có gia đình hộ đông": "Cả Nhà"}
 LOW_INCOME = {"Sinh viên hộ nhỏ", "Sinh viên hộ đông"}  # ~62% chưa có thu nhập: combo không có món phụ
-# % giảm theo cụm: sinh viên nhạy cảm giá giảm sâu; người đi làm cần tiện lợi giảm nhẹ; gia đình hay rời bỏ giảm vừa
-DISCOUNT = {"Sinh viên hộ nhỏ": 0.20, "Sinh viên hộ đông": 0.15,
-            "Người đi làm trẻ": 0.10, "Người có gia đình hộ đông": 0.15}
+DISCOUNT = 0.10  # mọi combo giảm 10% so với giá lẻ, rồi làm tròn xuống giá đuôi 5k / 9k (charm_price)
 SEGMENT_OFFER = {
     "Sinh viên hộ nhỏ": "Giảm thêm khi có thẻ sinh viên, miễn phí giao hàng.",
     "Sinh viên hộ đông": "",
@@ -154,6 +152,14 @@ def _pick(avg, group, total):
     return [(i, int(q)) for i, q in zip(rows["item_id"], _allocate(total, list(rows["avg"]))) if q > 0]
 
 
+def charm_price(price):
+    """Làm tròn xuống giá gần nhất có hàng nghìn là 5 hoặc 9 (…5.000₫ / …9.000₫), vd 102.600 → 99.000."""
+    k = int(price) // 1000
+    while k > 0 and k % 10 not in (5, 9):
+        k -= 1
+    return max(k, 1) * 1000
+
+
 def build_combo(segment, dtype, size, slot, month, n, avg, menu, source_note):
     """Combo cho đơn cỡ `size` người của ô (cụm, loại ngày), theo ràng buộc ở đầu file."""
     mains = _pick(avg, "Món chính", size)
@@ -168,7 +174,8 @@ def build_combo(segment, dtype, size, slot, month, n, avg, menu, source_note):
     items = tuple(mains + addons + sides + drinks)
 
     draft = Combo("", "", segment, "", items, 0, "", "", "")
-    price = int(list_price(draft, menu) * (1 - DISCOUNT[segment]) // 1000 * 1000)
+    list_total = list_price(draft, menu)
+    price = charm_price(list_total * (1 - DISCOUNT))
     names = menu.set_index("item_id")["name"]
     day_txt = "ngày thường" if dtype == "weekday" else "cuối tuần"
     code = f"{'WD' if dtype == 'weekday' else 'WE'}{slot}"
@@ -179,7 +186,8 @@ def build_combo(segment, dtype, size, slot, month, n, avg, menu, source_note):
         segment=segment, people=f"{size} người", items=items, price=price, offer=offer.strip(),
         reason=(f"Từ {n} đơn {size} người vào {day_txt} tháng {month_label(previous_month(month))} của cụm {segment} "
                 f"({source_note}); món chính mua nhiều nhất: {', '.join(names[i] for i, _ in mains)}; "
-                f"thức uống: {names[drinks[0][0]]}. Giảm {DISCOUNT[segment]:.0%} so với giá lẻ."),
+                f"thức uống: {names[drinks[0][0]]}. Giảm {DISCOUNT:.0%} so với giá lẻ, làm tròn xuống giá đuôi 5k/9k "
+                f"(thực giảm {1 - price / list_total:.0%})."),
         icon=ICON[(segment, dtype)], day_type=dtype, month=month, status="proposed")
 
 

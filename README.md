@@ -59,7 +59,7 @@ App đóng vai cửa hàng đồ ăn nhanh **FASTBITE** (tên giả định củ
 - **Thức uống**: đúng bằng số người và **cùng một loại**.
 - **Món thêm** (khoai, súp): số phần trung bình mỗi đơn, tối đa 2 loại; **Cơm trắng và Mì Ý thêm không có trong combo** (chỉ bán lẻ).
 - **Món phụ** (tráng miệng): không quá số người, tối đa 2 loại; **2 cụm sinh viên (thu nhập thấp) không có món phụ**.
-- Giá = giá lẻ − % giảm của cụm (20% / 15% / 10% / 15%).
+- Giá = giá lẻ giảm 10% rồi làm tròn xuống giá đuôi 5.000₫ hoặc 9.000₫ gần nhất (vd 102.600₫ → 99.000₫), nên thực giảm từ 10% trở lên.
 
 Admin xem lý do, sửa giá rồi **duyệt**; chưa duyệt thì khách tiếp tục thấy combo đã duyệt gần nhất (chưa từng duyệt thì thấy 8 combo mặc định bên dưới). **Combo ngày thường đặt được mọi ngày** (cuối tuần hiện và đặt được cả combo ngày thường lẫn combo cuối tuần); **combo cuối tuần chỉ đặt được Thứ 7–CN**, ngày thường vẫn xem được nhưng nút đặt bị khóa, trong giỏ bị khóa và ghi "Chỉ áp dụng Thứ 7–CN". Combo gợi ý cho khách là combo đặt được hôm nay có số người gần số người trong hộ nhất.
 
