@@ -1,13 +1,16 @@
 """Trang chủ (bố cục như trang chủ web La Che Fresca): banner, nhóm món, Dành cho bạn, combo khuyến mãi, thực đơn, cam kết."""
 import streamlit as st
 
+import combos
 import shared
 import ui
-from menu import CATEGORY_ICON, COMBOS, combos_for
+from menu import GROUP_ICON
 
 PAGES = shared.PAGES
 user = shared.current_user()
 menu = shared.menu()
+shown, combo_month = combos.displayed()
+today = combos.day_type()
 
 # ---------- Banner ----------
 with st.container(key="hero"):
@@ -40,10 +43,11 @@ if user is None or not shared.is_admin(user):
     segment = shared.user_segment(user)[0] if user else None
     if segment:
         combo, extra = shared.user_offer(user, segment)
-        ui.soft_note(f"<b>Combo gợi ý cho bạn: {ui.esc(combo.name)}</b> (viền vàng)<br>"
-                     f"<span style='font-size:.9rem'>Theo thông tin bạn đã điền, bạn thuộc nhóm khách hàng "
-                     f"<b>{ui.esc(segment)}</b>. {ui.esc(combo.reason)}</span>")
-        ui.combo_cards(combos_for(segment), menu, highlight=combo.combo_id, extra_offer=extra)
+        ui.soft_note(f"<b>Combo gợi ý cho bạn hôm nay: {ui.esc(combo.name)}</b> (viền vàng)<br>"
+                     f"<span style='font-size:.9rem'>Bạn thuộc nhóm khách hàng <b>{ui.esc(segment)}</b>. "
+                     f"Combo ngày thường đặt được mọi ngày; combo cuối tuần chỉ đặt được Thứ 7–CN.</span>")
+        ui.combo_cards(combos.for_segment(segment), menu, highlight=combo.combo_id if combo else None,
+                       extra_offer=extra, key_prefix="foryou", on_add=shared.add_to_cart)
     else:
         with st.container(key="card"):
             c1, c2 = st.columns([5, 1.4], vertical_alignment="center")
@@ -61,14 +65,25 @@ if user is None or not shared.is_admin(user):
                     st.switch_page(PAGES["account"])
 
 # ---------- Combo khuyến mãi ----------
-ui.section_title("Combo khuyến mãi")
-ui.combo_cards(COMBOS, menu)
+ui.section_title("Combo khuyến mãi" + (f" tháng {combos.month_label(combo_month)}" if combo_month else ""))
+if combo_month is None:  # chưa có combo tháng nào được duyệt: combo mặc định, áp dụng mọi ngày
+    ui.combo_cards(shown, menu, key_prefix="combo", on_add=shared.add_to_cart)
+else:
+    # Tab của loại ngày hôm nay đứng trước; tab còn lại vẫn xem được nhưng nút đặt bị khóa
+    # Combo ngày thường áp dụng mọi ngày; cuối tuần thì cả hai loại đều đặt được (tab cuối tuần đứng trước)
+    order = ["weekend", "weekday"] if today == "weekend" else ["weekday", "weekend"]
+    labels = [combos.DAY_LABEL[d] + (" · đang áp dụng" if d == "weekday" or today == "weekend" else "")
+              for d in order]
+    for dtype, tab in zip(order, st.tabs(labels)):
+        with tab:
+            ui.combo_cards([c for c in shown if c.day_type == dtype], menu, key_prefix=f"combo_{dtype}",
+                           on_add=shared.add_to_cart)
 
 # ---------- Thực đơn theo nhóm món ----------
 ui.section_title("Món lẻ")
-categories = list(CATEGORY_ICON)
-for cat, tab in zip(categories, st.tabs([f"{CATEGORY_ICON[c]} {c}" for c in categories])):
+groups = list(GROUP_ICON)
+for group, tab in zip(groups, st.tabs([f"{GROUP_ICON[g]} {g}" for g in groups])):
     with tab:
-        ui.item_cards(menu[menu["category"] == cat])
+        ui.item_cards(menu[menu["group"] == group], key_prefix=f"item_{group}", on_add=shared.add_to_cart)
 
 ui.features()

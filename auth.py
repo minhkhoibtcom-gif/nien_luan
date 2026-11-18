@@ -22,7 +22,8 @@ PASSWORD_MIN, PASSWORD_MAX = 8, 72
 
 # Cột hồ sơ được sửa trong trang Tài khoản (đều không bắt buộc)
 CONTACT_FIELDS = ["name", "phone", "address_line", "address_commune", "address_province"]
-SURVEY_FIELDS = ["age", "family_size", "gender", "marital_status", "occupation", "education", "output", "feedback"]
+# 6 thuộc tính khách tự khai; Output và Feedback của mô hình lấy từ đơn hàng và đánh giá (orders.py)
+SURVEY_FIELDS = ["age", "family_size", "gender", "marital_status", "occupation", "education"]
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS users (
@@ -38,29 +39,122 @@ CREATE TABLE IF NOT EXISTS users (
     address_line     TEXT,
     address_commune  TEXT,
     address_province TEXT,
-    -- 8 thuộc tính của mô hình phân khúc (giá trị giống bộ dữ liệu huấn luyện), NULL = khách bỏ trống
+    -- 6 thuộc tính của mô hình phân khúc do khách tự khai (giá trị giống bộ dữ liệu), NULL = bỏ trống
     age              INTEGER,
     family_size      INTEGER,
     gender           TEXT,
     marital_status   TEXT,
     occupation       TEXT,
     education        TEXT,
-    output           TEXT,
-    feedback         TEXT,
+    output           TEXT,     -- không còn dùng (lấy từ đơn hàng), giữ để tương thích users.db cũ
+    feedback         TEXT,     -- không còn dùng (lấy từ đánh giá đơn hàng)
     profile_updated_at TEXT
 );
+
+-- Đơn hàng: thông tin giao hàng là bản chụp lúc đặt (giống bảng orders của web La Che Fresca)
+CREATE TABLE IF NOT EXISTS orders (
+    order_id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id           INTEGER NOT NULL REFERENCES users (user_id) ON DELETE CASCADE,
+    name              TEXT NOT NULL,
+    phone             TEXT NOT NULL,
+    shipping_line     TEXT NOT NULL,
+    shipping_commune  TEXT NOT NULL,
+    shipping_province TEXT NOT NULL,
+    note              TEXT,
+    payment_method    TEXT NOT NULL DEFAULT 'cod' CHECK (payment_method IN ('cod', 'bank_transfer')),
+    total_amount      INTEGER NOT NULL CHECK (total_amount >= 0),
+    status            TEXT NOT NULL DEFAULT 'pending'
+                      CHECK (status IN ('pending', 'shipping', 'completed', 'cancelled')),
+    created_at        TEXT NOT NULL,
+    updated_at        TEXT NOT NULL,
+    -- Đánh giá dịch vụ cho cả đơn (1-5 sao), NULL = chưa đánh giá
+    rating            INTEGER CHECK (rating BETWEEN 1 AND 5),
+    rating_comment    TEXT,
+    rated_at          TEXT,
+    day_type          TEXT,     -- weekday (T2-T6) / weekend (T7-CN) lúc đặt
+    segment           TEXT      -- cụm của khách lúc đặt (NULL = chưa xếp được), dùng để tạo combo tháng sau
+);
+CREATE INDEX IF NOT EXISTS idx_orders_user ON orders (user_id, created_at);
+
+-- Chi tiết đơn: mỗi dòng là MỘT MÓN của menu.csv. Món trong combo được tách ra từng món,
+-- line_total là thành tiền thực trả (giá combo chia cho các món theo tỷ lệ giá lẻ, tổng đúng bằng giá combo).
+CREATE TABLE IF NOT EXISTS order_items (
+    line_id     INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id    INTEGER NOT NULL REFERENCES orders (order_id) ON DELETE CASCADE,
+    code        TEXT NOT NULL,
+    name        TEXT NOT NULL,
+    quantity    INTEGER NOT NULL CHECK (quantity > 0),
+    unit_price  INTEGER NOT NULL CHECK (unit_price >= 0),
+    line_total  INTEGER NOT NULL CHECK (line_total >= 0),
+    combo_id    TEXT,       -- món thuộc combo nào (NULL = món lẻ)
+    combo_name  TEXT,
+    combo_qty   INTEGER     -- số phần combo đã đặt
+);
+
+-- Combo theo tháng: hệ thống đề xuất từ đơn tháng trước (theo cụm x ngày thường/cuối tuần), admin duyệt
+CREATE TABLE IF NOT EXISTS combos (
+    combo_id    TEXT PRIMARY KEY,        -- VD: 2026-11-WE-SVD
+    month       TEXT NOT NULL,           -- tháng áp dụng YYYY-MM
+    day_type    TEXT NOT NULL CHECK (day_type IN ('weekday', 'weekend')),
+    segment     TEXT NOT NULL,
+    name        TEXT NOT NULL,
+    people      TEXT NOT NULL,
+    price       INTEGER NOT NULL CHECK (price >= 0),
+    offer       TEXT,
+    reason      TEXT,
+    icon        TEXT,
+    status      TEXT NOT NULL DEFAULT 'proposed' CHECK (status IN ('proposed', 'active', 'rejected')),
+    created_at  TEXT NOT NULL,
+    approved_at TEXT
+);
+CREATE TABLE IF NOT EXISTS combo_items (
+    combo_id    TEXT NOT NULL REFERENCES combos (combo_id) ON DELETE CASCADE,
+    item_id     TEXT NOT NULL,
+    quantity    INTEGER NOT NULL CHECK (quantity > 0),
+    PRIMARY KEY (combo_id, item_id)
+);
 """
+
+
+def _migrate(conn):
+    """Nâng cấp users.db tạo bởi phiên bản trước (thêm cột, đổi cấu trúc order_items) mà không mất dữ liệu."""
+    cols = {r[1] for r in conn.execute("PRAGMA table_info(orders)")}
+    for col in ("day_type", "segment"):
+        if col not in cols:
+            conn.execute(f"ALTER TABLE orders ADD COLUMN {col} TEXT")
+    cols = {r[1] for r in conn.execute("PRAGMA table_info(order_items)")}
+    if "line_id" not in cols:
+        conn.executescript("""
+            ALTER TABLE order_items RENAME TO order_items_old;
+            CREATE TABLE order_items (
+                line_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                order_id INTEGER NOT NULL REFERENCES orders (order_id) ON DELETE CASCADE,
+                code TEXT NOT NULL, name TEXT NOT NULL,
+                quantity INTEGER NOT NULL CHECK (quantity > 0),
+                unit_price INTEGER NOT NULL CHECK (unit_price >= 0),
+                line_total INTEGER NOT NULL CHECK (line_total >= 0),
+                combo_id TEXT, combo_name TEXT, combo_qty INTEGER);
+            INSERT INTO order_items (order_id, code, name, quantity, unit_price, line_total)
+                SELECT order_id, code, name, quantity, unit_price, quantity * unit_price FROM order_items_old;
+            DROP TABLE order_items_old;
+        """)
 
 
 class AuthError(Exception):
     """Lỗi hiển thị được cho người dùng (dữ liệu không hợp lệ, sai mật khẩu...)."""
 
 
-def _connect():
+def connect():
+    """Kết nối users.db (tạo bảng nếu chưa có). Dùng chung cho tài khoản và đơn hàng."""
     conn = sqlite3.connect(DB_FILE)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
     conn.executescript(SCHEMA)
+    _migrate(conn)
     return conn
+
+
+_connect = connect
 
 
 def _now():

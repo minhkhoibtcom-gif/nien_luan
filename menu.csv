@@ -1,36 +1,37 @@
-item_id,category,name,price
-G01,Gà giòn,Gà Giòn Vui Vẻ 1 miếng,33000
-G02,Gà giòn,Gà Giòn Vui Vẻ 2 miếng,66000
-G04,Gà giòn,Gà Giòn Vui Vẻ 4 miếng,126000
-G06,Gà giòn,Gà Giòn Vui Vẻ 6 miếng,188000
-G11,Gà giòn,Gà Sốt Cay 1 miếng,35000
-G12,Gà giòn,Gà Sốt Cay 2 miếng,70000
-M01,Mì Ý,Mì Ý Jolly vừa,35000
-M02,Mì Ý,Mì Ý Jolly lớn,45000
-M03,Mì Ý,Mì Ý Sốt Cay vừa,40000
-C01,Cơm,Cơm Gà Giòn Vui Vẻ,48000
-C02,Cơm,Cơm Gà Sốt Cay,50000
-C03,Cơm,Cơm Gà Mắm Tỏi,35000
-B01,Burger,Burger Gà Giòn,35000
-B02,Burger,Burger Tôm,40000
-P01,Món phụ,Khoai tây chiên vừa,20000
-P02,Món phụ,Khoai tây chiên lớn,25000
-P03,Món phụ,Khoai tây lắc BBQ vừa,25000
-P04,Món phụ,Khoai tây lắc BBQ lớn,35000
-P05,Món phụ,Súp bí đỏ,15000
-P06,Món phụ,Cơm trắng,10000
-T01,Tráng miệng,Bánh Xoài Đào,15000
-T02,Tráng miệng,Tropical Sundae,20000
-T03,Tráng miệng,Kem Sundae Dâu,15000
-T04,Tráng miệng,Kem Sundae Socola,15000
-T05,Tráng miệng,Kem Sôcôla (cúp),7000
-T06,Tráng miệng,Kem Sữa Tươi (cúp),5000
-N01,Thức uống,Pepsi vừa,12000
-N02,Thức uống,Pepsi lớn,17000
-N03,Thức uống,Mirinda vừa,12000
-N04,Thức uống,7Up vừa,12000
-N05,Thức uống,Trà Chanh Hạt Chia,20000
-N06,Thức uống,Nước ép xoài đào,20000
-N07,Thức uống,Cacao sữa đá vừa,20000
-N08,Thức uống,Cacao sữa đá lớn,25000
-N09,Thức uống,Nước suối,8000
+item_id,group,category,name,price
+G01,Món chính,Gà giòn,Gà Giòn Vui Vẻ 1 miếng,33000
+G02,Món chính,Gà giòn,Gà Giòn Vui Vẻ 2 miếng,66000
+G04,Món chính,Gà giòn,Gà Giòn Vui Vẻ 4 miếng,126000
+G06,Món chính,Gà giòn,Gà Giòn Vui Vẻ 6 miếng,188000
+G11,Món chính,Gà giòn,Gà Sốt Cay 1 miếng,35000
+G12,Món chính,Gà giòn,Gà Sốt Cay 2 miếng,70000
+M01,Món chính,Mì Ý,Mì Ý Jolly vừa,35000
+M02,Món chính,Mì Ý,Mì Ý Jolly lớn,45000
+M03,Món chính,Mì Ý,Mì Ý Sốt Cay vừa,40000
+C01,Món chính,Cơm,Cơm Gà Giòn Vui Vẻ,48000
+C02,Món chính,Cơm,Cơm Gà Sốt Cay,50000
+C03,Món chính,Cơm,Cơm Gà Mắm Tỏi,35000
+B01,Món chính,Burger,Burger Gà Giòn,35000
+B02,Món chính,Burger,Burger Tôm,40000
+P01,Món thêm,Món thêm,Khoai tây chiên vừa,20000
+P02,Món thêm,Món thêm,Khoai tây chiên lớn,25000
+P03,Món thêm,Món thêm,Khoai tây lắc BBQ vừa,25000
+P04,Món thêm,Món thêm,Khoai tây lắc BBQ lớn,35000
+P05,Món thêm,Món thêm,Súp bí đỏ,15000
+P06,Món thêm,Món thêm,Cơm trắng,10000
+P07,Món thêm,Món thêm,Mì Ý thêm,7000
+T01,Món phụ,Món phụ,Bánh Xoài Đào,15000
+T02,Món phụ,Món phụ,Tropical Sundae,20000
+T03,Món phụ,Món phụ,Kem Sundae Dâu,15000
+T04,Món phụ,Món phụ,Kem Sundae Socola,15000
+T05,Món phụ,Món phụ,Kem Sôcôla (cúp),7000
+T06,Món phụ,Món phụ,Kem Sữa Tươi (cúp),5000
+N01,Thức uống,Thức uống,Pepsi vừa,12000
+N02,Thức uống,Thức uống,Pepsi lớn,17000
+N03,Thức uống,Thức uống,Mirinda vừa,12000
+N04,Thức uống,Thức uống,7Up vừa,12000
+N05,Thức uống,Thức uống,Trà Chanh Hạt Chia,20000
+N06,Thức uống,Thức uống,Nước ép xoài đào,20000
+N07,Thức uống,Thức uống,Cacao sữa đá vừa,20000
+N08,Thức uống,Thức uống,Cacao sữa đá lớn,25000
+N09,Thức uống,Thức uống,Nước suối,8000

@@ -4,9 +4,11 @@ import pandas as pd
 import streamlit as st
 
 import auth
+import combos
+import orders
 import shared
 import ui
-from menu import COMBOS, MENU_SOURCE, combos_for, list_price, pick_combo, retention_offer
+from menu import MENU_SOURCE, combo_lines, list_price, retention_offer
 from segmentation import (CAT_COLS, CATEGORY_ORDER, DISPLAY_NAMES, HIDDEN_COLS,
                           SEGMENT_ORDER, STRATEGIES, predict, segment_profile)
 
@@ -89,11 +91,11 @@ def show_strategy(segment):
 
 
 def show_combos(segment, highlight=None, extra=None):
-    """Combo khuyến mãi của cụm; highlight = combo chọn cho khách (viền vàng)."""
-    combos = combos_for(segment)
-    ui.soft_note("<br>".join(f"<b>{ui.esc(c.name)}</b> ({ui.esc(c.people)}): "
-                             f"<span style='font-size:.9rem'>{ui.esc(c.reason)}</span>" for c in combos))
-    ui.combo_cards(combos, shared.menu(), highlight=highlight, extra_offer=extra, columns=3)
+    """Combo khuyến mãi đang áp dụng của cụm; highlight = combo chọn cho khách (viền vàng)."""
+    mine = combos.for_segment(segment)
+    ui.soft_note("<br>".join(f"<b>{ui.esc(c.name)}</b> ({ui.esc(c.people)}, {combos.DAY_SHORT[c.day_type]}): "
+                             f"<span style='font-size:.9rem'>{ui.esc(c.reason)}</span>" for c in mine))
+    ui.combo_cards(mine, shared.menu(), highlight=highlight, extra_offer=extra, columns=3)
 
 
 model = shared.load_model()
@@ -106,8 +108,131 @@ ui.hero("Khu vực quản trị",
         ["K-Prototypes", "4 cụm", f"{len(customers)} khách hàng"])
 st.write("")
 
-tab_new, tab_overview, tab_list, tab_accounts = st.tabs(
-    ["Phân khúc khách mới", "Tổng quan các cụm", "Danh sách khách hàng", "Tài khoản khách hàng"])
+tab_orders, tab_combos, tab_new, tab_overview, tab_list, tab_accounts = st.tabs(
+    ["Đơn hàng", "Combo theo tháng", "Phân khúc khách mới", "Tổng quan các cụm", "Danh sách khách hàng",
+     "Tài khoản khách hàng"])
+
+# ---------- Combo theo tháng: đề xuất từ số lượng món mỗi cụm mua theo ngày thường / cuối tuần ----------
+with tab_combos:
+    month = combos.current_month()
+    prev = combos.previous_month(month)
+    combos.ensure_proposals(month)  # đầu tháng tự tạo đề xuất (chưa áp dụng cho tới khi duyệt)
+    shown, shown_month = combos.displayed()
+    st.markdown(f"#### Combo tháng {combos.month_label(month)}")
+    if shown_month == month:
+        st.success(f"Khách đang thấy {len(shown)} combo đã duyệt của tháng {combos.month_label(month)}.")
+    elif shown_month:
+        st.warning(f"Chưa duyệt combo nào của tháng này, khách đang thấy combo tháng {combos.month_label(shown_month)}.")
+    else:
+        st.warning("Chưa từng duyệt combo theo tháng, khách đang thấy 8 combo mặc định (áp dụng mọi ngày).")
+    st.caption(f"Mỗi tháng hệ thống đề xuất combo từ đơn tháng {combos.month_label(prev)}: mỗi cụm 2 combo ngày thường "
+               f"(2 cỡ đơn phổ biến nhất) và 1 combo cuối tuần (cỡ đơn phổ biến nhất), mỗi cỡ cần từ {combos.MIN_ORDERS} đơn. "
+               "Ràng buộc: món chính = số người, tối đa 2 loại; thức uống = số người, cùng một loại; món phụ không quá "
+               "số người, 2 cụm sinh viên không có món phụ; Cơm trắng và Mì Ý thêm không vào combo. "
+               "Combo ngày thường đặt được mọi ngày, combo cuối tuần chỉ Thứ 7–CN.")
+
+    lines = combos.order_lines(prev)
+    summary = combos.cell_summary(lines)
+    if summary.empty:
+        st.info(f"Chưa có đơn nào của tháng {combos.month_label(prev)} để tạo đề xuất.")
+    else:
+        st.markdown(f"**Số đơn tháng {combos.month_label(prev)} theo cụm × loại ngày**")
+        pivot = summary.pivot(index="segment", columns="day_type", values="orders").reindex(SEGMENT_ORDER)
+        pivot = pivot.rename(columns={"weekday": "Ngày thường", "weekend": "Cuối tuần"}).fillna(0).astype(int)
+        st.dataframe(pivot, width="stretch")
+        st.caption(f"Gồm {int(summary['real'].sum())} đơn thật và {int(summary['simulated'].sum())} đơn mô phỏng "
+                   "(simulated_orders.csv, dữ liệu giả lập để minh họa).")
+        c1, c2, c3 = st.columns(3)
+        seg_pick = c1.selectbox("Xem món mua nhiều nhất của cụm", SEGMENT_ORDER, key="cm_seg")
+        day_pick = c2.selectbox("Loại ngày", ["weekday", "weekend"], key="cm_day",
+                                format_func={"weekday": "Ngày thường", "weekend": "Cuối tuần"}.get)
+        sizes = combos.size_summary(lines, seg_pick, day_pick)
+        size_pick = c3.selectbox("Cỡ đơn (số người)", list(sizes.index), key="cm_size",
+                                 format_func=lambda s: f"{s} người ({sizes[s]} đơn)")
+        n, avg = combos.item_averages(lines, seg_pick, day_pick, shared.menu(), size_pick)
+        if n:
+            st.dataframe(avg.head(10).rename(columns={"name": "Món", "group": "Nhóm món",
+                                                      "avg": "Số phần TB / đơn"})[["Món", "Nhóm món", "Số phần TB / đơn"]]
+                         .round(2), width="stretch", hide_index=True)
+
+    if st.button("Tạo lại đề xuất từ dữ liệu tháng trước", icon=":material/refresh:",
+                 help="Thay các đề xuất chưa duyệt; combo đã duyệt giữ nguyên"):
+        combos.save_proposals(month, combos.suggest(month)[0])
+        shared.flash("success", "Đã tạo lại đề xuất combo.")
+        st.rerun()
+
+    menu = shared.menu()
+    all_month = combos.month_combos(month)
+    proposed = [c for c in all_month if c.status == "proposed"]
+    if proposed and st.button(f"Duyệt tất cả {len(proposed)} đề xuất", type="primary", icon=":material/done_all:"):
+        for c in proposed:
+            combos.approve(c.combo_id)
+        shared.flash("success", f"Đã duyệt {len(proposed)} combo tháng {combos.month_label(month)}.")
+        st.rerun()
+    for c in all_month:
+        lp = list_price(c, menu)
+        status = {"proposed": "Chờ duyệt", "active": "Đang áp dụng", "rejected": "Đã bỏ"}[c.status]
+        with st.expander(f"{c.icon} {c.name} · {c.segment} · {combos.DAY_SHORT[c.day_type]} · "
+                         f"{ui.vnd(c.price)} · {status}"):
+            st.markdown("\n".join(f"- {x}" for x in combo_lines(c, menu)))
+            st.caption(f"{c.reason}  \nGiá lẻ {ui.vnd(lp)} → giá combo {ui.vnd(c.price)} "
+                       f"(giảm {1 - c.price / lp:.0%}). {c.offer}")
+            if c.status != "active":
+                p1, p2, p3 = st.columns([2, 1, 1], vertical_alignment="bottom")
+                price = p1.number_input("Giá combo (₫)", min_value=1000, max_value=lp, step=1000, value=c.price,
+                                        key=f"price_{c.combo_id}")
+                if p2.button("Duyệt", key=f"ok_{c.combo_id}", type="primary", width="stretch"):
+                    combos.approve(c.combo_id, price)
+                    shared.flash("success", f"Đã duyệt {c.name}.")
+                    st.rerun()
+                if c.status == "proposed" and p3.button("Bỏ", key=f"no_{c.combo_id}", width="stretch"):
+                    combos.reject(c.combo_id)
+                    st.rerun()
+
+# ---------- Đơn hàng (như tab Đơn hàng của web: lọc, tìm, chuyển trạng thái) ----------
+ACTION_LABEL = {"shipping": "Xác nhận & giao", "completed": "Hoàn tất", "cancelled": "Hủy đơn"}
+with tab_orders:
+    counts, revenue = orders.order_stats()
+    m = st.columns(4)
+    m[0].metric("Chờ xác nhận", counts.get("pending", 0))
+    m[1].metric("Đang giao", counts.get("shipping", 0))
+    m[2].metric("Hoàn tất", counts.get("completed", 0))
+    m[3].metric("Doanh thu (đơn hoàn tất)", ui.vnd(revenue))
+    f1, f2 = st.columns([1, 2])
+    status = f1.selectbox("Trạng thái", ["all"] + list(orders.STATUS_LABEL),
+                          format_func=lambda s: "Tất cả" if s == "all" else orders.STATUS_LABEL[s])
+    query = f2.text_input("Tìm theo mã đơn, tên hoặc SĐT người nhận", placeholder="VD: DH00000001")
+    found = orders.all_orders(status, query)
+    if not found:
+        st.info("Không có đơn hàng phù hợp.")
+    for o in found:
+        title = (f"{orders.order_code(o['order_id'])} · {o['name']} · {o['created_at'][:16]} · "
+                 f"{ui.vnd(o['total_amount'])} · {orders.STATUS_LABEL[o['status']]}")
+        with st.expander(title):
+            st.markdown("\n".join(f"- {title} = {ui.vnd(total)}" + (f"  \n  <small>{detail}</small>" if detail else "")
+                                  for title, detail, total in orders.display_lines(o)), unsafe_allow_html=True)
+            if o.get("segment"):
+                st.caption(f"Cụm lúc đặt: {o['segment']} · {combos.DAY_LABEL.get(o['day_type'], '')}")
+            st.caption(f"Tài khoản: {o['email']} · Người nhận: {o['name']} · {o['phone']}  \n"
+                       f"Địa chỉ: {o['shipping_line']}, {o['shipping_commune']}, {o['shipping_province']}  \n"
+                       f"{orders.PAYMENT_LABEL[o['payment_method']]}"
+                       + (f"  \nGhi chú: {o['note']}" if o["note"] else "")
+                       + (f"  \nĐánh giá: {'★' * o['rating']}{'☆' * (5 - o['rating'])}"
+                          + (f" — {o['rating_comment']}" if o["rating_comment"] else "") if o["rating"]
+                          else "  \nChưa đánh giá"))
+            nexts = orders.NEXT_STATUS.get(o["status"], [])
+            if nexts:
+                bcols = st.columns(len(nexts) + 2)
+                for col, nxt in zip(bcols, nexts):
+                    if col.button(ACTION_LABEL[nxt], key=f"st_{o['order_id']}_{nxt}", width="stretch",
+                                  type="secondary" if nxt == "cancelled" else "primary"):
+                        try:
+                            orders.set_status(o["order_id"], nxt)
+                            shared.flash("success", f"Đơn {orders.order_code(o['order_id'])}: "
+                                                    f"{orders.STATUS_LABEL[nxt]}.")
+                        except orders.OrderError as e:
+                            shared.flash("error", str(e))
+                        st.rerun()
 
 # ---------- Phân khúc khách mới ----------
 with tab_new:
@@ -155,10 +280,10 @@ with tab_new:
         st.caption("Các cụm chồng lấn khá nhiều nên kết quả mang tính tham khảo, "
                    "khách ở gần ranh giới có thể phù hợp với cả cụm lân cận.")
 
-        combo = pick_combo(segment, family)
+        combo = combos.pick_for(segment, family)
         extra = retention_offer(output, feedback)
-        st.markdown(f"**Combo khuyến mãi cho khách này: {combo.name}** (chọn theo số người trong hộ = {family}); "
-                    f"ưu đãi kèm theo trạng thái của khách: {extra}")
+        st.markdown(f"**Combo khuyến mãi cho khách này hôm nay: {combo.name}** "
+                    f"({combos.DAY_LABEL[combo.day_type]}); ưu đãi kèm theo trạng thái của khách: {extra}")
         show_combos(segment, highlight=combo.combo_id, extra=extra)
 
 # ---------- Tổng quan các cụm ----------
@@ -179,13 +304,15 @@ with tab_overview:
         with st.expander(f"{segment} ({profile.loc[segment, 'Số khách']} khách)"):
             show_strategy(segment)
 
-    st.subheader("Combo khuyến mãi theo cụm")
-    st.caption(f"{MENU_SOURCE} Giá lẻ của combo tính tự động từ menu.csv; cỡ combo chọn theo số người trong hộ.")
+    st.subheader("Combo khuyến mãi đang áp dụng theo cụm")
+    st.caption(f"{MENU_SOURCE} Giá lẻ của combo tính tự động từ menu.csv. Quản lý combo theo tháng ở tab "
+               "\"Combo theo tháng\".")
     menu = shared.menu()
     st.dataframe(pd.DataFrame([{
-        "Cụm": c.segment, "Combo": c.name, "Phục vụ": c.people, "Giá lẻ": list_price(c, menu),
-        "Giá combo": c.price, "Giảm (%)": round((1 - c.price / list_price(c, menu)) * 100),
-        "Ưu đãi": c.offer} for c in COMBOS]), width="stretch", hide_index=True)
+        "Cụm": c.segment, "Combo": c.name, "Áp dụng": combos.DAY_SHORT[c.day_type], "Phục vụ": c.people,
+        "Giá lẻ": list_price(c, menu), "Giá combo": c.price,
+        "Giảm (%)": round((1 - c.price / list_price(c, menu)) * 100), "Ưu đãi": c.offer}
+        for c in combos.displayed()[0]]), width="stretch", hide_index=True)
     for segment, tab in zip(SEGMENT_ORDER, st.tabs(SEGMENT_ORDER)):
         with tab:
             show_combos(segment)
@@ -210,14 +337,19 @@ with tab_accounts:
     for u in auth.all_customers():
         segment, used = shared.user_segment(u)
         address = ", ".join(x for x in (u["address_line"], u["address_commune"], u["address_province"]) if x)
+        b = orders.behavior(u["user_id"])
+        offer = shared.user_offer(u, segment) if segment else (None, None)
         rows.append({
             "Mã": u["user_id"], "Họ tên": u["name"], "Email": u["email"], "SĐT": u["phone"] or "",
             "Địa chỉ": address, "Tuổi": u["age"], "Số người": u["family_size"],
             **{shared.FIELD_LABELS[f]: L[f].get(u[f], "") for f in
-               ("gender", "marital_status", "occupation", "education", "output", "feedback")},
-            "Số thông tin đã điền": used, "Nhóm": segment or "Chưa xếp được",
-            "Combo gợi ý": shared.user_offer(u, segment)[0].name if segment else "",
-            "Ưu đãi riêng": (shared.user_offer(u, segment)[1] or "") if segment else "",
+               ("gender", "marital_status", "occupation", "education")},
+            "Số đơn": b["orders"], "Đơn gần nhất": (b["last_order"] or "")[:10],
+            "Sao TB": b["avg_rating"],
+            f"Còn đặt ({orders.ACTIVE_DAYS} ngày)": L["output"].get(b["output"], ""),
+            "Hài lòng": L["feedback"].get(b["feedback"], ""),
+            "Số thông tin dùng": used, "Nhóm": segment or "Chưa xếp được",
+            "Combo gợi ý": offer[0].name if offer[0] else "", "Ưu đãi riêng": offer[1] or "",
             "Ngày đăng ký": u["created_at"][:10],
         })
     accounts = pd.DataFrame(rows)

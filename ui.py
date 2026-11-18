@@ -10,7 +10,8 @@ from pathlib import Path
 
 import streamlit as st
 
-from menu import CATEGORY_ICON, MENU_SOURCE, combo_lines, image_path, list_price
+import combos
+from menu import CATEGORY_ICON, GROUP_ICON, MENU_SOURCE, combo_lines, image_path, list_price
 
 ASSETS = Path(__file__).parent / "assets"
 LOGO = ASSETS / "logo.png"
@@ -26,22 +27,32 @@ INK = "#2b2d42"
 
 CSS = f"""
 <style>
-header[data-testid="stHeader"] {{ background: transparent; }}
-.block-container {{ padding-top: 1rem; max-width: 1200px; }}
+/* Ẩn thanh header mặc định của Streamlit (vẽ đè một đường kẻ ngang lên thanh menu) */
+header[data-testid="stHeader"], [data-testid="stDecoration"] {{ display: none; }}
+.block-container {{ padding-top: 1.5rem; max-width: 1200px; }}
+/* Ẩn dòng "Press Enter to submit form" và bộ đếm ký tự dưới ô nhập */
+[data-testid="InputInstructions"] {{ display: none !important; }}
 
-/* Thanh trên cùng */
+/* Thanh trên cùng: container xếp ngang, các nhóm tự giãn đều, chữ không bị cắt */
 .st-key-navbar {{
   background: linear-gradient(135deg, #fff8ec 0%, {CREAM} 50%, #ffffff 100%);
   border: 1px solid rgba(214, 40, 40, .15); border-radius: 14px; padding: .55rem 1rem;
 }}
-.st-key-navbar [data-testid="stPageLink"] a {{ font-weight: 600; }}
-.st-key-navbar [data-testid="stPageLink"] a p {{ color: {INK}; }}
+.st-key-navbar [data-testid="stPageLink"] a {{ font-weight: 600; white-space: nowrap; }}
+.st-key-navbar [data-testid="stPageLink"] a p {{ color: {INK}; white-space: nowrap; }}
 .st-key-navbar [data-testid="stPageLink"] a:hover p {{ color: {RED}; }}
+.st-key-navbar [data-testid="stMarkdownContainer"] p {{ margin: 0; }}
+/* Logo + tên cửa hàng là một nút: bấm vào về trang chủ */
+.st-key-brand button {{
+  background: url("{{logo}}") left center / 40px 40px no-repeat !important;
+  padding: 0 0 0 52px !important; min-height: 40px; border: none !important; box-shadow: none !important;
+}}
+.st-key-brand button p {{ color: {RED} !important; font-size: 1.35rem !important; font-weight: 800; letter-spacing: .5px; }}
+.st-key-brand button:hover p {{ color: {RED_DARK} !important; }}
 .lcf-brand-row {{ display: flex; align-items: center; gap: .6rem; }}
 .lcf-brand-row img {{ width: 40px; height: 40px; border-radius: 10px; object-fit: cover; }}
 .lcf-brand {{ color: {RED}; font-size: 1.35rem; font-weight: 800; line-height: 1; white-space: nowrap; letter-spacing: .5px; }}
-.lcf-hello {{ text-align: right; font-weight: 600; color: {INK}; padding-top: .45rem; white-space: nowrap;
-  overflow: hidden; text-overflow: ellipsis; }}
+.lcf-hello {{ font-weight: 600; color: {INK}; white-space: nowrap; }}
 
 /* Banner */
 .st-key-hero, .lcf-hero {{
@@ -71,7 +82,7 @@ div[data-testid="stMetricValue"] {{ color: {RED_DARK}; }}
 .lcf-section-soft {{ background: {CREAM}; border-radius: 14px; padding: 1rem 1.2rem; margin: .5rem 0 1rem; }}
 
 /* Nhóm món */
-.lcf-cats {{ display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .8rem; }}
+.lcf-cats {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .8rem; }}
 .lcf-cat {{ background: #fff; border-radius: 12px; padding: 1rem .5rem; text-align: center;
   box-shadow: 0 .125rem .5rem rgba(0, 0, 0, .08); transition: transform .15s, box-shadow .15s; }}
 .lcf-cat:hover {{ transform: translateY(-4px); box-shadow: 0 .5rem 1rem rgba(214, 40, 40, .2); }}
@@ -89,6 +100,11 @@ div[data-testid="stMetricValue"] {{ color: {RED_DARK}; }}
 }}
 .lcf-card:hover {{ transform: translateY(-4px); box-shadow: 0 .75rem 1.5rem rgba(214, 40, 40, .18); }}
 .lcf-card.lcf-highlight {{ outline: 3px solid {YELLOW}; }}
+.lcf-badge.lcf-day {{ background: #eef1f6; color: #555; }}
+.lcf-badge.lcf-day-on {{ background: #e3f6e8; color: #1b7a3a; }}
+/* Thẻ trong cột Streamlit: cao bằng nhau để nút Thêm vào giỏ thẳng hàng */
+.lcf-card.lcf-combo {{ min-height: 500px; margin-bottom: .5rem; }}
+.lcf-card.lcf-item {{ min-height: 300px; margin-bottom: .5rem; }}
 .lcf-card img {{ width: 100%; height: 160px; object-fit: cover; background: #fff; }}
 .lcf-emoji {{ height: 160px; display: flex; align-items: center; justify-content: center; font-size: 4rem;
   background: linear-gradient(135deg, {CREAM} 0%, #fff8ec 100%); }}
@@ -156,12 +172,13 @@ def vnd(n):
 
 
 def apply_theme():
-    html_block(CSS)
+    html_block(CSS.replace("{logo}", data_uri(LOGO)))
 
 
-def brand():
-    html_block(f'<div class="lcf-brand-row"><img src="{data_uri(LOGO)}" alt="">'
-               f'<span class="lcf-brand">{SITE_NAME}</span></div>')
+def brand_button():
+    """Logo + tên cửa hàng trên thanh menu; trả về True khi được bấm (nơi gọi chuyển về trang chủ)."""
+    return st.button(SITE_NAME, key="brand", type="tertiary", help="Về trang chủ")
+
 
 
 def hero(title, text, badges=()):
@@ -185,9 +202,10 @@ def soft_note(markup):
 
 
 def categories(menu):
-    counts = menu["category"].value_counts()
-    tiles = "".join(f'<div class="lcf-cat"><div class="lcf-cat-icon">{icon}</div><div>{esc(cat)}</div>'
-                    f'<small>{counts.get(cat, 0)} món</small></div>' for cat, icon in CATEGORY_ICON.items())
+    """Ô nhóm lớn của thực đơn: Món chính (gà giòn, mì Ý, cơm, burger), Món thêm, Món phụ, Thức uống."""
+    counts = menu["group"].value_counts()
+    tiles = "".join(f'<div class="lcf-cat"><div class="lcf-cat-icon">{icon}</div><div>{esc(group)}</div>'
+                    f'<small>{counts.get(group, 0)} món</small></div>' for group, icon in GROUP_ICON.items())
     html_block(f'<div class="lcf-cats">{tiles}</div>')
 
 
@@ -212,37 +230,61 @@ def _picture(code, icon):
     return f'<img src="{img}" alt="">' if img else f'<div class="lcf-emoji">{icon}</div>'
 
 
-def item_cards(items):
+def _card_grid(entries, columns, key_prefix, on_add):
+    """Vẽ thẻ theo hàng `columns` cột; mỗi thẻ kèm nút "Thêm vào giỏ" (on_add=None thì không có nút).
+    entries: [(mã, tên hiển thị, html thẻ, đặt được hôm nay?, ghi chú khi chưa đặt được)]."""
+    for start in range(0, len(entries), columns):
+        cols = st.columns(columns, gap="medium")
+        for col, (code, label, card, ok, note) in zip(cols, entries[start:start + columns]):
+            with col:
+                html_block(card)
+                if not on_add:
+                    continue
+                if not ok:
+                    st.button(note, key=f"{key_prefix}_{code}", icon=":material/event_busy:", disabled=True,
+                              width="stretch")
+                elif st.button("Thêm vào giỏ", key=f"{key_prefix}_{code}", icon=":material/add_shopping_cart:",
+                               type="primary", width="stretch"):
+                    on_add(code, label)
+
+
+def item_cards(items, key_prefix="item", on_add=None, columns=4):
     """Thẻ món lẻ: ảnh (hoặc biểu tượng nhóm món), nhóm món, tên, giá."""
-    cards = "".join(
-        f'<div class="lcf-card">{_picture(r.item_id, CATEGORY_ICON.get(r.category, "🍽️"))}'
-        f'<div class="lcf-card-body"><span class="lcf-badge" style="align-self:flex-start">{esc(r.category)}</span>'
-        f'<div class="lcf-card-name">{esc(r.name)}</div>'
-        f'<div class="lcf-price-row"><span class="lcf-price">{vnd(r.price)}</span></div></div></div>'
-        for r in items.itertuples())
-    html_block(f'<div class="lcf-grid">{cards}</div>')
+    entries = [(r.item_id, r.name,
+                f'<div class="lcf-card lcf-item">{_picture(r.item_id, CATEGORY_ICON.get(r.category, "🍽️"))}'
+                f'<div class="lcf-card-body"><span class="lcf-badge" style="align-self:flex-start">{esc(r.category)}</span>'
+                f'<div class="lcf-card-name">{esc(r.name)}</div>'
+                f'<div class="lcf-price-row"><span class="lcf-price">{vnd(r.price)}</span></div></div></div>',
+                True, "")
+               for r in items.itertuples()]
+    _card_grid(entries, columns, key_prefix, on_add)
 
 
-def combo_cards(combos, menu, highlight=None, extra_offer=None, columns=4):
+def combo_cards(combo_list, menu, highlight=None, extra_offer=None, columns=4, key_prefix="combo", on_add=None):
     """Thẻ combo: thành phần, ưu đãi, giá lẻ gạch ngang, giá combo, % tiết kiệm.
     highlight: combo_id được viền vàng (combo của khách); extra_offer: ưu đãi riêng của khách."""
-    cards = []
-    for c in combos:
+    entries = []
+    for c in combo_list:
         lp = list_price(c, menu)
         lines = "".join(f"<li>{esc(x)}</li>" for x in combo_lines(c, menu))
-        offer = esc(c.offer) + (f"<br><b>Dành riêng cho bạn:</b> {esc(extra_offer)}"
-                                if extra_offer and c.combo_id == highlight else "")
-        cls = "lcf-card lcf-highlight" if c.combo_id == highlight else "lcf-card"
-        cards.append(
+        parts = [esc(c.offer)] if c.offer else []
+        if extra_offer and c.combo_id == highlight:
+            parts.append(f"<b>Dành riêng cho bạn:</b> {esc(extra_offer)}")
+        offer = f'<div class="lcf-offer">{"<br>".join(parts)}</div>' if parts else ""
+        cls = "lcf-card lcf-combo lcf-highlight" if c.combo_id == highlight else "lcf-card lcf-combo"
+        ok = combos.is_available(c)
+        day = "" if c.day_type == "all" else (
+            f'<span class="lcf-badge lcf-day{" lcf-day-on" if ok else ""}">{esc(combos.DAY_SHORT[c.day_type])}'
+            f'{" · hôm nay" if ok and c.day_type == "weekend" else ""}</span>')
+        entries.append((c.combo_id, f"Combo {c.name}",
             f'<div class="{cls}">{_picture(c.combo_id, c.icon)}<div class="lcf-card-body">'
-            f'<span class="lcf-badge" style="align-self:flex-start">{esc(c.people)}</span>'
+            f'<div><span class="lcf-badge">{esc(c.people)}</span>{day}</div>'
             f'<div class="lcf-card-name">Combo {esc(c.name)}</div><ul>{lines}</ul>'
-            f'<div class="lcf-offer">{offer}</div>'
+            f'{offer}'
             f'<div class="lcf-price-row"><span class="lcf-price">{vnd(c.price)}</span>'
             f'<span class="lcf-old">{vnd(lp)}</span><span class="lcf-save">-{1 - c.price / lp:.0%}</span></div>'
-            f'</div></div>')
-    grid = "lcf-grid lcf-grid-3" if columns == 3 else "lcf-grid"
-    html_block(f'<div class="{grid}">{"".join(cards)}</div>')
+            f'</div></div>', ok, f"Chỉ áp dụng {combos.DAY_SHORT.get(c.day_type, '')}"))
+    _card_grid(entries, columns, key_prefix, on_add)
 
 
 def footer(text):

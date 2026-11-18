@@ -11,6 +11,7 @@ Phân khúc khách hàng bằng thuật toán **K-Prototypes** (4 cụm) trên b
 | `app.py` | Giao diện demo (Streamlit): thanh trên cùng và điều hướng giữa các trang |
 | `views/` | Các trang: trang chủ, đăng nhập, đăng ký, tài khoản, quản trị |
 | `auth.py`, `shared.py` | Tài khoản (SQLite `users.db`, không đưa lên git) và phần dùng chung giữa các trang |
+| `orders.py` | Giỏ hàng, đặt hàng, trạng thái đơn, đánh giá; suy ra Output/Feedback của mô hình từ đơn hàng (lưu cùng `users.db`) |
 | `segmentation.py` | Làm sạch dữ liệu, huấn luyện K-Prototypes, dự đoán cụm, chiến lược cho từng cụm |
 | `online food delivery dataset.csv` | Dữ liệu gốc (388 dòng, 285 mẫu sau khi bỏ trùng) |
 | `online food delivery dataset 3000.csv` | Dữ liệu mở rộng dùng để huấn luyện: giữ nguyên 388 dòng gốc + 2715 dòng tổng hợp, còn 3000 mẫu sau khi bỏ trùng |
@@ -22,8 +23,10 @@ Phân khúc khách hàng bằng thuật toán **K-Prototypes** (4 cụm) trên b
 | `.streamlit/config.toml` | Cấu hình giao diện |
 | `start.bat`, `stop.bat` | Bật / tắt app demo trên Windows |
 | `ui.py` | Giao diện cửa hàng FASTBITE: tông đỏ – vàng, thanh trên cùng, banner, thẻ món, thẻ combo, chân trang |
-| `menu.csv` | Thực đơn: 35 món, giá lẻ tham khảo từ jollibee.com.vn (16/11/2026) |
-| `menu.py` | 8 combo khuyến mãi cho 4 cụm, chọn combo theo nhóm và số người trong hộ, ưu đãi theo trạng thái khách |
+| `menu.csv` | Thực đơn 36 món, 4 nhóm: Món chính (gà giòn, mì Ý, cơm, burger), Món thêm (khoai, súp, cơm trắng, Mì Ý thêm 7.000₫), Món phụ (tráng miệng), Thức uống; giá lẻ tham khảo từ jollibee.com.vn (16/11/2026) |
+| `menu.py` | Thực đơn, lớp Combo, 8 combo mặc định (dùng khi chưa duyệt combo tháng), ưu đãi theo trạng thái khách |
+| `combos.py` | Combo theo tháng: đề xuất từ số lượng món mỗi cụm mua vào ngày thường / cuối tuần tháng trước, duyệt, combo đang áp dụng |
+| `simulate_orders.py`, `simulated_orders.csv` | Sinh 10.000 đơn mô phỏng (tháng 10/2026) làm dữ liệu tạo combo tháng đầu |
 | `assets/` | Logo FASTBITE; `assets/products/` để bổ sung ảnh món và combo (xem `README.txt` trong đó) |
 
 ## Chạy demo trên máy
@@ -50,7 +53,21 @@ Trình duyệt sẽ tự mở http://localhost:8501. Lần đầu mở, mô hìn
 
 App đóng vai cửa hàng đồ ăn nhanh **FASTBITE** (tên giả định của đồ án, không liên quan tới Jollibee); bố cục theo web bán sữa La Che Fresca (đồ án CT275), thực đơn dùng món và giá lẻ của Jollibee để minh họa.
 
-**Combo khuyến mãi** (giá lẻ tính tự động từ `menu.csv`; cỡ combo chọn theo số người trong hộ):
+**Combo theo tháng** (`combos.py`): đầu mỗi tháng hệ thống gom đơn tháng trước (đơn thật trong `users.db` + đơn mô phỏng); cỡ đơn (số người) = số phần món chính trong đơn. **Mỗi cụm 3 combo**: 2 combo ngày thường theo 2 cỡ đơn phổ biến nhất của ngày thường và 1 combo cuối tuần theo cỡ đơn phổ biến nhất của cuối tuần (mỗi cỡ cần từ 20 đơn). Mỗi combo dựng từ các đơn cùng cụm, cùng loại ngày, cùng cỡ, theo ràng buộc:
+
+- **Món chính** (gà giòn, mì Ý, cơm, burger): đúng bằng số người, có thể khác loại nhưng **tối đa 2 loại**.
+- **Thức uống**: đúng bằng số người và **cùng một loại**.
+- **Món thêm** (khoai, súp): số phần trung bình mỗi đơn, tối đa 2 loại; **Cơm trắng và Mì Ý thêm không có trong combo** (chỉ bán lẻ).
+- **Món phụ** (tráng miệng): không quá số người, tối đa 2 loại; **2 cụm sinh viên (thu nhập thấp) không có món phụ**.
+- Giá = giá lẻ − % giảm của cụm (20% / 15% / 10% / 15%).
+
+Admin xem lý do, sửa giá rồi **duyệt**; chưa duyệt thì khách tiếp tục thấy combo đã duyệt gần nhất (chưa từng duyệt thì thấy 8 combo mặc định bên dưới). **Combo ngày thường đặt được mọi ngày** (cuối tuần hiện và đặt được cả combo ngày thường lẫn combo cuối tuần); **combo cuối tuần chỉ đặt được Thứ 7–CN**, ngày thường vẫn xem được nhưng nút đặt bị khóa, trong giỏ bị khóa và ghi "Chỉ áp dụng Thứ 7–CN". Combo gợi ý cho khách là combo đặt được hôm nay có số người gần số người trong hộ nhất.
+
+Khi đặt combo, đơn lưu **từng món** trong combo; thành tiền của combo được chia cho các món theo tỷ lệ giá lẻ (tổng đúng bằng giá combo), kèm mã combo. Đơn còn lưu loại ngày và cụm của khách lúc đặt để làm dữ liệu cho tháng sau.
+
+**Đơn mô phỏng** (`simulate_orders.py` → `simulated_orders.csv`): 10.000 đơn tháng 10/2026 của 3000 khách trong dataset, mỗi cụm có thói quen riêng theo ngày thường/cuối tuần (sinh viên hộ nhỏ ăn một mình món rẻ, hội bạn đặt nhóm cuối tuần, dân văn phòng ăn trưa ngày thường và tối cuối tuần cho 2 người, gia đình đặt cả nhà cuối tuần). Đây là **dữ liệu giả lập** để có combo cho tháng đầu; có đơn thật thì được cộng vào. Sinh lại: `python simulate_orders.py 10000 2026-10`.
+
+**Combo mặc định** (thiết kế tay, áp dụng mọi ngày, chỉ dùng khi chưa có combo tháng nào được duyệt; cỡ combo theo số người trong hộ):
 
 | Cụm | Combo | Giá lẻ → giá combo |
 |---|---|---|
@@ -59,22 +76,27 @@ App đóng vai cửa hàng đồ ăn nhanh **FASTBITE** (tên giả định củ
 | Người đi làm trẻ | Trưa Văn Phòng (1 người), Tối Cặp Đôi (2–3 người); hộ từ 4 người dùng Cả Nhà 4 Người | 83k → 75k, 245k → 219k |
 | Người có gia đình hộ đông | Cả Nhà 4 Người (3–4 người), Cả Nhà 5–6 Người | 314k → 269k, 428k → 369k |
 
-Kèm ưu đãi theo trạng thái của khách (Output, Feedback): còn đặt và hài lòng → tích điểm; còn đặt nhưng chưa hài lòng → voucher xin lỗi 20k; đã ngừng nhưng từng hài lòng → voucher 30k; đã ngừng và chưa hài lòng → voucher 50k + hoàn tiền nếu giao trễ.
+Kèm ưu đãi theo trạng thái của khách (Output, Feedback): còn đặt và hài lòng → không có ưu đãi thêm; còn đặt nhưng chưa hài lòng → voucher xin lỗi 20k; đã ngừng nhưng từng hài lòng → voucher 30k; đã ngừng và chưa hài lòng → voucher 50k + hoàn tiền nếu giao trễ.
 
 **Khách hàng**
 
-- **Trang chủ**: banner, nhóm món, "Dành cho bạn" (các combo của nhóm khách, combo hợp nhất viền vàng kèm ưu đãi riêng), tất cả combo khuyến mãi, món lẻ theo nhóm món.
+- **Trang chủ**: banner, nhóm món, "Dành cho bạn" (combo ngày thường và cuối tuần của nhóm khách, combo áp dụng hôm nay viền vàng kèm ưu đãi riêng), combo khuyến mãi của tháng chia tab Ngày thường / Cuối tuần (tab hôm nay đứng trước), món lẻ theo nhóm món.
 - **Đăng ký / Đăng nhập**: mật khẩu 8–72 ký tự (băm scrypt), sai 5 lần liên tiếp thì khóa 15 phút.
-- **Tài khoản**: họ tên, số điện thoại, địa chỉ và 8 thông tin của mô hình (tuổi, số người trong gia đình, giới tính, hôn nhân, nghề nghiệp, học vấn, có tiếp tục đặt món online, mức hài lòng). Tất cả đều không bắt buộc; ô bỏ trống được bỏ qua khi xếp nhóm (khoảng cách K-Prototypes chỉ tính trên thông tin đã điền, cần ít nhất tuổi hoặc số người trong gia đình). Có đổi mật khẩu.
+- **Giỏ hàng / Đặt hàng** (giống web La Che Fresca): nút "Thêm vào giỏ" trên mỗi combo và món (phải đăng nhập); giỏ hàng có ô chọn món, sửa số lượng, xóa; form giao hàng điền sẵn từ hồ sơ, thanh toán COD hoặc chuyển khoản; chỉ đặt các món được chọn.
+- **Đánh giá**: đặt xong hiện box chấm 1–5 sao cho cả đơn (kèm góp ý); có thể bỏ qua và đánh giá sau trong "Đơn hàng của tôi".
+- **Tài khoản**: một form "Thông tin cá nhân" gồm họ tên, số điện thoại, địa chỉ và 6 thông tin cho mô hình (tuổi, số người trong gia đình, giới tính, hôn nhân, nghề nghiệp, học vấn), đều không bắt buộc. "Đơn hàng của tôi": trạng thái đơn, hủy đơn đang chờ xác nhận, đánh giá đơn chưa đánh giá. Có đổi mật khẩu.
+- **Xếp nhóm**: 2 thuộc tính còn lại của mô hình không hỏi khách mà suy ra từ đơn hàng — *tiếp tục đặt món* = có đơn chưa hủy trong 30 ngày gần nhất (từng đặt nhưng lâu hơn = không; chưa đặt đơn nào = bỏ qua), *hài lòng* = sao trung bình từ 4 (chưa đánh giá = bỏ qua). Khoảng cách K-Prototypes chỉ tính trên thông tin đã có; cần ít nhất tuổi hoặc số người trong gia đình.
 
 **Quản trị** (chỉ admin; tài khoản tạo sẵn lần đầu chạy: `admin@fastbite.vn` / `Admin@123`, đổi bằng mục `[admin]` với `email`, `password` trong `.streamlit/secrets.toml`)
 
+- **Đơn hàng**: số đơn chờ xác nhận / đang giao / hoàn tất, doanh thu; lọc theo trạng thái, tìm theo mã đơn, tên, SĐT; chuyển trạng thái Chờ xác nhận → Đang giao → Hoàn tất (hoặc Hủy); xem đánh giá, cụm và loại ngày lúc đặt.
+- **Combo theo tháng**: số đơn tháng trước theo cụm × loại ngày (thật / mô phỏng), món mua nhiều nhất của từng ô, danh sách đề xuất kèm lý do và giá lẻ → giá combo; sửa giá, duyệt, bỏ, duyệt tất cả, tạo lại đề xuất.
 - **Phân khúc khách mới**: nhập thông tin một khách hàng để xem khách đó thuộc cụm nào, kèm đặc điểm, chiến lược marketing, combo khuyến mãi (theo số người trong hộ) và ưu đãi kèm theo.
 - **Tổng quan các cụm**: quy mô từng cụm, bảng đặc điểm, biểu đồ thành phần theo từng thuộc tính, bảng tổng hợp combo và combo của từng cụm.
 - **Danh sách khách hàng**: xem, lọc toàn bộ khách hàng của bộ dữ liệu theo cụm và tải danh sách về dạng CSV.
-- **Tài khoản khách hàng**: các tài khoản đã đăng ký trong app, thông tin đã điền, nhóm, combo và ưu đãi riêng của từng người, tải CSV.
+- **Tài khoản khách hàng**: các tài khoản đã đăng ký trong app, thông tin đã điền, số đơn, sao trung bình, hai thuộc tính suy ra từ đơn hàng, nhóm, combo và ưu đãi riêng của từng người, tải CSV.
 
-Lưu ý: đăng nhập giữ trong phiên làm việc của trình duyệt, tải lại trang (F5) sẽ phải đăng nhập lại. Trên Streamlit Cloud, `users.db` bị xóa mỗi khi app khởi động lại.
+Lưu ý: đăng nhập và giỏ hàng giữ trong phiên làm việc của trình duyệt, tải lại trang (F5) sẽ phải đăng nhập lại và giỏ hàng trống (đơn đã đặt vẫn được lưu). Trên Streamlit Cloud, `users.db` bị xóa mỗi khi app khởi động lại.
 
 ## Dữ liệu mở rộng
 

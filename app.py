@@ -21,39 +21,49 @@ login = st.Page("views/login.py", title="Đăng nhập", icon=":material/login:"
 register = st.Page("views/register.py", title="Đăng ký", icon=":material/person_add:", url_path="dang-ky")
 account = st.Page("views/account.py", title="Tài khoản", icon=":material/person:", url_path="tai-khoan")
 admin = st.Page("views/admin.py", title="Quản trị", icon=":material/monitoring:", url_path="quan-tri")
-shared.PAGES.update(home=home, login=login, register=register, account=account, admin=admin)
+cart = st.Page("views/cart.py", title="Giỏ hàng", icon=":material/shopping_cart:", url_path="gio-hang")
+shared.PAGES.update(home=home, login=login, register=register, account=account, admin=admin, cart=cart)
 
 user = shared.current_user()
 # Luôn đăng ký đủ các trang (menu ẩn, thanh trên cùng tự vẽ) để st.switch_page tới được mọi trang;
 # quyền xem do từng trang kiểm tra (shared.require_login / require_admin).
-page = st.navigation([home, login, register, account, admin], position="hidden")
+page = st.navigation([home, login, register, account, admin, cart], position="hidden")
 
 auth_page = page.url_path in (login.url_path, register.url_path)
-if not auth_page:
-    with st.container(key="navbar"):
-        if user is None:
-            cols = st.columns([4, 1.3, 3, 1.3, 1.2], vertical_alignment="center")
-            with cols[0]:
-                ui.brand()
-            cols[1].page_link(home, label="Trang chủ", icon=":material/home:")
-            cols[3].page_link(login, label="Đăng nhập", icon=":material/login:")
-            if cols[4].button("Đăng ký", type="primary", width="stretch"):
-                st.switch_page(register)
-        else:
-            cols = st.columns([4, 1.3, 1.3, 1.3, 2.2, 1.3], vertical_alignment="center")
-            with cols[0]:
-                ui.brand()
-            cols[1].page_link(home, label="Trang chủ", icon=":material/home:")
-            cols[2].page_link(account, label="Tài khoản", icon=":material/person:")
-            if shared.is_admin(user):
-                cols[3].page_link(admin, label="Quản trị", icon=":material/monitoring:")
-            cols[4].markdown(f'<div class="lcf-hello">Xin chào, {ui.esc(user["name"])}</div>', unsafe_allow_html=True)
-            if cols[5].button("Đăng xuất", width="stretch"):
-                shared.logout()
-                st.switch_page(home)
-
+navbar = (st.container(key="navbar", horizontal=True, horizontal_alignment="distribute",
+                       vertical_alignment="center") if not auth_page else None)
 shared.show_flash()
+
+# Box đánh giá ngay sau khi đặt hàng (views/cart.py đặt cờ rate_order)
+if user is not None and st.session_state.get("rate_order"):
+    shared.rating_dialog(st.session_state["rate_order"])
+
 page.run()
+
+# Vẽ thanh trên cùng sau khi trang chạy xong để số món trong giỏ cập nhật ngay khi vừa thêm
+if navbar is not None:
+    with navbar:
+        # 3 nhóm: logo | liên kết | lời chào + nút; mỗi nhóm rộng vừa nội dung nên chữ không bị cắt
+        if ui.brand_button():
+            st.switch_page(home)
+        with st.container(horizontal=True, width="content", vertical_alignment="center", gap="medium"):
+            st.page_link(home, label="Trang chủ", icon=":material/home:")
+            if user is not None:
+                st.page_link(cart, label=f"Giỏ hàng ({sum(shared.cart().values())})", icon=":material/shopping_cart:")
+                st.page_link(account, label="Tài khoản", icon=":material/person:")
+                if shared.is_admin(user):
+                    st.page_link(admin, label="Quản trị", icon=":material/monitoring:")
+        with st.container(horizontal=True, width="content", vertical_alignment="center", gap="small"):
+            if user is None:
+                st.page_link(login, label="Đăng nhập", icon=":material/login:")
+                if st.button("Đăng ký", type="primary"):
+                    st.switch_page(register)
+            else:
+                st.markdown(f'<span class="lcf-hello">Xin chào, {ui.esc(user["name"])}</span>',
+                            unsafe_allow_html=True, width="content")
+                if st.button("Đăng xuất"):
+                    shared.logout()
+                    st.switch_page(home)
 
 if not auth_page:
     ui.footer("Đồ án niên luận: phân khúc khách hàng đặt đồ ăn online bằng K-Prototypes trên bộ dữ liệu "

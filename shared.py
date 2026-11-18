@@ -2,7 +2,9 @@
 import streamlit as st
 
 import auth
-from menu import load_menu, pick_combo, retention_offer
+import combos
+import orders
+from menu import load_menu, retention_offer
 from segmentation import CATEGORY_ORDER, predict_partial, train
 
 # Trang của app (app.py gán khi khởi tạo st.navigation) để các trang gọi st.page_link / st.switch_page
@@ -67,15 +69,68 @@ def is_admin(user):
     return bool(user) and user["role"] == "admin"
 
 
+def user_values(user):
+    """8 thuộc tính của mô hình cho một khách: 6 thuộc tính tự khai trong hồ sơ, Output và Feedback suy ra
+    từ đơn hàng và đánh giá (orders.behavior). None = bỏ trống, được bỏ qua khi xếp nhóm."""
+    values = {col: user.get(field) for field, col in FIELD_MAP.items() if field not in ("output", "feedback")}
+    b = orders.behavior(user["user_id"])
+    values.update({"Output": b["output"], "Feedback": b["feedback"]})
+    return values
+
+
 def user_segment(user):
-    """(tên cụm hoặc None, số thông tin đã dùng) từ hồ sơ của khách; ô bỏ trống được bỏ qua."""
-    values = {col: user.get(field) for field, col in FIELD_MAP.items()}
-    return predict_partial(load_model(), values)
+    """(tên cụm hoặc None, số thông tin đã dùng) cho khách; ô bỏ trống được bỏ qua."""
+    return predict_partial(load_model(), user_values(user))
 
 
 def user_offer(user, segment):
     """(combo chính, ưu đãi riêng hoặc None) cho khách đã có nhóm."""
-    return pick_combo(segment, user.get("family_size")), retention_offer(user.get("output"), user.get("feedback"))
+    values = user_values(user)
+    return (combos.pick_for(segment, user.get("family_size")),
+            retention_offer(values["Output"], values["Feedback"]))
+
+
+def cart():
+    return st.session_state.setdefault("cart", {})
+
+
+def add_to_cart(code, label):
+    """Nút Thêm vào giỏ: chưa đăng nhập thì chuyển sang trang đăng nhập (như web)."""
+    if current_user() is None:
+        flash("warning", "Vui lòng đăng nhập để thêm món vào giỏ hàng.")
+        st.switch_page(PAGES["login"])
+    try:
+        orders.cart_add(cart(), code)
+        st.toast(f"Đã thêm \"{label}\" vào giỏ hàng.", icon=":material/shopping_cart:")
+    except orders.OrderError as e:
+        st.toast(str(e), icon=":material/error:")
+
+
+@st.dialog("Đánh giá đơn hàng", dismissible=False)
+def rating_dialog(order_id):
+    """Box đánh giá 1-5 sao cho cả đơn; hiện ngay sau khi đặt hàng hoặc khi bấm Đánh giá trong Đơn hàng của tôi."""
+    order = orders.get_order(order_id)
+    st.markdown(f"Đơn **{orders.order_code(order_id)}** · {sum(i['quantity'] for i in order['items'])} món · "
+                f"{order['total_amount']:,}₫".replace(",", "."))
+    st.markdown("Bạn hài lòng với dịch vụ đặt món của FASTBITE như thế nào?")
+    stars = st.feedback("stars", key=f"stars_{order_id}")
+    comment = st.text_area("Góp ý (không bắt buộc)", max_chars=500, key=f"comment_{order_id}")
+    c1, c2 = st.columns(2)
+    if c1.button("Gửi đánh giá", type="primary", width="stretch"):
+        if stars is None:
+            st.error("Vui lòng chọn số sao.")
+            return
+        try:
+            orders.rate_order(current_user()["user_id"], order_id, stars + 1, comment)  # chỉ đánh giá đơn của mình
+            flash("success", "Cảm ơn bạn đã đánh giá!")
+        except orders.OrderError as e:
+            flash("error", str(e))
+        st.session_state.pop("rate_order", None)
+        st.rerun()
+    if c2.button("Bỏ qua", width="stretch"):
+        st.session_state.pop("rate_order", None)
+        flash("info", "Bạn có thể đánh giá đơn này sau trong mục Đơn hàng của tôi (trang Tài khoản).")
+        st.rerun()
 
 
 def require_login():
