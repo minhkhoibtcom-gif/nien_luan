@@ -34,26 +34,30 @@ HIDDEN_COLS = ["latitude", "longitude", "Output"]  # chỉ ẩn ở bảng danh 
 SEGMENT_ORDER = ["Sinh viên hộ nhỏ", "Sinh viên hộ đông",
                  "Người đi làm trẻ", "Người có gia đình hộ đông"]
 
+# Chiến lược cho từng cụm, chỉ dùng các tính năng hệ thống đang có: combo theo tháng của cụm
+# (ngày thường / cuối tuần, cỡ theo số người, admin duyệt), ưu đãi kèm theo trạng thái khách
+# (tiếp tục đặt món suy ra từ đơn 30 ngày gần nhất, hài lòng suy ra từ số sao đánh giá), đánh giá sau đơn.
 STRATEGIES = {
     "Sinh viên hộ nhỏ": [
-        "Nhóm đông nhất nhưng đa số chưa có thu nhập: ưu tiên mã giảm giá sinh viên và ưu đãi theo khung giờ.",
-        "Thiết kế suất ăn một người giá thấp, miễn phí giao hàng cho đơn nhỏ.",
-        "Tiếp cận qua mạng xã hội và hợp tác với trường đại học, câu lạc bộ sinh viên.",
+        "Nhóm đông nhất, đa số chưa có thu nhập: combo không có món phụ, giữ giá mỗi suất thấp.",
+        "Combo ngày thường cỡ 1–2 người, đặt được mọi ngày, phù hợp bữa ăn nhanh hằng ngày.",
+        "Cỡ combo tháng sau được đề xuất từ số đơn của cụm tháng này (tab Combo theo tháng), admin duyệt rồi áp dụng.",
     ],
     "Sinh viên hộ đông": [
-        "Nhóm có tỷ lệ tiếp tục đặt món và phản hồi tích cực cao nhất: tập trung giữ chân bằng chương trình điểm thưởng.",
-        "Khuyến khích giới thiệu bạn bè, thưởng cho cả người giới thiệu và người được giới thiệu.",
-        "Đẩy combo nhóm và combo gia đình để tăng giá trị mỗi đơn.",
+        "Nhóm có tỷ lệ tiếp tục đặt món và phản hồi tích cực cao nhất: duy trì combo ăn chung đã được ưa chuộng.",
+        "Thu nhập thấp nên combo không có món phụ; cỡ combo theo số người để giá mỗi người thấp.",
+        "Combo cuối tuần cỡ lớn cho các buổi ăn chung Thứ 7–CN; combo ngày thường vẫn đặt được vào cuối tuần.",
     ],
     "Người đi làm trẻ": [
-        "Đa số có thu nhập trên 25.000, phần lớn đang đi làm nên cần sự tiện lợi: tung gói giao bữa trưa văn phòng và gói đăng ký theo tháng.",
-        "Cam kết thời gian giao đúng giờ, gợi ý thực đơn cao cấp hơn thay vì giảm giá sâu.",
-        "Thu thập phản hồi sau đơn hàng để cải thiện tỷ lệ phản hồi tích cực còn ở mức trung bình.",
+        "Đa số có thu nhập trên 25.000, cần sự tiện lợi: combo 1–2 người cho bữa trưa, kèm cam kết giao đúng giờ.",
+        "Có thể có món phụ trong combo, chọn món theo số lượng cụm này thực mua thay vì giảm giá sâu.",
+        "Nhắc khách đánh giá sau mỗi đơn để cải thiện tỷ lệ phản hồi tích cực còn ở mức trung bình.",
     ],
     "Người có gia đình hộ đông": [
-        "Đa số có thu nhập trên 25.000 nhưng tỷ lệ tiếp tục đặt món và phản hồi tích cực thấp nhất: ưu tiên khảo sát lý do không hài lòng trước khi chi cho quảng cáo.",
-        "Cải thiện chất lượng dịch vụ, rồi gửi ưu đãi mời quay lại cho khách từng phản hồi tiêu cực.",
-        "Giới thiệu combo gia đình và đặt lịch trước cho bữa tối, cuối tuần.",
+        "Đa số có thu nhập trên 25.000 nhưng tỷ lệ tiếp tục đặt món và phản hồi tích cực thấp nhất: "
+        "xem các đơn bị đánh giá thấp để tìm lý do không hài lòng.",
+        "Khách hơn 30 ngày không đặt hoặc đánh giá thấp được tự động kèm voucher mời quay lại (20.000₫–50.000₫).",
+        "Combo gia đình cỡ theo số người trong hộ cho ngày thường và cuối tuần, có món phụ cho cả nhà.",
     ],
 }
 

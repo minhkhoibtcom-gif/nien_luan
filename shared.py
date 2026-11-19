@@ -38,9 +38,37 @@ for _field, _col in FIELD_MAP.items():
         assert list(OPTION_LABELS[_field]) == CATEGORY_ORDER[_col], _field
 
 
-@st.cache_resource(show_spinner="Đang huấn luyện K-Prototypes...")
-def load_model():
+@st.cache_resource(show_spinner=False)
+def _train_model():
     return train()
+
+
+# Vòng tròn xoay giữa màn hình (không kèm chữ) trong lúc huấn luyện mô hình lần đầu
+_SPINNER = """
+<style>
+@keyframes fb-spin { to { transform: rotate(360deg); } }
+.fb-loading { position: fixed; inset: 0; z-index: 999999; display: flex; align-items: center;
+              justify-content: center; background: rgba(255, 243, 224, .65); }
+.fb-loading div { width: 56px; height: 56px; border-radius: 50%; border: 6px solid #f6aa1c;
+                  border-top-color: #d62828; animation: fb-spin .8s linear infinite; }
+</style>
+<div class="fb-loading" role="status" aria-label="Đang tải"><div></div></div>
+"""
+_model_ready = False
+
+
+def load_model():
+    global _model_ready
+    if _model_ready:
+        return _train_model()
+    holder = st.empty()
+    holder.html(_SPINNER)
+    try:
+        model = _train_model()
+    finally:
+        holder.empty()
+    _model_ready = True
+    return model
 
 
 @st.cache_data(show_spinner=False)

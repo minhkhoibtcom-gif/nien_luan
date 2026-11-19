@@ -20,6 +20,7 @@ Phân khúc khách hàng bằng thuật toán **K-Prototypes** (4 cụm) trên b
 | `export_segment_model.py` | Xuất 4 tâm cụm + tham số chuẩn hóa ra `segment_model.json` (và file test) để chương trình khác tự xếp khách vào nhóm |
 | `kprototypes.ipynb` | Notebook phân tích: khám phá dữ liệu, chọn số cụm, đánh giá |
 | `customer_segments.csv` | Kết quả gán cụm do notebook xuất ra |
+| `compare_clustering.py` | So sánh K-Prototypes với K-Means, K-Modes, Hierarchical; xuất `so_sanh_chi_so.csv` và 9 biểu đồ trong `figures/so_sanh/` |
 | `.streamlit/config.toml` | Cấu hình giao diện |
 | `start.bat`, `stop.bat` | Bật / tắt app demo trên Windows |
 | `ui.py` | Giao diện cửa hàng FASTBITE: tông đỏ – vàng, thanh trên cùng, banner, thẻ món, thẻ combo, chân trang |
@@ -126,3 +127,21 @@ Notebook dùng thêm một số thư viện không có trong `requirements.txt`:
 ```bash
 pip install jupyter matplotlib gower
 ```
+
+## So sánh thuật toán phân cụm
+
+```bash
+venv\Scripts\python compare_clustering.py
+```
+
+Chạy 4 thuật toán với K = 2…8 trên dataset 3000 mẫu (khoảng 30 giây), ghi chỉ số vào `so_sanh_chi_so.csv` và vẽ:
+
+1. Silhouette (Gower), Davies–Bouldin, Calinski–Harabasz theo K
+2. Các chỉ số và thời gian chạy tại K = 4
+3. Hình chiếu FAMD 2 chiều, tô màu theo cụm
+4. Biểu đồ silhouette từng điểm
+5. Heatmap ARI giữa các thuật toán
+6. Bảng chéo nhãn cụm K-Prototypes × từng thuật toán
+7. Kích thước các cụm
+8. Tâm cụm theo tuổi và số người trong hộ
+9. Cây phân cấp (dendrogram)
