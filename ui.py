@@ -6,6 +6,7 @@ Các khối Streamlit được đặt key (st.container(key=...)) để CSS nh�
 import base64
 import html
 import mimetypes
+from datetime import date
 from pathlib import Path
 
 import streamlit as st
@@ -140,13 +141,39 @@ div[data-testid="stMetricValue"] {{ color: {RED_DARK}; }}
 /* Form nằm trong thẻ đăng nhập/đăng ký: không vẽ thêm khung thứ hai */
 .st-key-auth_card div[data-testid="stForm"] {{ box-shadow: none; padding: 0; }}
 
-.lcf-footer {{
-  margin-top: 2.5rem; padding: 1.5rem 1.8rem; border-radius: 14px;
-  background: linear-gradient(135deg, #2b0a0a 0%, #4a1010 100%); color: #f3d6b0; font-size: .9rem;
+/* Chân trang: nền đỏ sẫm, 4 cột (thương hiệu | khám phá | thực đơn | liên hệ) + dải bản quyền */
+.st-key-footer {{
+  margin-top: 3rem; padding: 2rem 2rem 1.1rem; border-radius: 18px; gap: .6rem;
+  background: linear-gradient(135deg, #2b0a0a 0%, #4a1010 60%, #5c1414 100%); color: #f3d6b0;
+  border-top: 4px solid {YELLOW};
 }}
-.lcf-footer b {{ color: #fff; }}
-.lcf-footer img {{ width: 34px; height: 34px; border-radius: 9px; object-fit: cover; vertical-align: middle; margin-right: .5rem; }}
-.lcf-footer hr {{ border-color: rgba(255, 255, 255, .15); margin: .8rem 0; }}
+.st-key-footer [data-testid="stMarkdownContainer"] p {{ margin: 0; }}
+.lcf-f-brand {{ display: flex; align-items: center; gap: .6rem; margin-bottom: .7rem; }}
+.lcf-f-brand img {{ width: 42px; height: 42px; border-radius: 11px; object-fit: cover; }}
+.lcf-f-brand b {{ color: #fff; font-size: 1.3rem; letter-spacing: .04em; }}
+.lcf-f-text {{ font-size: .9rem; line-height: 1.6; color: #f3d6b0; }}
+.lcf-f-title {{
+  color: {YELLOW}; font-weight: 800; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase;
+  margin-bottom: .55rem;
+}}
+.lcf-f-list {{ list-style: none; padding: 0; margin: 0; font-size: .9rem; line-height: 2; color: #f3d6b0; }}
+.lcf-f-list li {{ margin: 0; padding: 0; }}
+.lcf-f-list.nowrap li {{ white-space: nowrap; }}
+.lcf-f-chips {{ display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .9rem; }}
+.lcf-f-chips span {{
+  border: 1px solid rgba(246, 170, 28, .45); color: #ffe2ad; border-radius: 999px;
+  padding: .15rem .65rem; font-size: .75rem; white-space: nowrap;
+}}
+.st-key-footer [data-testid="stPageLink"] a {{ padding: .1rem 0; min-height: 0; background: transparent; }}
+.st-key-footer [data-testid="stPageLink"] a p {{ color: #f3d6b0; font-size: .9rem; }}
+.st-key-footer [data-testid="stPageLink"] a:hover p {{ color: {YELLOW}; }}
+.st-key-footer [data-testid="stPageLink"] span[data-testid="stIconMaterial"] {{ color: {YELLOW}; }}
+.lcf-f-bottom {{
+  border-top: 1px solid rgba(255, 255, 255, .14); margin-top: 1.2rem; padding-top: .9rem;
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: .4rem 1.5rem;
+  font-size: .78rem; color: #d9b48a;
+}}
+.lcf-f-bottom b {{ color: #fff; }}
 </style>
 """
 
@@ -287,7 +314,46 @@ def combo_cards(combo_list, menu, highlight=None, extra_offer=None, columns=4, k
     _card_grid(entries, columns, key_prefix, on_add)
 
 
-def footer(text):
-    html_block(f'<div class="lcf-footer"><img src="{data_uri(LOGO)}" alt=""><b>{SITE_NAME}</b>'
-               f'<hr>{esc(text)}<br><span style="font-size:.8rem">{esc(MENU_SOURCE)} '
-               f'{SITE_NAME} là tên cửa hàng giả định của đồ án, không liên quan tới Jollibee.</span></div>')
+# Thông tin liên hệ của cửa hàng giả định (không phải của doanh nghiệp thật)
+CONTACT = {
+    "Địa chỉ": "Đường 3/2, Ninh Kiều, Cần Thơ",
+    "Hotline": "1900 0000",
+    "Email": "hotro@fastbite.vn",
+    "Giờ mở cửa": "08:00 – 22:00, tất cả các ngày",
+}
+
+
+def footer(pages, user=None, about=""):
+    """Chân trang kiểu web bán hàng. Liên kết dùng st.page_link để chuyển trang không mất phiên đăng nhập."""
+    def title(text):
+        html_block(f'<div class="lcf-f-title">{esc(text)}</div>')
+
+    with st.container(key="footer"):
+        brand, explore, menu_col, contact = st.columns([1.5, 1, 1.05, 1.4], gap="large")
+        with brand:
+            html_block(f'<div class="lcf-f-brand"><img src="{data_uri(LOGO)}" alt=""><b>{SITE_NAME}</b></div>'
+                       f'<div class="lcf-f-text">{esc(SLOGAN)} Gà giòn, mì Ý, burger và combo tiết kiệm '
+                       'được gợi ý riêng theo nhóm khách hàng của bạn.</div>'
+                       '<div class="lcf-f-chips"><span>💵 Thanh toán khi nhận hàng</span>'
+                       '<span>🏦 Chuyển khoản</span><span>⭐ Đánh giá sau mỗi đơn</span></div>')
+        with explore:
+            title("Khám phá")
+            st.page_link(pages["home"], label="Trang chủ", icon=":material/home:")
+            if user is None:
+                st.page_link(pages["login"], label="Đăng nhập", icon=":material/login:")
+                st.page_link(pages["register"], label="Đăng ký thành viên", icon=":material/person_add:")
+            else:
+                st.page_link(pages["cart"], label="Giỏ hàng", icon=":material/shopping_cart:")
+                st.page_link(pages["account"], label="Tài khoản & đơn hàng", icon=":material/person:")
+        with menu_col:
+            title("Thực đơn")
+            items = "".join(f"<li>{icon} {esc(group)}</li>" for group, icon in GROUP_ICON.items())
+            html_block(f'<ul class="lcf-f-list nowrap">{items}<li>🎁 Combo khuyến mãi</li></ul>')
+        with contact:
+            title("Liên hệ")
+            icons = {"Địa chỉ": "📍", "Hotline": "📞", "Email": "✉️", "Giờ mở cửa": "🕘"}
+            rows = "".join(f"<li>{icons[k]} {esc(v)}</li>" for k, v in CONTACT.items())
+            html_block(f'<ul class="lcf-f-list">{rows}</ul>')
+        html_block(f'<div class="lcf-f-bottom"><span>© {date.today().year} <b>{SITE_NAME}</b>. {esc(about)}</span>'
+                   f'<span>{esc(MENU_SOURCE)} {SITE_NAME} và thông tin liên hệ là giả định của đồ án, '
+                   'không liên quan tới Jollibee.</span></div>')
