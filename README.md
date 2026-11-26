@@ -10,8 +10,10 @@ Phân khúc khách hàng bằng thuật toán **K-Prototypes** (4 cụm) trên b
 |---|---|
 | `app.py` | Giao diện demo (Streamlit): thanh trên cùng và điều hướng giữa các trang |
 | `views/` | Các trang: trang chủ, đăng nhập, đăng ký, tài khoản, quản trị |
-| `auth.py`, `shared.py` | Tài khoản (SQLite `users.db`, không đưa lên git) và phần dùng chung giữa các trang |
-| `orders.py` | Giỏ hàng, đặt hàng, trạng thái đơn, đánh giá; suy ra Output/Feedback của mô hình từ đơn hàng (lưu cùng `users.db`) |
+| `db.py` | Kết nối database: SQLite `users.db` trên máy (không đưa lên git), PostgreSQL khi có cấu hình trong Secrets; schema các bảng |
+| `migrate_to_postgres.py` | Chép một lần toàn bộ dữ liệu từ `users.db` sang PostgreSQL |
+| `auth.py`, `shared.py` | Tài khoản và phần dùng chung giữa các trang |
+| `orders.py` | Giỏ hàng, đặt hàng, trạng thái đơn, đánh giá; suy ra Output/Feedback của mô hình từ đơn hàng |
 | `segmentation.py` | Làm sạch dữ liệu, huấn luyện K-Prototypes, dự đoán cụm, chiến lược cho từng cụm |
 | `online food delivery dataset.csv` | Dữ liệu gốc (388 dòng, 285 mẫu sau khi bỏ trùng) |
 | `online food delivery dataset 3000.csv` | Dữ liệu mở rộng dùng để huấn luyện: giữ nguyên 388 dòng gốc + 2715 dòng tổng hợp, còn 3000 mẫu sau khi bỏ trùng |
@@ -54,7 +56,7 @@ Trình duyệt sẽ tự mở http://localhost:8501. Lần đầu mở, mô hìn
 
 App đóng vai cửa hàng đồ ăn nhanh **FASTBITE** (tên giả định của đồ án, không liên quan tới Jollibee); bố cục theo web bán sữa La Che Fresca (đồ án CT275), thực đơn dùng món và giá lẻ của Jollibee để minh họa.
 
-**Combo theo tháng** (`combos.py`): đầu mỗi tháng hệ thống gom đơn tháng trước (đơn thật trong `users.db` + đơn mô phỏng); cỡ đơn (số người) = số phần món chính trong đơn. **Mỗi cụm 3 combo**: 2 combo ngày thường theo 2 cỡ đơn phổ biến nhất của ngày thường và 1 combo cuối tuần theo cỡ đơn phổ biến nhất của cuối tuần (mỗi cỡ cần từ 20 đơn). Mỗi combo dựng từ các đơn cùng cụm, cùng loại ngày, cùng cỡ, theo ràng buộc:
+**Combo theo tháng** (`combos.py`): đầu mỗi tháng hệ thống gom đơn tháng trước (đơn thật trong database + đơn mô phỏng); cỡ đơn (số người) = số phần món chính trong đơn. **Mỗi cụm 3 combo**: 2 combo ngày thường theo 2 cỡ đơn phổ biến nhất của ngày thường và 1 combo cuối tuần theo cỡ đơn phổ biến nhất của cuối tuần (mỗi cỡ cần từ 20 đơn). Mỗi combo dựng từ các đơn cùng cụm, cùng loại ngày, cùng cỡ, theo ràng buộc:
 
 - **Món chính** (gà giòn, mì Ý, cơm, burger): đúng bằng số người, có thể khác loại nhưng **tối đa 2 loại**.
 - **Thức uống**: đúng bằng số người và **cùng một loại**.
@@ -97,7 +99,31 @@ Kèm ưu đãi theo trạng thái của khách (Output, Feedback): còn đặt v
 - **Danh sách khách hàng**: xem, lọc toàn bộ khách hàng của bộ dữ liệu theo cụm và tải danh sách về dạng CSV.
 - **Tài khoản khách hàng**: các tài khoản đã đăng ký trong app, thông tin đã điền, số đơn, sao trung bình, hai thuộc tính suy ra từ đơn hàng, nhóm, combo và ưu đãi riêng của từng người, tải CSV.
 
-Lưu ý: đăng nhập và giỏ hàng giữ trong phiên làm việc của trình duyệt, tải lại trang (F5) sẽ phải đăng nhập lại và giỏ hàng trống (đơn đã đặt vẫn được lưu). Trên Streamlit Cloud, `users.db` bị xóa mỗi khi app khởi động lại.
+Lưu ý: đăng nhập và giỏ hàng giữ trong phiên làm việc của trình duyệt, tải lại trang (F5) sẽ phải đăng nhập lại và giỏ hàng trống (đơn đã đặt vẫn được lưu). Trên Streamlit Cloud, `users.db` bị xóa mỗi khi app khởi động lại; muốn giữ dữ liệu thì dùng PostgreSQL (mục dưới).
+
+## Lưu dữ liệu bằng PostgreSQL (Supabase)
+
+Mặc định app lưu tài khoản, đơn hàng và combo trong SQLite `users.db`. Khi có mục `[postgres]` trong Secrets (hoặc biến môi trường `DATABASE_URL`), app chuyển sang PostgreSQL, code không cần sửa. Dòng cuối tab **Quản trị → Tài khoản khách hàng** cho biết app đang lưu ở đâu.
+
+1. Tạo project miễn phí trên [supabase.com](https://supabase.com) (đặt mật khẩu database, chọn vùng gần Việt Nam, ví dụ Singapore).
+2. Trong project bấm **Connect**, chọn chuỗi kết nối **Session pooler** (dùng được trên mạng IPv4 như Streamlit Cloud), thay `[YOUR-PASSWORD]` bằng mật khẩu database.
+3. Khai báo chuỗi đó:
+   - Trên máy: chép `.streamlit/secrets.toml.example` thành `.streamlit/secrets.toml` (file này không đưa lên git) và sửa `url`.
+   - Trên Streamlit Cloud: trang quản lý app → **Settings → Secrets**, dán mục `[postgres]` (và `[admin]` nếu muốn đổi tài khoản admin).
+
+   ```toml
+   [postgres]
+   url = "postgresql://postgres.xxxx:MAT_KHAU@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require"
+   ```
+4. Chạy app: lần đầu app tự tạo các bảng và tài khoản admin trên PostgreSQL.
+5. (Tùy chọn) Chép dữ liệu đang có trong `users.db` sang, chạy một lần trên máy đã khai báo `secrets.toml`:
+
+   ```bash
+   venv\Scripts\python migrate_to_postgres.py            # dừng nếu PostgreSQL đã có dữ liệu
+   venv\Scripts\python migrate_to_postgres.py --replace  # xóa dữ liệu trên PostgreSQL rồi chép lại
+   ```
+
+Lưu ý: project miễn phí của Supabase có thể bị tạm dừng sau một thời gian không dùng, khi đó app báo "Không kết nối được database"; vào trang Supabase bấm khôi phục project rồi tải lại app. Xem dữ liệu trong **Table Editor** của Supabase. Bỏ mục `[postgres]` thì app quay về SQLite.
 
 ## Dữ liệu mở rộng
 

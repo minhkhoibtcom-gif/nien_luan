@@ -156,13 +156,12 @@ def place_order(user_id, cart, selected, form, segment=None, today=None):
     total = sum(r["line_total"] for r in lines)
     now = _now().isoformat(" ")
     with auth.connect() as conn:
-        cur = conn.execute(
+        order_id = conn.execute(
             "INSERT INTO orders (user_id, name, phone, shipping_line, shipping_commune, shipping_province, note,"
             " payment_method, total_amount, status, created_at, updated_at, day_type, segment)"
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?)",
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?) RETURNING order_id",
             (user_id, name, phone, line, commune, province, note or None, payment, total, now, now,
-             combos.day_type(today), segment))
-        order_id = cur.lastrowid
+             combos.day_type(today), segment)).fetchone()[0]
         conn.executemany(
             "INSERT INTO order_items (order_id, code, name, quantity, unit_price, line_total, combo_id, combo_name,"
             " combo_qty) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -176,10 +175,18 @@ def place_order(user_id, cart, selected, form, segment=None, today=None):
 # ---------- Xem / đổi trạng thái đơn ----------
 
 def _attach_items(conn, orders):
+    """Gắn chi tiết món cho các đơn bằng một truy vấn (không phải một truy vấn cho mỗi đơn)."""
+    items = {o["order_id"]: [] for o in orders}
+    ids = list(items)
+    for start in range(0, len(ids), 500):
+        chunk = ids[start:start + 500]
+        for r in conn.execute(
+                "SELECT order_id, code, name, quantity, unit_price, line_total, combo_id, combo_name, combo_qty "
+                f"FROM order_items WHERE order_id IN ({', '.join('?' * len(chunk))}) ORDER BY line_id", chunk):
+            row = dict(r)
+            items[row.pop("order_id")].append(row)
     for o in orders:
-        o["items"] = [dict(r) for r in conn.execute(
-            "SELECT code, name, quantity, unit_price, line_total, combo_id, combo_name, combo_qty "
-            "FROM order_items WHERE order_id = ? ORDER BY line_id", (o["order_id"],))]
+        o["items"] = items[o["order_id"]]
     return orders
 
 
@@ -228,7 +235,8 @@ def all_orders(status="all", query=""):
     query = query.strip()
     if query:
         digits = re.sub(r"\D", "", query.upper().removeprefix("DH"))
-        sql += " AND (o.name LIKE ? OR o.phone LIKE ?" + (" OR o.order_id = ?" if digits else "") + ")"
+        # LOWER: LIKE của PostgreSQL phân biệt hoa thường, của SQLite thì không
+        sql += " AND (LOWER(o.name) LIKE LOWER(?) OR o.phone LIKE ?" + (" OR o.order_id = ?" if digits else "") + ")"
         params += [f"%{query}%", f"%{query}%"] + ([int(digits)] if digits else [])
     sql += " ORDER BY o.created_at DESC, o.order_id DESC"
     with auth.connect() as conn:

@@ -9,12 +9,18 @@ Các trang (thư mục views/):
 """
 import streamlit as st
 
+import db
 import shared
 import ui
 
 st.set_page_config(page_title=ui.SITE_NAME, page_icon=str(ui.LOGO), layout="wide")
 ui.apply_theme()
-shared.init_admin()
+try:
+    shared.init_admin()
+except db.DatabaseUnavailable:
+    st.error("Không kết nối được database. Kiểm tra URL PostgreSQL trong Secrets, kết nối mạng, "
+             "hoặc database đang bị tạm dừng trên trang quản lý (Supabase / Neon), rồi tải lại trang.")
+    st.stop()
 
 home = st.Page("views/home.py", title="Trang chủ", icon=":material/home:", default=True)
 login = st.Page("views/login.py", title="Đăng nhập", icon=":material/login:", url_path="dang-nhap")

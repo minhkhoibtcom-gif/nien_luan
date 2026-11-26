@@ -6,3 +6,4 @@ __pycache__/
 .claude/
 *.rar
 users.db
+.streamlit/secrets.toml

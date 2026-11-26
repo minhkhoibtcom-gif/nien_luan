@@ -1,7 +1,7 @@
 """Combo theo tháng: đề xuất từ số lượng món mà mỗi cụm mua vào ngày thường / cuối tuần của tháng trước.
 
 Quy trình mỗi tháng M:
-1. Gom đơn tháng M-1: đơn thật trong users.db (đã lưu cụm và loại ngày lúc đặt, bỏ đơn đã hủy)
+1. Gom đơn tháng M-1: đơn thật trong database (đã lưu cụm và loại ngày lúc đặt, bỏ đơn đã hủy)
    và đơn mô phỏng trong simulated_orders.csv (nếu có của tháng đó).
    Cỡ đơn (số người) = số phần món chính trong đơn (mỗi người một món chính).
 2. Mỗi cụm có 3 combo: 2 combo NGÀY THƯỜNG theo 2 cỡ đơn phổ biến nhất của ngày thường, và 1 combo CUỐI TUẦN
@@ -13,12 +13,13 @@ Quy trình mỗi tháng M:
      không bao giờ có trong combo (menu.NOT_IN_COMBO).
    - Món phụ (tráng miệng): số phần trung bình làm tròn, không quá số người, tối đa 2 loại; 2 cụm sinh viên
      (thu nhập thấp) không có món phụ.
-3. Giá combo = giá lẻ - % giảm của cụm (làm tròn xuống nghìn đồng). Lưu thành đề xuất (status = proposed).
+3. Giá combo = giá lẻ giảm 10%, làm tròn xuống giá đuôi 5.000₫ / 9.000₫. Lưu thành đề xuất (status = proposed).
 4. Admin duyệt (có thể sửa giá) -> active. Combo ngày thường đặt được MỌI NGÀY (cả cuối tuần); combo cuối tuần
    chỉ đặt được Thứ 7-CN (ngày thường vẫn xem được). Sang tháng mới cần đề xuất + duyệt lại; chưa duyệt thì
    tạm dùng combo đã duyệt gần nhất, chưa từng duyệt thì dùng combo mặc định (menu.DEFAULT_COMBOS).
 """
 import math
+import time
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
@@ -80,11 +81,13 @@ def order_lines(month, menu=None):
     menu = load_menu() if menu is None else menu
     frames = []
     with auth.connect() as conn:
-        real = pd.read_sql_query(
-            "SELECT o.order_id AS order_key, o.segment, o.day_type, i.code AS item_id, i.quantity "
+        rows = conn.execute(
+            "SELECT o.order_id, o.segment, o.day_type, i.code, i.quantity "
             "FROM orders o JOIN order_items i ON i.order_id = o.order_id "
             "WHERE o.status <> 'cancelled' AND o.segment IS NOT NULL AND o.day_type IS NOT NULL "
-            "AND substr(o.created_at, 1, 7) = ?", conn, params=(month,))
+            "AND substr(o.created_at, 1, 7) = ?", (month,)).fetchall()
+    real = pd.DataFrame([tuple(r) for r in rows],
+                        columns=["order_key", "segment", "day_type", "item_id", "quantity"])
     if not real.empty:
         real["order_key"] = "R" + real["order_key"].astype(str)
         frames.append(real.assign(source="thật"))
@@ -219,8 +222,18 @@ def _now():
     return datetime.now().replace(microsecond=0).isoformat(" ")
 
 
+# combo đang hiển thị được nhớ tạm (đỡ truy vấn lặp lại khi database ở xa); ghi / duyệt combo thì xóa ngay
+CACHE_SECONDS = 60
+_displayed_cache = {}
+
+
+def _invalidate():
+    _displayed_cache.clear()
+
+
 def save_proposals(month, combos):
     """Ghi đề xuất mới của tháng (thay đề xuất chưa duyệt cũ; combo đã duyệt giữ nguyên)."""
+    _invalidate()
     with auth.connect() as conn:
         conn.execute("DELETE FROM combos WHERE month = ? AND status <> 'active'", (month,))
         active = {r[0] for r in conn.execute("SELECT combo_id FROM combos WHERE month = ?", (month,))}
@@ -231,13 +244,14 @@ def save_proposals(month, combos):
                          " icon, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'proposed', ?)",
                          (c.combo_id, month, c.day_type, c.segment, c.name, c.people, c.price, c.offer, c.reason,
                           c.icon, _now()))
-            conn.executemany("INSERT INTO combo_items (combo_id, item_id, quantity) VALUES (?, ?, ?)",
-                             [(c.combo_id, i, q) for i, q in c.items])
+            conn.executemany("INSERT INTO combo_items (combo_id, item_id, quantity, line_no) VALUES (?, ?, ?, ?)",
+                             [(c.combo_id, i, q, n) for n, (i, q) in enumerate(c.items)])
 
 
 def clear_month(month):
     """Xóa toàn bộ combo của tháng (kể cả đã duyệt) để tạo lại theo quy tắc mới. Đơn đã đặt không bị ảnh hưởng
     vì order_items lưu từng món và tên combo riêng."""
+    _invalidate()
     with auth.connect() as conn:
         conn.execute("DELETE FROM combos WHERE month = ?", (month,))
 
@@ -246,7 +260,8 @@ def _load(where, params):
     with auth.connect() as conn:
         rows = conn.execute(f"SELECT * FROM combos WHERE {where} ORDER BY combo_id", params).fetchall()
         items = {}
-        for r in conn.execute("SELECT combo_id, item_id, quantity FROM combo_items ORDER BY rowid"):
+        for r in conn.execute("SELECT combo_id, item_id, quantity FROM combo_items WHERE combo_id IN "
+                              f"(SELECT combo_id FROM combos WHERE {where}) ORDER BY combo_id, line_no", params):
             items.setdefault(r["combo_id"], []).append((r["item_id"], r["quantity"]))
     order = {s: i for i, s in enumerate(SEGMENT_CODE)}
     combos = [Combo(r["combo_id"], r["name"], r["segment"], r["people"], tuple(items.get(r["combo_id"], [])),
@@ -263,6 +278,7 @@ def month_combos(month, status=None):
 
 
 def approve(combo_id, price=None):
+    _invalidate()
     with auth.connect() as conn:
         if price is not None:
             conn.execute("UPDATE combos SET price = ? WHERE combo_id = ?", (int(price), combo_id))
@@ -270,6 +286,7 @@ def approve(combo_id, price=None):
 
 
 def reject(combo_id):
+    _invalidate()
     with auth.connect() as conn:
         conn.execute("UPDATE combos SET status = 'rejected' WHERE combo_id = ?", (combo_id,))
 
@@ -287,14 +304,20 @@ def displayed(today=None):
     """(combo đang hiển thị, tháng của bộ combo hoặc None nếu dùng combo mặc định).
     Ưu tiên combo đã duyệt của tháng này; chưa có thì combo đã duyệt gần nhất; chưa từng duyệt thì mặc định."""
     month = current_month(today)
-    active = month_combos(month, "active")
-    if active:
-        return active, month
-    with auth.connect() as conn:
-        row = conn.execute("SELECT MAX(month) FROM combos WHERE status = 'active' AND month < ?", (month,)).fetchone()
-    if row and row[0]:
-        return month_combos(row[0], "active"), row[0]
-    return list(DEFAULT_COMBOS), None
+    hit = _displayed_cache.get(month)
+    if hit and time.monotonic() - hit[0] < CACHE_SECONDS:
+        return list(hit[1]), hit[2]
+    shown, shown_month = month_combos(month, "active"), month
+    if not shown:
+        with auth.connect() as conn:
+            row = conn.execute("SELECT MAX(month) FROM combos WHERE status = 'active' AND month < ?",
+                               (month,)).fetchone()
+        if row and row[0]:
+            shown, shown_month = month_combos(row[0], "active"), row[0]
+        else:
+            shown, shown_month = list(DEFAULT_COMBOS), None
+    _displayed_cache[month] = (time.monotonic(), shown, shown_month)
+    return list(shown), shown_month
 
 
 def get(combo_id, today=None):

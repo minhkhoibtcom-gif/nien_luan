@@ -5,6 +5,7 @@ import streamlit as st
 
 import auth
 import combos
+import db
 import orders
 import shared
 import ui
@@ -365,3 +366,4 @@ with tab_accounts:
         st.dataframe(shown, width="stretch", hide_index=True)
         st.download_button("Tải danh sách tài khoản (CSV)", shown.to_csv(index=False).encode("utf-8-sig"),
                            file_name="tai_khoan_khach_hang.csv", mime="text/csv")
+    st.caption(f"Dữ liệu tài khoản, đơn hàng và combo lưu trong: {db.describe()}")
