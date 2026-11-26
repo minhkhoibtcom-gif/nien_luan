@@ -141,7 +141,7 @@ div[data-testid="stMetricValue"] {{ color: {RED_DARK}; }}
 /* Form nằm trong thẻ đăng nhập/đăng ký: không vẽ thêm khung thứ hai */
 .st-key-auth_card div[data-testid="stForm"] {{ box-shadow: none; padding: 0; }}
 
-/* Chân trang: nền đỏ sẫm, 4 cột (thương hiệu | khám phá | thực đơn | liên hệ) + dải bản quyền */
+/* Chân trang: nền đỏ sẫm, 3 cột (thương hiệu | thực đơn | liên hệ) + dải bản quyền */
 .st-key-footer {{
   margin-top: 3rem; padding: 2rem 2rem 1.1rem; border-radius: 18px; gap: .6rem;
   background: linear-gradient(135deg, #2b0a0a 0%, #4a1010 60%, #5c1414 100%); color: #f3d6b0;
@@ -164,10 +164,6 @@ div[data-testid="stMetricValue"] {{ color: {RED_DARK}; }}
   border: 1px solid rgba(246, 170, 28, .45); color: #ffe2ad; border-radius: 999px;
   padding: .15rem .65rem; font-size: .75rem; white-space: nowrap;
 }}
-.st-key-footer [data-testid="stPageLink"] a {{ padding: .1rem 0; min-height: 0; background: transparent; }}
-.st-key-footer [data-testid="stPageLink"] a p {{ color: #f3d6b0; font-size: .9rem; }}
-.st-key-footer [data-testid="stPageLink"] a:hover p {{ color: {YELLOW}; }}
-.st-key-footer [data-testid="stPageLink"] span[data-testid="stIconMaterial"] {{ color: {YELLOW}; }}
 .lcf-f-bottom {{
   border-top: 1px solid rgba(255, 255, 255, .14); margin-top: 1.2rem; padding-top: .9rem;
   display: flex; flex-wrap: wrap; justify-content: space-between; gap: .4rem 1.5rem;
@@ -323,28 +319,19 @@ CONTACT = {
 }
 
 
-def footer(pages, user=None, about=""):
-    """Chân trang kiểu web bán hàng. Liên kết dùng st.page_link để chuyển trang không mất phiên đăng nhập."""
+def footer(about=""):
+    """Chân trang kiểu web bán hàng: thương hiệu | thực đơn | liên hệ, dải bản quyền bên dưới."""
     def title(text):
         html_block(f'<div class="lcf-f-title">{esc(text)}</div>')
 
     with st.container(key="footer"):
-        brand, explore, menu_col, contact = st.columns([1.5, 1, 1.05, 1.4], gap="large")
+        brand, menu_col, contact = st.columns([1.6, 1, 1.4], gap="large")
         with brand:
             html_block(f'<div class="lcf-f-brand"><img src="{data_uri(LOGO)}" alt=""><b>{SITE_NAME}</b></div>'
                        f'<div class="lcf-f-text">{esc(SLOGAN)} Gà giòn, mì Ý, burger và combo tiết kiệm '
                        'được gợi ý riêng theo nhóm khách hàng của bạn.</div>'
                        '<div class="lcf-f-chips"><span>💵 Thanh toán khi nhận hàng</span>'
                        '<span>🏦 Chuyển khoản</span><span>⭐ Đánh giá sau mỗi đơn</span></div>')
-        with explore:
-            title("Khám phá")
-            st.page_link(pages["home"], label="Trang chủ", icon=":material/home:")
-            if user is None:
-                st.page_link(pages["login"], label="Đăng nhập", icon=":material/login:")
-                st.page_link(pages["register"], label="Đăng ký thành viên", icon=":material/person_add:")
-            else:
-                st.page_link(pages["cart"], label="Giỏ hàng", icon=":material/shopping_cart:")
-                st.page_link(pages["account"], label="Tài khoản & đơn hàng", icon=":material/person:")
         with menu_col:
             title("Thực đơn")
             items = "".join(f"<li>{icon} {esc(group)}</li>" for group, icon in GROUP_ICON.items())

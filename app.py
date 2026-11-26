@@ -72,5 +72,5 @@ if navbar is not None:
                     st.switch_page(home)
 
 if not auth_page:
-    ui.footer(shared.PAGES, user, about="Đồ án niên luận: phân khúc khách hàng đặt đồ ăn online bằng K-Prototypes, "
+    ui.footer(about="Đồ án niên luận: phân khúc khách hàng đặt đồ ăn online bằng K-Prototypes, "
               "gợi ý combo khuyến mãi cho từng nhóm khách.")
