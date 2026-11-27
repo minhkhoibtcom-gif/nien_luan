@@ -1,354 +1,257 @@
 TÂM CỤM QUA TỪNG VÒNG LẶP CỦA K-PROTOTYPES
-Dữ liệu: online food delivery dataset 3000.csv (3000 mẫu sau làm sạch)
-Tham số: K = 4, init = 'Cao', n_init = 5, random_state = 42, gamma = 0.500
-Biến số (Age, Family size) được chuẩn hóa khi huấn luyện; bảng dưới ghi giá trị ở thang đo gốc, kèm giá trị chuẩn hóa trong ngoặc.
+Dữ liệu: genz_vn.xlsx (361 mẫu)
+Tham số: K = 3, init = 'Cao', n_init = 5, random_state = 42, gamma = 0.500
+Biến số (Tuổi, Thu nhập, Thái độ, Ý định đặt tiếp) được chuẩn hóa khi huấn luyện; bảng dưới ghi giá trị ở thang đo gốc, kèm giá trị chuẩn hóa trong ngoặc.
 Vòng 0 là tâm ban đầu sau bước khởi tạo. moves = số điểm đổi cụm trong vòng đó; thuật toán dừng khi moves = 0 hoặc cost không giảm.
-Lần chạy được chọn: lần 1 (cost thấp nhất = 4734.9, 6 vòng lặp).
+Lần chạy được chọn: lần 4 (cost thấp nhất = 1055.8, 4 vòng lặp).
 
 ====================================================================================================
-LẦN CHẠY 1/5  <== ĐƯỢC CHỌN   |   số vòng lặp = 6   |   cost cuối = 4734.9
+LẦN CHẠY 1/5   |   số vòng lặp = 5   |   cost cuối = 1099.7
 ====================================================================================================
 
-Vòng 0 (khởi tạo)   cost = 5725.8
-Cụm                            Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
------------------------------  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0 (Người có gia đình hộ đông)  932       28.53 (+1.144)  3.80 (+0.368)  Male    Married         Employee    Graduate                    Yes     Positive
-1 (Người đi làm trẻ)           472       25.08 (+0.098)  3.00 (-0.194)  Female  Married         Employee    Post Graduate               No      Positive
-2 (Sinh viên hộ đông)          206       19.76 (-1.513)  4.02 (+0.526)  Male    Single          Student     Graduate                    Yes     Positive
-3 (Sinh viên hộ nhỏ)           1390      22.86 (-0.576)  2.91 (-0.259)  Male    Single          Student     Post Graduate               Yes     Positive
+Vòng 0 (khởi tạo)   cost = 1218.4
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    230       25.88 (+0.618)  16.57 (+0.328)  4.58 (+0.087)  4.69 (-0.046)    Nữ         Đã kết hôn  Đại học
+1    88        19.77 (-1.402)  7.16 (-0.582)   4.69 (+0.222)  4.76 (+0.061)    Nam        Độc thân    Cao đẳng
+2    43        22.69 (-0.438)  7.33 (-0.565)   3.74 (-0.918)  4.81 (+0.122)    Nam        Độc thân    Đại học
 
-Vòng 1   moves = 896   cost = 4905.6
-Cụm                            Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
------------------------------  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0 (Người có gia đình hộ đông)  681       29.08 (+1.310)  4.33 (+0.740)  Male    Married         Employee    Graduate                    Yes     Positive
-1 (Người đi làm trẻ)           498       26.14 (+0.420)  2.38 (-0.638)  Female  Married         Employee    Post Graduate               Yes     Positive
-2 (Sinh viên hộ đông)          544       22.03 (-0.825)  4.74 (+1.035)  Male    Single          Student     Graduate                    Yes     Positive
-3 (Sinh viên hộ nhỏ)           1277      23.07 (-0.511)  2.45 (-0.587)  Male    Single          Student     Post Graduate               Yes     Positive
+Vòng 1   moves = 85   cost = 1108.4
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    169       26.16 (+0.712)  19.56 (+0.617)  4.71 (+0.252)  4.80 (+0.107)    Nữ         Đã kết hôn  Đại học
+1    100       20.57 (-1.140)  5.90 (-0.703)   4.88 (+0.457)  5.01 (+0.400)    Nam        Độc thân    Cao đẳng
+2    92        23.80 (-0.068)  9.35 (-0.370)   3.71 (-0.959)  4.26 (-0.631)    Nữ         Độc thân    Đại học
 
-Vòng 2   moves = 453   cost = 4773.4
-Cụm                            Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
------------------------------  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0 (Người có gia đình hộ đông)  527       29.41 (+1.410)  4.69 (+0.996)  Male    Married         Employee    Graduate                    Yes     Positive
-1 (Người đi làm trẻ)           635       26.80 (+0.618)  2.30 (-0.690)  Female  Married         Employee    Post Graduate               Yes     Positive
-2 (Sinh viên hộ đông)          674       22.75 (-0.609)  4.72 (+1.017)  Male    Single          Student     Post Graduate               Yes     Positive
-3 (Sinh viên hộ nhỏ)           1164      22.70 (-0.622)  2.34 (-0.663)  Male    Single          Student     Post Graduate               Yes     Positive
+Vòng 2   moves = 25   cost = 1102.6
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    161       26.19 (+0.722)  19.97 (+0.657)  4.71 (+0.243)  4.83 (+0.147)    Nữ         Đã kết hôn  Đại học
+1    95        20.86 (-1.041)  5.84 (-0.709)   4.99 (+0.585)  5.12 (+0.556)    Nam        Độc thân    Cao đẳng
+2    105       23.51 (-0.166)  9.38 (-0.367)   3.76 (-0.901)  4.19 (-0.728)    Nữ         Độc thân    Đại học
 
-Vòng 3   moves = 65   cost = 4768.5
-Cụm                            Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
------------------------------  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0 (Người có gia đình hộ đông)  492       29.49 (+1.432)  4.78 (+1.058)  Male    Married         Employee    Graduate                    Yes     Positive
-1 (Người đi làm trẻ)           635       26.97 (+0.670)  2.28 (-0.705)  Female  Married         Employee    Post Graduate               Yes     Positive
-2 (Sinh viên hộ đông)          704       22.88 (-0.570)  4.70 (+1.001)  Male    Single          Student     Post Graduate               Yes     Positive
-3 (Sinh viên hộ nhỏ)           1169      22.70 (-0.624)  2.34 (-0.665)  Male    Single          Student     Post Graduate               Yes     Positive
+Vòng 3   moves = 7   cost = 1100.5
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    157       26.19 (+0.722)  20.29 (+0.688)  4.70 (+0.241)  4.78 (+0.088)    Nữ         Đã kết hôn  Đại học
+1    98        21.12 (-0.956)  5.92 (-0.702)   4.99 (+0.581)  5.20 (+0.663)    Nam        Độc thân    Cao đẳng
+2    106       23.45 (-0.186)  9.34 (-0.371)   3.76 (-0.894)  4.18 (-0.743)    Nữ         Độc thân    Đại học
 
-Vòng 4   moves = 94   cost = 4735.6
-Cụm                            Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
------------------------------  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0 (Người có gia đình hộ đông)  465       29.49 (+1.434)  4.87 (+1.124)  Male    Married         Employee    Graduate                    Yes     Positive
-1 (Người đi làm trẻ)           662       27.03 (+0.689)  2.32 (-0.676)  Female  Married         Employee    Graduate                    Yes     Positive
-2 (Sinh viên hộ đông)          702       22.88 (-0.570)  4.70 (+1.002)  Male    Single          Student     Post Graduate               Yes     Positive
-3 (Sinh viên hộ nhỏ)           1171      22.72 (-0.617)  2.34 (-0.665)  Male    Single          Student     Post Graduate               Yes     Positive
+Vòng 4   moves = 5   cost = 1099.7
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    155       26.20 (+0.725)  20.42 (+0.701)  4.71 (+0.244)  4.77 (+0.066)    Nữ         Đã kết hôn  Đại học
+1    99        21.29 (-0.899)  6.01 (-0.693)   4.98 (+0.577)  5.24 (+0.716)    Nam        Độc thân    Cao đẳng
+2    107       23.35 (-0.218)  9.30 (-0.375)   3.77 (-0.888)  4.17 (-0.758)    Nữ         Độc thân    Đại học
 
-Vòng 5   moves = 58   cost = 4734.9
-Cụm                            Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
------------------------------  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0 (Người có gia đình hộ đông)  455       29.53 (+1.444)  4.90 (+1.144)  Male    Married         Employee    Graduate                    Yes     Positive
-1 (Người đi làm trẻ)           676       26.99 (+0.675)  2.35 (-0.654)  Female  Married         Employee    Graduate                    Yes     Positive
-2 (Sinh viên hộ đông)          699       22.87 (-0.573)  4.70 (+1.004)  Male    Single          Student     Post Graduate               Yes     Positive
-3 (Sinh viên hộ nhỏ)           1170      22.75 (-0.610)  2.33 (-0.667)  Male    Single          Student     Post Graduate               Yes     Positive
-
-Vòng 6   moves = 0   cost = 4734.9
-Cụm                            Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
------------------------------  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0 (Người có gia đình hộ đông)  455       29.53 (+1.444)  4.90 (+1.144)  Male    Married         Employee    Graduate                    Yes     Positive
-1 (Người đi làm trẻ)           676       26.99 (+0.675)  2.35 (-0.654)  Female  Married         Employee    Graduate                    Yes     Positive
-2 (Sinh viên hộ đông)          699       22.87 (-0.573)  4.70 (+1.004)  Male    Single          Student     Post Graduate               Yes     Positive
-3 (Sinh viên hộ nhỏ)           1170      22.75 (-0.610)  2.33 (-0.667)  Male    Single          Student     Post Graduate               Yes     Positive
+Vòng 5   moves = 0   cost = 1099.7
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    155       26.20 (+0.725)  20.42 (+0.701)  4.71 (+0.244)  4.77 (+0.066)    Nữ         Đã kết hôn  Đại học
+1    99        21.29 (-0.899)  6.01 (-0.693)   4.98 (+0.577)  5.24 (+0.716)    Nam        Độc thân    Cao đẳng
+2    107       23.35 (-0.218)  9.30 (-0.375)   3.77 (-0.888)  4.17 (-0.758)    Nữ         Độc thân    Đại học
 
 ====================================================================================================
-LẦN CHẠY 2/5   |   số vòng lặp = 9   |   cost cuối = 4851.4
+LẦN CHẠY 2/5   |   số vòng lặp = 5   |   cost cuối = 1062.7
 ====================================================================================================
 
-Vòng 0 (khởi tạo)   cost = 5384.1
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    476       29.34 (+1.389)  3.26 (-0.013)  Male    Married         Employee    Graduate                    Yes     Positive
-1    1675      23.52 (-0.376)  3.30 (+0.015)  Male    Single          Student     Post Graduate               Yes     Positive
-2    320       22.78 (-0.598)  5.52 (+1.582)  Male    Single          Student     Graduate                    Yes     Positive
-3    529       25.75 (+0.301)  1.87 (-0.994)  Female  Single          Student     Post Graduate               Yes     Positive
+Vòng 0 (khởi tạo)   cost = 1273.4
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    160       25.63 (+0.536)  12.88 (-0.029)  4.77 (+0.321)  4.99 (+0.371)    Nữ         Đã kết hôn  Đại học
+1    82        22.85 (-0.385)  22.56 (+0.908)  4.83 (+0.391)  4.61 (-0.155)    Nam        Độc thân    Đại học
+2    119       22.63 (-0.455)  7.10 (-0.587)   3.92 (-0.701)  4.43 (-0.392)    Nam        Độc thân    Cao đẳng
 
-Vòng 1   moves = 851   cost = 5027.1
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    628       29.47 (+1.428)  3.91 (+0.443)  Male    Married         Employee    Graduate                    Yes     Positive
-1    1162      22.60 (-0.655)  3.06 (-0.151)  Male    Single          Student     Graduate                    Yes     Positive
-2    431       23.51 (-0.377)  5.46 (+1.543)  Male    Single          Student     Graduate                    Yes     Positive
-3    779       24.87 (+0.035)  1.88 (-0.985)  Female  Single          Student     Post Graduate               Yes     Positive
+Vòng 1   moves = 91   cost = 1076.6
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    146       25.82 (+0.598)  11.92 (-0.121)  4.92 (+0.504)  5.09 (+0.511)    Nữ         Đã kết hôn  Đại học
+1    76        25.32 (+0.434)  29.21 (+1.551)  4.09 (-0.504)  4.26 (-0.628)    Nam        Độc thân    Đại học
+2    139       21.40 (-0.865)  5.72 (-0.721)   4.29 (-0.254)  4.58 (-0.193)    Nam        Độc thân    Cao đẳng
 
-Vòng 2   moves = 159   cost = 4991.0
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    646       29.35 (+1.390)  4.06 (+0.554)  Male    Married         Employee    Graduate                    Yes     Positive
-1    1090      22.41 (-0.712)  3.03 (-0.179)  Male    Single          Student     Graduate                    Yes     Positive
-2    411       23.26 (-0.453)  5.42 (+1.513)  Female  Single          Student     Graduate                    Yes     Positive
-3    853       25.01 (+0.076)  1.98 (-0.920)  Female  Single          Student     Post Graduate               Yes     Positive
+Vòng 2   moves = 26   cost = 1065.2
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    137       26.02 (+0.666)  12.30 (-0.084)  4.94 (+0.524)  5.11 (+0.541)    Nữ         Đã kết hôn  Đại học
+1    83        25.51 (+0.495)  27.17 (+1.354)  3.98 (-0.629)  4.19 (-0.729)    Nam        Đã kết hôn  Đại học
+2    141       21.17 (-0.939)  5.78 (-0.715)   4.39 (-0.139)  4.65 (-0.097)    Nam        Độc thân    Cao đẳng
 
-Vòng 3   moves = 186   cost = 4921.1
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    632       29.38 (+1.400)  4.15 (+0.618)  Male    Married         Employee    Graduate                    Yes     Positive
-1    968       22.17 (-0.784)  2.92 (-0.256)  Male    Single          Student     Graduate                    Yes     Positive
-2    497       23.25 (-0.458)  5.13 (+1.305)  Female  Single          Student     Post Graduate               Yes     Positive
-3    903       25.13 (+0.112)  2.04 (-0.876)  Female  Single          Student     Post Graduate               Yes     Positive
+Vòng 3   moves = 10   cost = 1063.1
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    130       26.07 (+0.680)  12.08 (-0.106)  4.95 (+0.542)  5.15 (+0.589)    Nữ         Đã kết hôn  Đại học
+1    91        25.57 (+0.517)  25.99 (+1.240)  4.00 (-0.605)  4.20 (-0.721)    Nam        Đã kết hôn  Đại học
+2    140       21.09 (-0.968)  5.86 (-0.707)   4.41 (-0.110)  4.66 (-0.078)    Nam        Độc thân    Cao đẳng
 
-Vòng 4   moves = 182   cost = 4882.0
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    629       29.33 (+1.386)  4.23 (+0.674)  Male    Married         Employee    Graduate                    Yes     Positive
-1    926       22.02 (-0.828)  2.74 (-0.380)  Male    Single          Student     Graduate                    Yes     Positive
-2    584       23.26 (-0.453)  4.92 (+1.162)  Female  Single          Student     Post Graduate               Yes     Positive
-3    861       25.37 (+0.185)  2.04 (-0.873)  Female  Single          Student     Post Graduate               Yes     Positive
+Vòng 4   moves = 4   cost = 1062.7
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    129       26.06 (+0.678)  11.98 (-0.116)  4.96 (+0.551)  5.15 (+0.596)    Nữ         Đã kết hôn  Đại học
+1    94        25.62 (+0.532)  25.53 (+1.195)  4.00 (-0.610)  4.20 (-0.719)    Nam        Đã kết hôn  Đại học
+2    138       21.00 (-0.996)  5.87 (-0.706)   4.42 (-0.099)  4.67 (-0.068)    Nam        Độc thân    Cao đẳng
 
-Vòng 5   moves = 152   cost = 4860.9
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    610       29.38 (+1.399)  4.30 (+0.723)  Male    Married         Employee    Graduate                    Yes     Positive
-1    927       22.07 (-0.814)  2.59 (-0.489)  Male    Single          Student     Graduate                    Yes     Positive
-2    638       23.11 (-0.500)  4.83 (+1.098)  Female  Single          Student     Post Graduate               Yes     Positive
-3    825       25.64 (+0.267)  2.10 (-0.835)  Female  Single          Student     Post Graduate               Yes     Positive
-
-Vòng 6   moves = 74   cost = 4852.9
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    611       29.28 (+1.371)  4.39 (+0.784)  Male    Married         Employee    Graduate                    Yes     Positive
-1    938       22.09 (-0.807)  2.53 (-0.526)  Male    Single          Student     Graduate                    Yes     Positive
-2    636       22.99 (-0.535)  4.80 (+1.073)  Female  Single          Student     Post Graduate               Yes     Positive
-3    815       25.81 (+0.318)  2.12 (-0.820)  Female  Single          Student     Post Graduate               Yes     Positive
-
-Vòng 7   moves = 36   cost = 4851.4
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    614       29.25 (+1.361)  4.41 (+0.797)  Male    Married         Employee    Graduate                    Yes     Positive
-1    929       22.10 (-0.807)  2.49 (-0.556)  Male    Single          Student     Graduate                    Yes     Positive
-2    648       22.95 (-0.547)  4.77 (+1.054)  Female  Single          Student     Post Graduate               Yes     Positive
-3    809       25.85 (+0.331)  2.13 (-0.810)  Female  Single          Student     Post Graduate               Yes     Positive
-
-Vòng 8   moves = 2   cost = 4851.4
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    614       29.25 (+1.361)  4.41 (+0.797)  Male    Married         Employee    Graduate                    Yes     Positive
-1    929       22.10 (-0.807)  2.49 (-0.559)  Male    Single          Student     Graduate                    Yes     Positive
-2    649       22.96 (-0.546)  4.77 (+1.053)  Female  Single          Student     Post Graduate               Yes     Positive
-3    808       25.85 (+0.332)  2.13 (-0.809)  Female  Single          Student     Post Graduate               Yes     Positive
-
-Vòng 9   moves = 0   cost = 4851.4
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    614       29.25 (+1.361)  4.41 (+0.797)  Male    Married         Employee    Graduate                    Yes     Positive
-1    929       22.10 (-0.807)  2.49 (-0.559)  Male    Single          Student     Graduate                    Yes     Positive
-2    649       22.96 (-0.546)  4.77 (+1.053)  Female  Single          Student     Post Graduate               Yes     Positive
-3    808       25.85 (+0.332)  2.13 (-0.809)  Female  Single          Student     Post Graduate               Yes     Positive
+Vòng 5   moves = 0   cost = 1062.7
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    129       26.06 (+0.678)  11.98 (-0.116)  4.96 (+0.551)  5.15 (+0.596)    Nữ         Đã kết hôn  Đại học
+1    94        25.62 (+0.532)  25.53 (+1.195)  4.00 (-0.610)  4.20 (-0.719)    Nam        Đã kết hôn  Đại học
+2    138       21.00 (-0.996)  5.87 (-0.706)   4.42 (-0.099)  4.67 (-0.068)    Nam        Độc thân    Cao đẳng
 
 ====================================================================================================
-LẦN CHẠY 3/5   |   số vòng lặp = 8   |   cost cuối = 4851.4
+LẦN CHẠY 3/5   |   số vòng lặp = 8   |   cost cuối = 1061.3
 ====================================================================================================
 
-Vòng 0 (khởi tạo)   cost = 5147.7
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    1152      24.41 (-0.105)  2.86 (-0.294)  Male    Single          Student     Graduate                    Yes     Positive
-1    703       23.24 (-0.461)  1.84 (-1.015)  Female  Single          Student     Post Graduate               Yes     Positive
-2    569       29.07 (+1.305)  4.06 (+0.554)  Male    Married         Employee    Graduate                    Yes     Positive
-3    576       23.05 (-0.517)  5.09 (+1.279)  Female  Single          Student     Post Graduate               Yes     Positive
+Vòng 0 (khởi tạo)   cost = 1181.7
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    172       25.28 (+0.422)  13.90 (+0.070)  4.20 (-0.371)  4.29 (-0.592)    Nữ         Độc thân    Đại học
+1    81        25.59 (+0.522)  14.63 (+0.141)  4.77 (+0.319)  5.58 (+1.184)    Nam        Đã kết hôn  Đại học
+2    108       20.80 (-1.064)  10.93 (-0.217)  4.80 (+0.351)  4.76 (+0.055)    Nam        Độc thân    Cao đẳng
 
-Vòng 1   moves = 689   cost = 5085.1
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    994       23.94 (-0.249)  2.84 (-0.308)  Male    Single          Student     Graduate                    Yes     Positive
-1    771       23.47 (-0.391)  1.87 (-0.993)  Female  Single          Student     Post Graduate               Yes     Positive
-2    639       29.46 (+1.423)  4.15 (+0.619)  Male    Married         Employee    Graduate                    Yes     Positive
-3    596       22.76 (-0.605)  4.89 (+1.135)  Female  Single          Student     Post Graduate               Yes     Positive
+Vòng 1   moves = 72   cost = 1103.1
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    156       25.25 (+0.411)  16.41 (+0.313)  4.02 (-0.589)  4.25 (-0.650)    Nữ         Độc thân    Đại học
+1    100       25.87 (+0.617)  15.70 (+0.245)  5.06 (+0.674)  5.38 (+0.912)    Nữ         Đã kết hôn  Đại học
+2    105       20.39 (-1.198)  5.95 (-0.698)   4.70 (+0.233)  4.79 (+0.098)    Nam        Độc thân    Cao đẳng
 
-Vòng 2   moves = 212   cost = 5020.4
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    932       23.33 (-0.434)  2.87 (-0.290)  Male    Single          Student     Graduate                    Yes     Positive
-1    820       24.14 (-0.188)  1.87 (-0.992)  Female  Single          Student     Post Graduate               Yes     Positive
-2    641       29.45 (+1.422)  4.17 (+0.631)  Male    Married         Employee    Graduate                    Yes     Positive
-3    607       22.84 (-0.582)  4.86 (+1.120)  Female  Single          Student     Post Graduate               Yes     Positive
+Vòng 2   moves = 36   cost = 1085.1
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    129       25.31 (+0.432)  18.26 (+0.492)  3.94 (-0.681)  4.18 (-0.744)    Nữ         Đã kết hôn  Đại học
+1    110       26.06 (+0.680)  15.45 (+0.221)  5.09 (+0.703)  5.27 (+0.761)    Nữ         Đã kết hôn  Đại học
+2    122       20.78 (-1.069)  5.74 (-0.719)   4.58 (+0.086)  4.79 (+0.101)    Nam        Độc thân    Cao đẳng
 
-Vòng 3   moves = 271   cost = 4926.8
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    933       22.66 (-0.637)  2.75 (-0.372)  Male    Single          Student     Graduate                    Yes     Positive
-1    783       24.88 (+0.038)  1.90 (-0.972)  Female  Single          Student     Post Graduate               Yes     Positive
-2    643       29.40 (+1.407)  4.17 (+0.630)  Male    Married         Employee    Graduate                    Yes     Positive
-3    641       23.01 (-0.531)  4.83 (+1.096)  Female  Single          Student     Post Graduate               Yes     Positive
+Vòng 3   moves = 25   cost = 1069.9
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    117       25.65 (+0.541)  21.15 (+0.772)  3.98 (-0.634)  4.19 (-0.734)    Nữ         Đã kết hôn  Đại học
+1    105       26.08 (+0.684)  14.24 (+0.103)  5.10 (+0.724)  5.29 (+0.782)    Nữ         Đã kết hôn  Đại học
+2    139       21.07 (-0.972)  5.65 (-0.728)   4.49 (-0.013)  4.74 (+0.027)    Nam        Độc thân    Cao đẳng
 
-Vòng 4   moves = 244   cost = 4868.8
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    919       22.24 (-0.764)  2.62 (-0.463)  Male    Single          Student     Graduate                    Yes     Positive
-1    807       25.44 (+0.207)  2.04 (-0.877)  Female  Single          Student     Post Graduate               Yes     Positive
-2    629       29.36 (+1.394)  4.25 (+0.684)  Male    Married         Employee    Graduate                    Yes     Positive
-3    645       23.01 (-0.529)  4.82 (+1.090)  Female  Single          Student     Post Graduate               Yes     Positive
+Vòng 4   moves = 11   cost = 1065.9
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    115       25.68 (+0.552)  22.39 (+0.892)  4.01 (-0.592)  4.21 (-0.706)    Nữ         Đã kết hôn  Đại học
+1    104       26.06 (+0.679)  13.17 (+0.000)  5.09 (+0.710)  5.31 (+0.812)    Nữ         Đã kết hôn  Đại học
+2    142       21.15 (-0.945)  5.70 (-0.722)   4.47 (-0.040)  4.70 (-0.023)    Nam        Độc thân    Cao đẳng
 
-Vòng 5   moves = 106   cost = 4855.4
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    927       22.13 (-0.798)  2.56 (-0.508)  Male    Single          Student     Graduate                    Yes     Positive
-1    819       25.71 (+0.287)  2.10 (-0.836)  Female  Single          Student     Post Graduate               Yes     Positive
-2    620       29.28 (+1.368)  4.36 (+0.766)  Male    Married         Employee    Graduate                    Yes     Positive
-3    634       22.97 (-0.543)  4.80 (+1.074)  Female  Single          Student     Post Graduate               Yes     Positive
+Vòng 5   moves = 13   cost = 1061.4
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    108       25.74 (+0.573)  23.43 (+0.992)  4.04 (-0.565)  4.21 (-0.697)    Nam        Đã kết hôn  Đại học
+1    109       26.08 (+0.685)  12.71 (-0.045)  5.05 (+0.660)  5.28 (+0.777)    Nữ         Đã kết hôn  Đại học
+2    144       21.15 (-0.948)  5.83 (-0.710)   4.44 (-0.076)  4.67 (-0.066)    Nam        Độc thân    Cao đẳng
 
-Vòng 6   moves = 60   cost = 4851.5
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    935       22.11 (-0.803)  2.50 (-0.549)  Male    Single          Student     Graduate                    Yes     Positive
-1    809       25.85 (+0.331)  2.13 (-0.810)  Female  Single          Student     Post Graduate               Yes     Positive
-2    614       29.25 (+1.361)  4.41 (+0.797)  Male    Married         Employee    Graduate                    Yes     Positive
-3    642       22.94 (-0.550)  4.78 (+1.059)  Female  Single          Student     Post Graduate               Yes     Positive
+Vòng 6   moves = 1   cost = 1061.3
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    108       25.74 (+0.573)  23.43 (+0.992)  4.04 (-0.565)  4.21 (-0.697)    Nam        Đã kết hôn  Đại học
+1    110       26.06 (+0.678)  12.64 (-0.052)  5.06 (+0.667)  5.28 (+0.773)    Nữ         Đã kết hôn  Đại học
+2    143       21.13 (-0.955)  5.84 (-0.709)   4.43 (-0.086)  4.67 (-0.069)    Nam        Độc thân    Cao đẳng
 
-Vòng 7   moves = 8   cost = 4851.4
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    929       22.10 (-0.807)  2.49 (-0.559)  Male    Single          Student     Graduate                    Yes     Positive
-1    808       25.85 (+0.332)  2.13 (-0.809)  Female  Single          Student     Post Graduate               Yes     Positive
-2    614       29.25 (+1.361)  4.41 (+0.797)  Male    Married         Employee    Graduate                    Yes     Positive
-3    649       22.96 (-0.546)  4.77 (+1.053)  Female  Single          Student     Post Graduate               Yes     Positive
+Vòng 7   moves = 1   cost = 1061.3
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    108       25.74 (+0.573)  23.43 (+0.992)  4.04 (-0.565)  4.21 (-0.697)    Nam        Đã kết hôn  Đại học
+1    111       26.04 (+0.672)  12.57 (-0.058)  5.07 (+0.677)  5.27 (+0.761)    Nữ         Đã kết hôn  Đại học
+2    142       21.11 (-0.961)  5.85 (-0.709)   4.42 (-0.100)  4.67 (-0.065)    Nam        Độc thân    Cao đẳng
 
-Vòng 8   moves = 0   cost = 4851.4
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    929       22.10 (-0.807)  2.49 (-0.559)  Male    Single          Student     Graduate                    Yes     Positive
-1    808       25.85 (+0.332)  2.13 (-0.809)  Female  Single          Student     Post Graduate               Yes     Positive
-2    614       29.25 (+1.361)  4.41 (+0.797)  Male    Married         Employee    Graduate                    Yes     Positive
-3    649       22.96 (-0.546)  4.77 (+1.053)  Female  Single          Student     Post Graduate               Yes     Positive
+Vòng 8   moves = 0   cost = 1061.3
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    108       25.74 (+0.573)  23.43 (+0.992)  4.04 (-0.565)  4.21 (-0.697)    Nam        Đã kết hôn  Đại học
+1    111       26.04 (+0.672)  12.57 (-0.058)  5.07 (+0.677)  5.27 (+0.761)    Nữ         Đã kết hôn  Đại học
+2    142       21.11 (-0.961)  5.85 (-0.709)   4.42 (-0.100)  4.67 (-0.065)    Nam        Độc thân    Cao đẳng
 
 ====================================================================================================
-LẦN CHẠY 4/5   |   số vòng lặp = 6   |   cost cuối = 4836.5
+LẦN CHẠY 4/5  <== ĐƯỢC CHỌN   |   số vòng lặp = 4   |   cost cuối = 1055.8
 ====================================================================================================
 
-Vòng 0 (khởi tạo)   cost = 6474.6
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    1467      26.15 (+0.421)  4.22 (+0.662)  Male    Single          Student     Graduate                    Yes     Positive
-1    605       22.52 (-0.678)  2.50 (-0.548)  Female  Single          Employee    Graduate                    Yes     Positive
-2    358       22.91 (-0.561)  1.72 (-1.102)  Male    Single          Student     Post Graduate               Yes     Positive
-3    570       24.72 (-0.011)  2.67 (-0.431)  Female  Single          Student     Post Graduate               Yes     Positive
+Vòng 0 (khởi tạo)   cost = 1138.0
+Cụm                            Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+-----------------------------  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0 (Người đi làm thu nhập khá)  179       25.67 (+0.549)  17.40 (+0.409)  4.25 (-0.313)  4.37 (-0.475)    Nữ         Đã kết hôn  Đại học
+1 (Sinh viên thu nhập thấp)    118       21.25 (-0.915)  5.85 (-0.708)   4.78 (+0.331)  4.67 (-0.066)    Nam        Độc thân    Cao đẳng
+2 (Khách trung thành)          64        24.47 (+0.152)  14.84 (+0.162)  4.72 (+0.264)  5.77 (+1.450)    Nam        Độc thân    Đại học
 
-Vòng 1   moves = 1151   cost = 5355.2
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    959       27.10 (+0.709)  4.69 (+0.993)  Male    Married         Employee    Graduate                    Yes     Positive
-1    673       21.62 (-0.951)  3.39 (+0.079)  Female  Single          Student     Graduate                    Yes     Positive
-2    606       22.89 (-0.565)  1.81 (-1.037)  Male    Single          Student     Post Graduate               Yes     Positive
-3    762       26.07 (+0.396)  2.58 (-0.495)  Female  Single          Student     Post Graduate               Yes     Positive
+Vòng 1   moves = 65   cost = 1067.7
+Cụm                            Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+-----------------------------  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0 (Người đi làm thu nhập khá)  166       25.89 (+0.621)  19.22 (+0.585)  4.19 (-0.379)  4.37 (-0.476)    Nữ         Đã kết hôn  Đại học
+1 (Sinh viên thu nhập thấp)    129       21.03 (-0.986)  5.70 (-0.723)   4.49 (-0.014)  4.64 (-0.113)    Nam        Độc thân    Cao đẳng
+2 (Khách trung thành)          66        25.11 (+0.365)  12.58 (-0.058)  5.32 (+0.981)  5.75 (+1.417)    Nam        Độc thân    Đại học
 
-Vòng 2   moves = 702   cost = 4968.6
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    681       28.22 (+1.047)  4.83 (+1.094)  Male    Married         Employee    Graduate                    Yes     Positive
-1    784       21.96 (-0.849)  4.02 (+0.520)  Female  Single          Student     Graduate                    Yes     Positive
-2    803       22.76 (-0.607)  2.03 (-0.880)  Male    Single          Student     Post Graduate               Yes     Positive
-3    732       26.74 (+0.600)  2.42 (-0.610)  Female  Single          Employee    Post Graduate               Yes     Positive
+Vòng 2   moves = 15   cost = 1056.9
+Cụm                            Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+-----------------------------  --------  --------------  --------------  -------------  ---------------  ---------  ----------  -------
+0 (Người đi làm thu nhập khá)  158       25.99 (+0.655)  19.68 (+0.630)  4.20 (-0.368)  4.37 (-0.478)    Nữ         Đã kết hôn  Đại học
+1 (Sinh viên thu nhập thấp)    132       21.05 (-0.980)  5.68 (-0.724)   4.40 (-0.128)  4.62 (-0.135)    Nữ         Độc thân    Đại học
+2 (Khách trung thành)          71        25.11 (+0.365)  12.61 (-0.055)  5.38 (+1.056)  5.68 (+1.316)    Nam        Độc thân    Đại học
 
-Vòng 3   moves = 351   cost = 4852.8
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    582       28.85 (+1.239)  4.81 (+1.083)  Male    Married         Employee    Graduate                    Yes     Positive
-1    717       22.42 (-0.708)  4.40 (+0.795)  Female  Single          Student     Graduate                    Yes     Positive
-2    983       22.53 (-0.674)  2.24 (-0.736)  Male    Single          Student     Post Graduate               Yes     Positive
-3    718       26.82 (+0.625)  2.34 (-0.665)  Female  Single          Employee    Post Graduate               Yes     Positive
+Vòng 3   moves = 6   cost = 1055.8
+Cụm                            Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+-----------------------------  --------  --------------  --------------  -------------  ---------------  ---------  ----------  -------
+0 (Người đi làm thu nhập khá)  155       26.03 (+0.667)  19.97 (+0.657)  4.21 (-0.358)  4.38 (-0.471)    Nữ         Đã kết hôn  Đại học
+1 (Sinh viên thu nhập thấp)    132       21.10 (-0.962)  5.68 (-0.724)   4.35 (-0.183)  4.60 (-0.167)    Nữ         Độc thân    Đại học
+2 (Khách trung thành)          74        24.97 (+0.319)  12.30 (-0.085)  5.40 (+1.076)  5.65 (+1.283)    Nam        Độc thân    Đại học
 
-Vòng 4   moves = 114   cost = 4837.1
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    551       29.20 (+1.346)  4.74 (+1.030)  Male    Married         Employee    Graduate                    Yes     Positive
-1    744       22.65 (-0.640)  4.50 (+0.861)  Female  Single          Student     Graduate                    Yes     Positive
-2    990       22.45 (-0.699)  2.27 (-0.712)  Male    Single          Student     Post Graduate               Yes     Positive
-3    715       26.73 (+0.596)  2.28 (-0.704)  Female  Single          Employee    Post Graduate               Yes     Positive
-
-Vòng 5   moves = 19   cost = 4836.5
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    552       29.25 (+1.361)  4.72 (+1.015)  Male    Married         Employee    Graduate                    Yes     Positive
-1    745       22.69 (-0.627)  4.51 (+0.869)  Female  Single          Student     Graduate                    Yes     Positive
-2    990       22.43 (-0.706)  2.28 (-0.708)  Male    Single          Student     Post Graduate               Yes     Positive
-3    713       26.68 (+0.582)  2.27 (-0.710)  Female  Single          Employee    Post Graduate               Yes     Positive
-
-Vòng 6   moves = 0   cost = 4836.5
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    552       29.25 (+1.361)  4.72 (+1.015)  Male    Married         Employee    Graduate                    Yes     Positive
-1    745       22.69 (-0.627)  4.51 (+0.869)  Female  Single          Student     Graduate                    Yes     Positive
-2    990       22.43 (-0.706)  2.28 (-0.708)  Male    Single          Student     Post Graduate               Yes     Positive
-3    713       26.68 (+0.582)  2.27 (-0.710)  Female  Single          Employee    Post Graduate               Yes     Positive
+Vòng 4   moves = 0   cost = 1055.8
+Cụm                            Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+-----------------------------  --------  --------------  --------------  -------------  ---------------  ---------  ----------  -------
+0 (Người đi làm thu nhập khá)  155       26.03 (+0.667)  19.97 (+0.657)  4.21 (-0.358)  4.38 (-0.471)    Nữ         Đã kết hôn  Đại học
+1 (Sinh viên thu nhập thấp)    132       21.10 (-0.962)  5.68 (-0.724)   4.35 (-0.183)  4.60 (-0.167)    Nữ         Độc thân    Đại học
+2 (Khách trung thành)          74        24.97 (+0.319)  12.30 (-0.085)  5.40 (+1.076)  5.65 (+1.283)    Nam        Độc thân    Đại học
 
 ====================================================================================================
-LẦN CHẠY 5/5   |   số vòng lặp = 7   |   cost cuối = 4786.6
+LẦN CHẠY 5/5   |   số vòng lặp = 6   |   cost cuối = 1060.7
 ====================================================================================================
 
-Vòng 0 (khởi tạo)   cost = 5500.7
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    1346      22.74 (-0.611)  3.44 (+0.112)  Male    Single          Student     Graduate                    Yes     Positive
-1    678       29.29 (+1.372)  3.84 (+0.396)  Male    Married         Employee    Graduate                    No      Positive
-2    401       22.01 (-0.833)  2.17 (-0.781)  Male    Single          Student     Post Graduate               Yes     Positive
-3    575       26.05 (+0.392)  3.02 (-0.183)  Female  Single          Student     Post Graduate               Yes     Positive
+Vòng 0 (khởi tạo)   cost = 1088.2
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    74        25.53 (+0.504)  14.73 (+0.151)  5.35 (+1.021)  5.32 (+0.832)    Nữ         Đã kết hôn  Đại học
+1    168       22.09 (-0.635)  6.07 (-0.687)   4.33 (-0.214)  4.81 (+0.126)    Nam        Độc thân    Cao đẳng
+2    119       25.77 (+0.582)  22.23 (+0.876)  4.23 (-0.332)  4.21 (-0.695)    Nam        Đã kết hôn  Đại học
 
-Vòng 1   moves = 923   cost = 4947.6
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    853       22.42 (-0.707)  4.23 (+0.672)  Male    Single          Student     Graduate                    Yes     Positive
-1    662       29.18 (+1.338)  4.33 (+0.744)  Male    Married         Employee    Graduate                    No      Positive
-2    810       22.54 (-0.671)  2.00 (-0.903)  Male    Single          Student     Post Graduate               Yes     Positive
-3    675       26.03 (+0.386)  2.58 (-0.496)  Female  Single          Employee    Post Graduate               Yes     Positive
+Vòng 1   moves = 54   cost = 1066.8
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    98        25.90 (+0.627)  13.37 (+0.019)  5.20 (+0.835)  5.32 (+0.831)    Nữ         Đã kết hôn  Đại học
+1    160       21.78 (-0.740)  5.69 (-0.724)   4.36 (-0.175)  4.67 (-0.068)    Nam        Độc thân    Cao đẳng
+2    103       25.68 (+0.553)  24.61 (+1.106)  4.07 (-0.524)  4.22 (-0.686)    Nam        Đã kết hôn  Đại học
 
-Vòng 2   moves = 311   cost = 4904.5
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    828       22.48 (-0.690)  4.34 (+0.748)  Male    Single          Student     Graduate                    Yes     Positive
-1    575       29.28 (+1.370)  4.61 (+0.942)  Male    Married         Employee    Graduate                    No      Positive
-2    805       22.45 (-0.699)  2.09 (-0.841)  Male    Single          Student     Post Graduate               Yes     Positive
-3    792       26.20 (+0.437)  2.41 (-0.611)  Female  Single          Employee    Post Graduate               Yes     Positive
+Vòng 2   moves = 12   cost = 1062.7
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    109       25.81 (+0.597)  12.98 (-0.018)  5.14 (+0.767)  5.31 (+0.809)    Nữ         Đã kết hôn  Đại học
+1    154       21.69 (-0.766)  5.65 (-0.728)   4.34 (-0.197)  4.63 (-0.128)    Nữ         Độc thân    Cao đẳng
+2    98        25.64 (+0.541)  25.20 (+1.164)  4.05 (-0.544)  4.21 (-0.698)    Nam        Đã kết hôn  Đại học
 
-Vòng 3   moves = 241   cost = 4820.3
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    717       22.72 (-0.618)  4.59 (+0.923)  Male    Single          Student     Graduate                    Yes     Positive
-1    548       29.39 (+1.404)  4.66 (+0.976)  Male    Married         Employee    Graduate                    Yes     Positive
-2    975       22.36 (-0.726)  2.25 (-0.724)  Male    Single          Student     Post Graduate               Yes     Positive
-3    760       26.42 (+0.502)  2.36 (-0.646)  Female  Single          Employee    Post Graduate               Yes     Positive
+Vòng 3   moves = 8   cost = 1061.6
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    111       25.83 (+0.604)  12.84 (-0.032)  5.12 (+0.739)  5.31 (+0.807)    Nữ         Đã kết hôn  Đại học
+1    150       21.55 (-0.813)  5.67 (-0.726)   4.36 (-0.178)  4.62 (-0.141)    Nữ         Độc thân    Cao đẳng
+2    100       25.67 (+0.550)  24.80 (+1.125)  4.05 (-0.553)  4.22 (-0.684)    Nam        Đã kết hôn  Đại học
 
-Vòng 4   moves = 141   cost = 4787.0
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    693       22.83 (-0.585)  4.70 (+1.007)  Male    Single          Student     Post Graduate               Yes     Positive
-1    525       29.50 (+1.437)  4.66 (+0.979)  Male    Married         Employee    Graduate                    Yes     Positive
-2    1056      22.41 (-0.712)  2.32 (-0.676)  Male    Single          Student     Post Graduate               Yes     Positive
-3    726       26.59 (+0.556)  2.31 (-0.685)  Female  Single          Employee    Post Graduate               Yes     Positive
+Vòng 4   moves = 3   cost = 1060.9
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    113       25.85 (+0.610)  12.70 (-0.046)  5.10 (+0.715)  5.30 (+0.794)    Nữ         Đã kết hôn  Đại học
+1    147       21.44 (-0.850)  5.68 (-0.725)   4.37 (-0.166)  4.62 (-0.143)    Nữ         Độc thân    Cao đẳng
+2    101       25.68 (+0.554)  24.60 (+1.106)  4.04 (-0.558)  4.23 (-0.680)    Nam        Đã kết hôn  Đại học
 
-Vòng 5   moves = 19   cost = 4786.6
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    704       22.87 (-0.572)  4.70 (+1.003)  Male    Single          Student     Post Graduate               Yes     Positive
-1    523       29.51 (+1.438)  4.66 (+0.975)  Male    Married         Employee    Graduate                    Yes     Positive
-2    1062      22.42 (-0.709)  2.32 (-0.673)  Male    Single          Student     Post Graduate               Yes     Positive
-3    711       26.63 (+0.567)  2.28 (-0.704)  Female  Single          Employee    Post Graduate               Yes     Positive
+Vòng 5   moves = 4   cost = 1060.7
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    115       25.85 (+0.608)  12.57 (-0.059)  5.08 (+0.699)  5.30 (+0.792)    Nữ         Đã kết hôn  Đại học
+1    143       21.33 (-0.887)  5.63 (-0.729)   4.37 (-0.159)  4.62 (-0.141)    Nữ         Độc thân    Cao đẳng
+2    103       25.68 (+0.553)  24.32 (+1.078)  4.04 (-0.559)  4.22 (-0.689)    Nam        Đã kết hôn  Đại học
 
-Vòng 6   moves = 1   cost = 4786.6
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    705       22.88 (-0.570)  4.70 (+1.003)  Male    Single          Student     Post Graduate               Yes     Positive
-1    522       29.51 (+1.440)  4.66 (+0.975)  Male    Married         Employee    Graduate                    Yes     Positive
-2    1062      22.42 (-0.709)  2.32 (-0.673)  Male    Single          Student     Post Graduate               Yes     Positive
-3    711       26.63 (+0.567)  2.28 (-0.704)  Female  Single          Employee    Post Graduate               Yes     Positive
-
-Vòng 7   moves = 0   cost = 4786.6
-Cụm  Số khách  Age             Family size    Gender  Marital Status  Occupation  Educational Qualifications  Output  Feedback
----  --------  --------------  -------------  ------  --------------  ----------  --------------------------  ------  --------
-0    705       22.88 (-0.570)  4.70 (+1.003)  Male    Single          Student     Post Graduate               Yes     Positive
-1    522       29.51 (+1.440)  4.66 (+0.975)  Male    Married         Employee    Graduate                    Yes     Positive
-2    1062      22.42 (-0.709)  2.32 (-0.673)  Male    Single          Student     Post Graduate               Yes     Positive
-3    711       26.63 (+0.567)  2.28 (-0.704)  Female  Single          Employee    Post Graduate               Yes     Positive
+Vòng 6   moves = 0   cost = 1060.7
+Cụm  Số khách  Tuổi            Thu nhập        Thái độ        Ý định đặt tiếp  Giới tính  Hôn nhân    Học vấn
+---  --------  --------------  --------------  -------------  ---------------  ---------  ----------  --------
+0    115       25.85 (+0.608)  12.57 (-0.059)  5.08 (+0.699)  5.30 (+0.792)    Nữ         Đã kết hôn  Đại học
+1    143       21.33 (-0.887)  5.63 (-0.729)   4.37 (-0.159)  4.62 (-0.141)    Nữ         Độc thân    Cao đẳng
+2    103       25.68 (+0.553)  24.32 (+1.078)  4.04 (-0.559)  4.22 (-0.689)    Nam        Đã kết hôn  Đại học

@@ -63,15 +63,18 @@ CREATE TABLE IF NOT EXISTS users (
     address_line     TEXT,
     address_commune  TEXT,
     address_province TEXT,
-    -- 6 thuộc tính của mô hình phân khúc do khách tự khai (giá trị giống bộ dữ liệu), NULL = bỏ trống
+    -- Thông tin khách tự khai cho mô hình phân khúc (giá trị giống segmentation.CATEGORY_ORDER), NULL = bỏ trống
     age              INTEGER,
-    family_size      INTEGER,
+    income           TEXT,     -- nhóm thu nhập: Dưới 10 triệu, 10–20 triệu, ...
     gender           TEXT,
     marital_status   TEXT,
-    occupation       TEXT,
     education        TEXT,
-    output           TEXT,     -- không còn dùng (lấy từ đơn hàng), giữ để tương thích users.db cũ
-    feedback         TEXT,     -- không còn dùng (lấy từ đánh giá đơn hàng)
+    party_size       INTEGER,  -- thường đặt cho mấy người: chỉ để chọn cỡ combo, không đưa vào mô hình
+    -- Cột của dataset cũ (Ấn Độ), không còn dùng, giữ để không phải xóa cột trên database đang chạy
+    family_size      INTEGER,
+    occupation       TEXT,
+    output           TEXT,
+    feedback         TEXT,
     profile_updated_at TEXT
 );
 
@@ -131,6 +134,13 @@ CREATE TABLE IF NOT EXISTS combos (
     created_at  TEXT NOT NULL,
     approved_at TEXT
 );
+-- Phiên đăng nhập (cookie fb_session): chỉ lưu bản băm SHA-256 của mã, không lưu mã gốc
+CREATE TABLE IF NOT EXISTS sessions (
+    token_hash  TEXT PRIMARY KEY,
+    user_id     INTEGER NOT NULL REFERENCES users (user_id) ON DELETE CASCADE,
+    created_at  TEXT NOT NULL,
+    expires_at  TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS combo_items (
     combo_id    TEXT NOT NULL REFERENCES combos (combo_id) ON DELETE CASCADE,
     item_id     TEXT NOT NULL,
@@ -152,8 +162,15 @@ def schema(backend=BACKEND):
     return SCHEMA.format(**DIALECT[backend])
 
 
+NEW_USER_COLUMNS = {"income": "TEXT", "party_size": "INTEGER"}  # thêm khi chuyển sang dataset Gen Z Việt Nam
+
+
 def _migrate_sqlite(conn):
     """Nâng cấp users.db tạo bởi phiên bản trước (thêm cột, đổi cấu trúc order_items) mà không mất dữ liệu."""
+    cols = {r[1] for r in conn.execute("PRAGMA table_info(users)")}
+    for col, kind in NEW_USER_COLUMNS.items():
+        if col not in cols:
+            conn.execute(f"ALTER TABLE users ADD COLUMN {col} {kind}")
     cols = {r[1] for r in conn.execute("PRAGMA table_info(orders)")}
     for col in ("day_type", "segment"):
         if col not in cols:
@@ -304,6 +321,8 @@ def _init(raw):
         raw.commit()
     else:
         raw.execute(schema())  # autocommit, không có tham số nên gửi được nhiều câu lệnh một lần
+        for col, kind in NEW_USER_COLUMNS.items():  # bảng users tạo bởi phiên bản trước
+            raw.execute(f"ALTER TABLE users ADD COLUMN IF NOT EXISTS {col} {kind}")
 
 
 def connect():

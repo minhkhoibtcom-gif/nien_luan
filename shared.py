@@ -5,37 +5,22 @@ import auth
 import combos
 import orders
 from menu import load_menu, retention_offer
-from segmentation import CATEGORY_ORDER, predict_partial, train
+from segmentation import ATT, CATEGORY_ORDER, INCOME_GROUPS, INT, NUM_COLS, CAT_COLS, predict_partial, train
 
 # Trang của app (app.py gán khi khởi tạo st.navigation) để các trang gọi st.page_link / st.switch_page
 PAGES = {}
 
-# Cột trong users.db -> tên cột của mô hình
-FIELD_MAP = {
-    "age": "Age", "family_size": "Family size", "gender": "Gender", "marital_status": "Marital Status",
-    "occupation": "Occupation", "education": "Educational Qualifications", "output": "Output", "feedback": "Feedback",
-}
-
-# Giá trị của mô hình -> nhãn tiếng Việt trên form
-OPTION_LABELS = {
-    "gender": {"Male": "Nam", "Female": "Nữ"},
-    "marital_status": {"Single": "Độc thân", "Married": "Đã kết hôn", "Prefer not to say": "Không muốn trả lời"},
-    "occupation": {"Student": "Học sinh, sinh viên", "Employee": "Nhân viên, người đi làm",
-                   "Self Employeed": "Tự kinh doanh", "House wife": "Nội trợ"},
-    "education": {"Uneducated": "Chưa qua đào tạo", "School": "Phổ thông", "Graduate": "Đại học, cao đẳng",
-                  "Post Graduate": "Thạc sĩ", "Ph.D": "Tiến sĩ"},
-    "output": {"Yes": "Có, vẫn đặt món online", "No": "Không còn đặt nữa"},
-    "feedback": {"Positive": "Hài lòng", "Negative": "Chưa hài lòng"},
-}
+# Cột trong database -> cột của mô hình (Thái độ, Ý định đặt tiếp lấy từ đơn hàng và đánh giá)
+FIELD_MAP = {"age": "Tuổi", "income": "Thu nhập", "gender": "Giới tính", "marital_status": "Hôn nhân",
+             "education": "Học vấn"}
+N_FEATURES = len(NUM_COLS) + len(CAT_COLS)
+# Lựa chọn của các ô chọn trên form; giá trị lưu trong database chính là giá trị của mô hình
+OPTIONS = {"income": CATEGORY_ORDER["Nhóm thu nhập"], "gender": CATEGORY_ORDER["Giới tính"],
+           "marital_status": CATEGORY_ORDER["Hôn nhân"], "education": CATEGORY_ORDER["Học vấn"]}
 FIELD_LABELS = {
-    "age": "Tuổi", "family_size": "Số người trong gia đình", "gender": "Giới tính",
-    "marital_status": "Tình trạng hôn nhân", "occupation": "Nghề nghiệp", "education": "Học vấn",
-    "output": "Bạn có tiếp tục đặt món online không?", "feedback": "Bạn có hài lòng với dịch vụ đặt món online?",
+    "age": "Tuổi", "income": "Thu nhập mỗi tháng", "gender": "Giới tính", "marital_status": "Tình trạng hôn nhân",
+    "education": "Học vấn", "party_size": "Bạn thường đặt cho mấy người?",
 }
-# Thứ tự lựa chọn giống bộ dữ liệu
-for _field, _col in FIELD_MAP.items():
-    if _field in OPTION_LABELS:
-        assert list(OPTION_LABELS[_field]) == CATEGORY_ORDER[_col], _field
 
 
 @st.cache_resource(show_spinner=False)
@@ -82,10 +67,48 @@ def init_admin():
         cfg = dict(st.secrets.get("admin", {}))
     except Exception:  # chưa có file secrets.toml
         cfg = {}
-    auth.ensure_admin(cfg.get("email", "admin@fastbite.vn"), cfg.get("password", "Admin@123"))
+    auth.ensure_admin(cfg.get("email", "admin@.com"), cfg.get("password", "Admin@123"))
+
+
+SESSION_COOKIE = "fb_session"
+
+
+def login_user(user_id):
+    """Đăng nhập trong phiên Streamlit hiện tại và hẹn ghi cookie để F5 / mở lại trình duyệt vẫn đăng nhập."""
+    st.session_state["user_id"] = user_id
+    token = auth.create_session(user_id)
+    st.session_state["_session_token"] = token
+    st.session_state["_cookie"] = token
+
+
+def sync_cookie():
+    """Ghi hoặc xóa cookie phiên trong trình duyệt (Streamlit chỉ đọc được cookie nên ghi bằng JavaScript).
+    Gọi ở mỗi lần chạy app; chỉ vẽ khi có việc cần làm (sau đăng nhập / đăng xuất)."""
+    if "_cookie" not in st.session_state:
+        return
+    token = st.session_state.pop("_cookie")
+    age = auth.SESSION_DAYS * 86400 if token else 0
+    st.html(f"""<script>
+document.cookie = "{SESSION_COOKIE}={token or ''}; path=/; max-age={age}; SameSite=Lax"
+  + (location.protocol === "https:" ? "; Secure" : "");
+</script>""", unsafe_allow_javascript=True)
+
+
+def _restore_login():
+    """Phiên Streamlit mới (F5, mở tab mới): đăng nhập lại từ cookie nếu mã phiên còn hạn. Chỉ thử một lần mỗi phiên."""
+    if st.session_state.get("_cookie_checked"):
+        return
+    st.session_state["_cookie_checked"] = True
+    token = st.context.cookies.get(SESSION_COOKIE)
+    user_id = auth.session_user(token)
+    if user_id:
+        st.session_state["user_id"] = user_id
+        st.session_state["_session_token"] = token
 
 
 def current_user():
+    if "user_id" not in st.session_state:
+        _restore_login()
     user_id = st.session_state.get("user_id")
     user = auth.get_user(user_id) if user_id else None
     if user_id and user is None:
@@ -97,12 +120,19 @@ def is_admin(user):
     return bool(user) and user["role"] == "admin"
 
 
-def user_values(user):
-    """8 thuộc tính của mô hình cho một khách: 6 thuộc tính tự khai trong hồ sơ, Output và Feedback suy ra
-    từ đơn hàng và đánh giá (orders.behavior). None = bỏ trống, được bỏ qua khi xếp nhóm."""
-    values = {col: user.get(field) for field, col in FIELD_MAP.items() if field not in ("output", "feedback")}
-    b = orders.behavior(user["user_id"])
-    values.update({"Output": b["output"], "Feedback": b["feedback"]})
+def user_values(user, behavior=None):
+    """7 thuộc tính của mô hình cho một khách: 5 thuộc tính tự khai trong hồ sơ, Thái độ và Ý định đặt tiếp suy ra
+    từ đánh giá và đơn hàng (orders.behavior). None = bỏ trống, được bỏ qua khi xếp nhóm."""
+    values = {}
+    for field, col in FIELD_MAP.items():
+        value = user.get(field)
+        if field in OPTIONS and value not in OPTIONS[field]:  # bỏ trống, hoặc giá trị của dataset cũ
+            value = None
+        values[col] = value
+    if values["Thu nhập"] is not None:
+        values["Thu nhập"] = INCOME_GROUPS[values["Thu nhập"]]
+    b = behavior or orders.behavior(user["user_id"])
+    values.update({ATT: b["attitude"], INT: b["intention"]})
     return values
 
 
@@ -112,10 +142,10 @@ def user_segment(user):
 
 
 def user_offer(user, segment):
-    """(combo chính, ưu đãi riêng hoặc None) cho khách đã có nhóm."""
-    values = user_values(user)
-    return (combos.pick_for(segment, user.get("family_size")),
-            retention_offer(values["Output"], values["Feedback"]))
+    """(combo chính, ưu đãi riêng hoặc None) cho khách đã có nhóm: cỡ combo theo số người khách thường đặt,
+    ưu đãi theo việc còn đặt món trong 30 ngày và mức hài lòng."""
+    b = orders.behavior(user["user_id"])
+    return combos.pick_for(segment, user.get("party_size")), retention_offer(b["output"], b["feedback"])
 
 
 def cart():
@@ -195,5 +225,8 @@ def show_flash():
 
 
 def logout():
+    auth.delete_session(st.session_state.get("_session_token"))
     st.session_state.clear()
+    st.session_state["_cookie_checked"] = True  # cookie cũ vẫn còn trong st.context.cookies của phiên này
+    st.session_state["_cookie"] = None          # xóa cookie ở lần chạy sau
     flash("success", "Bạn đã đăng xuất.")

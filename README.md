@@ -1,6 +1,6 @@
 # Phân khúc khách hàng đặt đồ ăn online
 
-Phân khúc khách hàng bằng thuật toán **K-Prototypes** (4 cụm) trên bộ dữ liệu *Online Food Delivery*, kèm giao diện demo viết bằng Streamlit.
+Phân khúc khách hàng bằng thuật toán **K-Prototypes** (3 cụm) trên dataset khảo sát **Gen Z Việt Nam** về đặt đồ ăn online (361 người, *Data in Brief* 2023, OSF doi 10.17605/OSF.IO/TEPXB), kèm giao diện demo viết bằng Streamlit.
 
 **Demo trực tuyến:** https://phan-khuc-khach-hang.streamlit.app/ (không cần cài đặt; nếu app đang "ngủ", bấm nút đánh thức và chờ khoảng 1 phút)
 
@@ -13,21 +13,21 @@ Phân khúc khách hàng bằng thuật toán **K-Prototypes** (4 cụm) trên b
 | `db.py` | Kết nối database: SQLite `users.db` trên máy (không đưa lên git), PostgreSQL khi có cấu hình trong Secrets; schema các bảng |
 | `migrate_to_postgres.py` | Chép một lần toàn bộ dữ liệu từ `users.db` sang PostgreSQL |
 | `auth.py`, `shared.py` | Tài khoản và phần dùng chung giữa các trang |
-| `orders.py` | Giỏ hàng, đặt hàng, trạng thái đơn, đánh giá; suy ra Output/Feedback của mô hình từ đơn hàng |
-| `segmentation.py` | Làm sạch dữ liệu, huấn luyện K-Prototypes, dự đoán cụm, chiến lược cho từng cụm |
-| `online food delivery dataset.csv` | Dữ liệu gốc (388 dòng, 285 mẫu sau khi bỏ trùng) |
-| `online food delivery dataset 3000.csv` | Dữ liệu mở rộng dùng để huấn luyện: giữ nguyên 388 dòng gốc + 2715 dòng tổng hợp, còn 3000 mẫu sau khi bỏ trùng |
-| `online food delivery dataset 1000.csv` | Bản mở rộng cũ 1000 mẫu (không còn dùng; chính là phần đầu của bản 3000) |
-| `generate_dataset.py` | Script sinh dữ liệu mở rộng từ dữ liệu gốc |
-| `export_segment_model.py` | Xuất 4 tâm cụm + tham số chuẩn hóa ra `segment_model.json` (và file test) để chương trình khác tự xếp khách vào nhóm |
-| `kprototypes.ipynb` | Notebook phân tích: khám phá dữ liệu, chọn số cụm, đánh giá |
+| `orders.py` | Giỏ hàng, đặt hàng, trạng thái đơn, đánh giá; suy ra Thái độ / Ý định đặt tiếp của mô hình từ đánh giá và đơn hàng |
+| `segmentation.py` | Đọc và mã hóa dữ liệu, huấn luyện K-Prototypes, dự đoán cụm, chiến lược cho từng cụm |
+| `data/genz_vn.xlsx` | Dataset Gen Z Việt Nam: 361 người 15–28 tuổi, câu Q1–Q25 thang Likert 7 mức, Q26–Q30 nhân khẩu học |
+| `thu_nghiem_vn/` | Chọn số cụm K (`chon_k.py`, 9 biểu đồ, bảng chỉ số) và file Word `ly_do_chon_K.docx` |
+| `archive/` | Dataset Ấn Độ 3000 mẫu và script sinh dữ liệu của phiên bản trước (không còn dùng) |
+| `export_segment_model.py` | Xuất 3 tâm cụm + tham số chuẩn hóa ra `segment_model.json` (và file test) để chương trình khác tự xếp khách vào nhóm |
+| `export_centroids.py` | Ghi tâm cụm qua từng vòng lặp của K-Prototypes ra `centroids_iterations.txt` |
+| `kprototypes.ipynb` | Notebook phân tích: mã hóa dữ liệu, chọn số cụm, đặc điểm và chiến lược từng cụm |
 | `customer_segments.csv` | Kết quả gán cụm do notebook xuất ra |
 | `compare_clustering.py` | So sánh K-Prototypes với K-Means, K-Modes, Hierarchical; xuất `so_sanh_chi_so.csv` và 9 biểu đồ trong `figures/so_sanh/` |
 | `.streamlit/config.toml` | Cấu hình giao diện |
 | `start.bat`, `stop.bat` | Bật / tắt app demo trên Windows |
 | `ui.py` | Giao diện cửa hàng FASTBITE: tông đỏ – vàng, thanh trên cùng, banner, thẻ món, thẻ combo, chân trang |
 | `menu.csv` | Thực đơn 36 món, 4 nhóm: Món chính (gà giòn, mì Ý, cơm, burger), Món thêm (khoai, súp, cơm trắng, Mì Ý thêm 7.000₫), Món phụ (tráng miệng), Thức uống; giá lẻ tham khảo từ jollibee.com.vn (16/11/2026) |
-| `menu.py` | Thực đơn, lớp Combo, 8 combo mặc định (dùng khi chưa duyệt combo tháng), ưu đãi theo trạng thái khách |
+| `menu.py` | Thực đơn, lớp Combo, 9 combo mặc định (dùng khi chưa duyệt combo tháng), ưu đãi theo trạng thái khách |
 | `combos.py` | Combo theo tháng: đề xuất từ số lượng món mỗi cụm mua vào ngày thường / cuối tuần tháng trước, duyệt, combo đang áp dụng |
 | `simulate_orders.py`, `simulated_orders.csv` | Sinh 10.000 đơn mô phỏng (tháng 10/2026) làm dữ liệu tạo combo tháng đầu |
 | `assets/` | Logo FASTBITE; `assets/products/` để bổ sung ảnh món và combo (xem `README.txt` trong đó) |
@@ -61,25 +61,24 @@ App đóng vai cửa hàng đồ ăn nhanh **FASTBITE** (tên giả định củ
 - **Món chính** (gà giòn, mì Ý, cơm, burger): đúng bằng số người, có thể khác loại nhưng **tối đa 2 loại**.
 - **Thức uống**: đúng bằng số người và **cùng một loại**.
 - **Món thêm** (khoai, súp): số phần trung bình mỗi đơn, tối đa 2 loại; **Cơm trắng và Mì Ý thêm không có trong combo** (chỉ bán lẻ).
-- **Món phụ** (tráng miệng): không quá số người, tối đa 2 loại; **2 cụm sinh viên (thu nhập thấp) không có món phụ**.
+- **Món phụ** (tráng miệng): không quá số người, tối đa 2 loại; **cụm Sinh viên thu nhập thấp không có món phụ**.
 - Giá = giá lẻ giảm 10% rồi làm tròn xuống giá đuôi 5.000₫ hoặc 9.000₫ gần nhất (vd 102.600₫ → 99.000₫), nên thực giảm từ 10% trở lên.
 
-Admin xem lý do, sửa giá rồi **duyệt**; chưa duyệt thì khách tiếp tục thấy combo đã duyệt gần nhất (chưa từng duyệt thì thấy 8 combo mặc định bên dưới). **Combo ngày thường đặt được mọi ngày** (cuối tuần hiện và đặt được cả combo ngày thường lẫn combo cuối tuần); **combo cuối tuần chỉ đặt được Thứ 7–CN**, ngày thường vẫn xem được nhưng nút đặt bị khóa, trong giỏ bị khóa và ghi "Chỉ áp dụng Thứ 7–CN". Combo gợi ý cho khách là combo đặt được hôm nay có số người gần số người trong hộ nhất.
+Admin xem lý do, sửa giá rồi **duyệt**; chưa duyệt thì khách tiếp tục thấy combo đã duyệt gần nhất (chưa từng duyệt thì thấy 9 combo mặc định bên dưới). **Combo ngày thường đặt được mọi ngày** (cuối tuần hiện và đặt được cả combo ngày thường lẫn combo cuối tuần); **combo cuối tuần chỉ đặt được Thứ 7–CN**, ngày thường vẫn xem được nhưng nút đặt bị khóa, trong giỏ bị khóa và ghi "Chỉ áp dụng Thứ 7–CN". Combo gợi ý cho khách là combo đặt được hôm nay có số người gần số người khách thường đặt nhất (ô không bắt buộc trong hồ sơ; bỏ trống thì gợi ý combo nhỏ nhất).
 
 Khi đặt combo, đơn lưu **từng món** trong combo; thành tiền của combo được chia cho các món theo tỷ lệ giá lẻ (tổng đúng bằng giá combo), kèm mã combo. Đơn còn lưu loại ngày và cụm của khách lúc đặt để làm dữ liệu cho tháng sau.
 
-**Đơn mô phỏng** (`simulate_orders.py` → `simulated_orders.csv`): 10.000 đơn tháng 10/2026 của 3000 khách trong dataset, mỗi cụm có thói quen riêng theo ngày thường/cuối tuần (sinh viên hộ nhỏ ăn một mình món rẻ, hội bạn đặt nhóm cuối tuần, dân văn phòng ăn trưa ngày thường và tối cuối tuần cho 2 người, gia đình đặt cả nhà cuối tuần). Đây là **dữ liệu giả lập** để có combo cho tháng đầu; có đơn thật thì được cộng vào. Sinh lại: `python simulate_orders.py 10000 2026-10`.
+**Đơn mô phỏng** (`simulate_orders.py` → `simulated_orders.csv`): 10.000 đơn tháng 10/2026 của 361 khách trong dataset, khách có ý định đặt tiếp cao đặt nhiều hơn. Dataset không có số người trong hộ nên mỗi cụm có phân bố số người mỗi đơn riêng (sinh viên 1–2 người, người đi làm 2–4 người, khách trung thành 1–3 người, cuối tuần đông hơn) và thói quen món riêng theo ngày thường/cuối tuần. Đây là **dữ liệu giả lập** để có combo cho tháng đầu; có đơn thật thì được cộng vào. Sinh lại: `python simulate_orders.py 10000 2026-10`.
 
-**Combo mặc định** (thiết kế tay, áp dụng mọi ngày, chỉ dùng khi chưa có combo tháng nào được duyệt; cỡ combo theo số người trong hộ):
+**Combo mặc định** (thiết kế tay, áp dụng mọi ngày, chỉ dùng khi chưa có combo tháng nào được duyệt; giá = giá lẻ giảm 10% rồi làm tròn đuôi 5k/9k; cỡ combo theo số người khách thường đặt):
 
 | Cụm | Combo | Giá lẻ → giá combo |
 |---|---|---|
-| Sinh viên hộ nhỏ | SV Tiết Kiệm (1 người), SV Đôi Bạn (2–3 người) | 47k → 39k, 119k → 95k |
-| Sinh viên hộ đông | Hội Bạn 4 Người, Hội Bạn 6 Người (5–6 người) | 294k → 245k, 415k → 349k |
-| Người đi làm trẻ | Trưa Văn Phòng (1 người), Tối Cặp Đôi (2–3 người); hộ từ 4 người dùng Cả Nhà 4 Người | 83k → 75k, 245k → 219k |
-| Người có gia đình hộ đông | Cả Nhà 4 Người (3–4 người), Cả Nhà 5–6 Người | 314k → 269k, 428k → 369k |
+| Sinh viên thu nhập thấp | SV Tiết Kiệm (1 người), SV Đôi Bạn (2), Hội Bạn 3 Người; không có món phụ | 47k → 39k, 119k → 105k, 166k → 149k |
+| Người đi làm thu nhập khá | Tối Cặp Đôi (2 người), Cả Nhà 3 Người, Cả Nhà 4 Người | 205k → 179k, 272k → 239k, 376k → 335k |
+| Khách trung thành | Trưa Quen Thuộc (1 người), Đôi Bạn Thân (2), Nhóm Nhỏ 3 Người | 98k → 85k, 160k → 139k, 297k → 265k |
 
-Kèm ưu đãi theo trạng thái của khách (Output, Feedback): còn đặt và hài lòng → không có ưu đãi thêm; còn đặt nhưng chưa hài lòng → voucher xin lỗi 20k; đã ngừng nhưng từng hài lòng → voucher 30k; đã ngừng và chưa hài lòng → voucher 50k + hoàn tiền nếu giao trễ.
+Kèm ưu đãi theo trạng thái của khách (còn đặt trong 30 ngày, hài lòng = sao TB từ 4): còn đặt và hài lòng → không có ưu đãi thêm; còn đặt nhưng chưa hài lòng → voucher xin lỗi 20k; đã ngừng nhưng từng hài lòng → voucher 30k; đã ngừng và chưa hài lòng → voucher 50k + hoàn tiền nếu giao trễ.
 
 **Khách hàng**
 
@@ -87,17 +86,17 @@ Kèm ưu đãi theo trạng thái của khách (Output, Feedback): còn đặt v
 - **Đăng ký / Đăng nhập**: mật khẩu 8–72 ký tự (băm scrypt), sai 5 lần liên tiếp thì khóa 15 phút.
 - **Giỏ hàng / Đặt hàng** (giống web La Che Fresca): nút "Thêm vào giỏ" trên mỗi combo và món (phải đăng nhập); giỏ hàng có ô chọn món, sửa số lượng, xóa; form giao hàng điền sẵn từ hồ sơ, thanh toán COD hoặc chuyển khoản; chỉ đặt các món được chọn.
 - **Đánh giá**: đặt xong hiện box chấm 1–5 sao cho cả đơn (kèm góp ý); có thể bỏ qua và đánh giá sau trong "Đơn hàng của tôi".
-- **Tài khoản**: một form "Thông tin cá nhân" gồm họ tên, số điện thoại, địa chỉ và 6 thông tin cho mô hình (tuổi, số người trong gia đình, giới tính, hôn nhân, nghề nghiệp, học vấn), đều không bắt buộc. "Đơn hàng của tôi": trạng thái đơn, hủy đơn đang chờ xác nhận, đánh giá đơn chưa đánh giá. Có đổi mật khẩu.
-- **Xếp nhóm**: 2 thuộc tính còn lại của mô hình không hỏi khách mà suy ra từ đơn hàng — *tiếp tục đặt món* = có đơn chưa hủy trong 30 ngày gần nhất (từng đặt nhưng lâu hơn = không; chưa đặt đơn nào = bỏ qua), *hài lòng* = sao trung bình từ 4 (chưa đánh giá = bỏ qua). Khoảng cách K-Prototypes chỉ tính trên thông tin đã có; cần ít nhất tuổi hoặc số người trong gia đình.
+- **Tài khoản**: một form "Thông tin cá nhân" gồm họ tên, số điện thoại, địa chỉ, 5 thông tin cho mô hình (tuổi, nhóm thu nhập, giới tính, hôn nhân, học vấn) và số người thường đặt (chỉ để chọn cỡ combo), đều không bắt buộc. "Đơn hàng của tôi": trạng thái đơn, hủy đơn đang chờ xác nhận, đánh giá đơn chưa đánh giá. Có đổi mật khẩu.
+- **Xếp nhóm**: 2 thuộc tính còn lại của mô hình (thang 1–7 như khảo sát) không hỏi khách mà suy ra — *Thái độ* = sao đánh giá trung bình đổi từ thang 1–5 sang 1–7 (chưa đánh giá = bỏ qua), *Ý định đặt tiếp* = số đơn chưa hủy trong 30 ngày: 0 đơn → 3, 1 đơn → 4,5, từ 2 đơn → 6 (chưa đặt đơn nào = bỏ qua). Khoảng cách K-Prototypes chỉ tính trên thông tin đã có; cần ít nhất tuổi hoặc thu nhập. Tuổi ngoài 15–28 (khoảng tuổi của khảo sát) được tính như tuổi gần nhất trong khoảng, kèm cảnh báo.
 
 **Quản trị** (chỉ admin; tài khoản tạo sẵn lần đầu chạy: `admin@fastbite.vn` / `Admin@123`, đổi bằng mục `[admin]` với `email`, `password` trong `.streamlit/secrets.toml`)
 
 - **Đơn hàng**: số đơn chờ xác nhận / đang giao / hoàn tất, doanh thu; lọc theo trạng thái, tìm theo mã đơn, tên, SĐT; chuyển trạng thái Chờ xác nhận → Đang giao → Hoàn tất (hoặc Hủy); xem đánh giá, cụm và loại ngày lúc đặt.
 - **Combo theo tháng**: số đơn tháng trước theo cụm × loại ngày (thật / mô phỏng), món mua nhiều nhất của từng ô, danh sách đề xuất kèm lý do và giá lẻ → giá combo; sửa giá, duyệt, bỏ, duyệt tất cả, tạo lại đề xuất.
-- **Phân khúc khách mới**: nhập thông tin một khách hàng để xem khách đó thuộc cụm nào, kèm đặc điểm, chiến lược marketing, combo khuyến mãi (theo số người trong hộ) và ưu đãi kèm theo.
+- **Tạo thử khách mới**: nhập thông tin một khách hàng để xem khách đó thuộc cụm nào, kèm đặc điểm, chiến lược marketing, combo khuyến mãi (theo số người thường đặt) và ưu đãi kèm theo.
 - **Tổng quan các cụm**: quy mô từng cụm, bảng đặc điểm, biểu đồ thành phần theo từng thuộc tính, bảng tổng hợp combo và combo của từng cụm.
 - **Danh sách khách hàng**: xem, lọc toàn bộ khách hàng của bộ dữ liệu theo cụm và tải danh sách về dạng CSV.
-- **Tài khoản khách hàng**: các tài khoản đã đăng ký trong app, thông tin đã điền, số đơn, sao trung bình, hai thuộc tính suy ra từ đơn hàng, nhóm, combo và ưu đãi riêng của từng người, tải CSV.
+- **Tài khoản khách hàng**: các tài khoản đã đăng ký trong app, thông tin đã điền, số đơn, sao trung bình, Thái độ và Ý định đặt tiếp suy ra, nhóm, combo và ưu đãi riêng của từng người, tải CSV.
 
 Lưu ý: đăng nhập và giỏ hàng giữ trong phiên làm việc của trình duyệt, tải lại trang (F5) sẽ phải đăng nhập lại và giỏ hàng trống (đơn đã đặt vẫn được lưu). Trên Streamlit Cloud, `users.db` bị xóa mỗi khi app khởi động lại; muốn giữ dữ liệu thì dùng PostgreSQL (mục dưới).
 
@@ -125,26 +124,25 @@ Mặc định app lưu tài khoản, đơn hàng và combo trong SQLite `users.d
 
 Lưu ý: project miễn phí của Supabase có thể bị tạm dừng sau một thời gian không dùng, khi đó app báo "Không kết nối được database"; vào trang Supabase bấm khôi phục project rồi tải lại app. Xem dữ liệu trong **Table Editor** của Supabase. Bỏ mục `[postgres]` thì app quay về SQLite.
 
-## Dữ liệu mở rộng
+## Dữ liệu
 
-Dữ liệu gốc chỉ có 285 mẫu không trùng nên được mở rộng lên 3000 mẫu bằng `generate_dataset.py`. Mỗi mẫu tổng hợp được tạo từ một khách hàng có thật: tuổi lệch ngẫu nhiên ±2, số người trong hộ lệch ±1 (xác suất 30%), mỗi thuộc tính phân loại có 5% khả năng lấy theo một khách khác cùng nghề nghiệp, `Customer Type` tính lại từ số người trong hộ, vị trí lấy theo một mã bưu chính có trong dữ liệu gốc. Mẫu trùng với mẫu đã có bị bỏ. Seed cố định nên chạy lại cho ra cùng kết quả (tham số là số mẫu, mặc định 3000):
+`data/genz_vn.xlsx` là dữ liệu khảo sát công khai của bài báo trên *Data in Brief* (2023) về hành vi đặt đồ ăn qua ứng dụng của Gen Z Việt Nam: 361 người, không có giá trị thiếu. `segmentation.load_customers` mã hóa như sau:
 
-```bash
-python generate_dataset.py
-```
+- **Tuổi** (Q27) và **Thu nhập** (Q29) được hỏi theo nhóm nên lấy giá trị giữa nhóm (16,5 / 20,5 / 24 / 27 tuổi; 5 / 15 / 25 / 35 / 45 triệu đồng/tháng).
+- **Thái độ** = trung bình Q19–Q21 (Cronbach alpha 0,80), **Ý định đặt tiếp** = trung bình Q22–Q25 (alpha 0,84), thang 1–7.
+- **Giới tính** (Q26), **Hôn nhân** (Q30), **Học vấn** (Q28) giữ dạng phân loại.
 
-Trên dữ liệu mở rộng, mô hình vẫn cho ra 4 cụm với đặc điểm tương tự dữ liệu gốc. Lưu ý: 2715 dòng cuối (khoảng 90% bộ 3000 mẫu) là dữ liệu tổng hợp, không phải khảo sát thật.
+K = 3 được chọn trong `thu_nghiem_vn/` (Elbow không có điểm gãy rõ; K = 3 tốt hơn hoặc ngang K = 4 ở Silhouette, Davies–Bouldin, Calinski–Harabasz và ổn định hơn rõ rệt). Ba cụm: **Sinh viên thu nhập thấp** (132 người), **Người đi làm thu nhập khá** (155), **Khách trung thành** (74).
 
 ## Dữ liệu mẫu để thử
 
-Mỗi dòng dưới đây được xếp vào một cụm khác nhau:
+Mỗi dòng dưới đây được xếp vào một cụm khác nhau (tab Quản trị → Tạo thử khách mới):
 
-| Tuổi | Số người trong hộ | Giới tính | Hôn nhân | Nghề nghiệp | Học vấn | Output | Feedback | Cụm |
-|---|---|---|---|---|---|---|---|---|
-| 20 | 2 | Female | Single | Student | Graduate | Yes | Positive | Sinh viên hộ nhỏ |
-| 21 | 6 | Male | Single | Student | Graduate | Yes | Positive | Sinh viên hộ đông |
-| 27 | 2 | Male | Married | Employee | Graduate | Yes | Positive | Người đi làm trẻ |
-| 31 | 5 | Female | Married | Employee | Graduate | No | Negative | Người có gia đình hộ đông |
+| Tuổi | Thu nhập | Thái độ | Ý định đặt tiếp | Giới tính | Hôn nhân | Học vấn | Cụm |
+|---|---|---|---|---|---|---|---|
+| 20 | Dưới 10 triệu | 4,25 | 4,5 | Nữ | Độc thân | Cao đẳng | Sinh viên thu nhập thấp |
+| 27 | 20–30 triệu | 4,0 | 4,25 | Nữ | Đã kết hôn | Đại học | Người đi làm thu nhập khá |
+| 24 | 10–20 triệu | 5,75 | 6,0 | Nam | Độc thân | Đại học | Khách trung thành |
 
 ## Chạy notebook (không bắt buộc)
 
@@ -160,14 +158,14 @@ pip install jupyter matplotlib gower
 venv\Scripts\python compare_clustering.py
 ```
 
-Chạy 4 thuật toán với K = 2…8 trên dataset 3000 mẫu (khoảng 30 giây), ghi chỉ số vào `so_sanh_chi_so.csv` và vẽ:
+Chạy 4 thuật toán với K = 2…8 trên dataset 361 người (vài giây), ghi chỉ số vào `so_sanh_chi_so.csv` và vẽ:
 
 1. Silhouette (Gower), Davies–Bouldin, Calinski–Harabasz theo K
-2. Các chỉ số và thời gian chạy tại K = 4
+2. Các chỉ số và thời gian chạy tại K = 3
 3. Hình chiếu FAMD 2 chiều, tô màu theo cụm
 4. Biểu đồ silhouette từng điểm
 5. Heatmap ARI giữa các thuật toán
 6. Bảng chéo nhãn cụm K-Prototypes × từng thuật toán
 7. Kích thước các cụm
-8. Tâm cụm theo tuổi và số người trong hộ
+8. Tâm cụm theo thu nhập và ý định đặt tiếp
 9. Cây phân cấp (dendrogram)

@@ -1,4 +1,4 @@
-"""Khu vực quản trị (chỉ admin): các trang phân tích của niên luận và danh sách tài khoản khách hàng."""
+"""Trang quản trị (chỉ admin): các trang phân tích của niên luận và danh sách tài khoản khách hàng."""
 import altair as alt
 import pandas as pd
 import streamlit as st
@@ -9,9 +9,9 @@ import db
 import orders
 import shared
 import ui
-from menu import MENU_SOURCE, combo_lines, list_price, retention_offer
-from segmentation import (CAT_COLS, CATEGORY_ORDER, DISPLAY_NAMES, HIDDEN_COLS,
-                          SEGMENT_ORDER, STRATEGIES, predict, segment_profile)
+from menu import DEFAULT_COMBOS, MENU_SOURCE, combo_lines, list_price, retention_offer
+from segmentation import (AGE_LIMITS, ATT, CAT_COLS, CATEGORY_ORDER, INCOME_GROUPS, INT, SEGMENT_ORDER,
+                          STRATEGIES, predict, segment_profile)
 
 shared.require_admin()
 
@@ -22,7 +22,7 @@ INK = "#2b2d42"
 
 
 def label(col):
-    return DISPLAY_NAMES.get(col, col)
+    return col
 
 
 def sizes_chart(customers):
@@ -103,14 +103,11 @@ model = shared.load_model()
 customers = model.customers
 profile = segment_profile(customers)
 
-ui.hero("Khu vực quản trị",
-        f"Phân khúc khách hàng bằng K-Prototypes (4 cụm) trên {len(customers)} khách hàng của bộ dữ liệu, "
-        "kèm chiến lược tiếp thị, combo khuyến mãi cho từng cụm và tài khoản khách hàng đã đăng ký.",
-        ["K-Prototypes", "4 cụm", f"{len(customers)} khách hàng"])
+ui.hero("Trang quản trị", "")
 st.write("")
 
 tab_orders, tab_combos, tab_new, tab_overview, tab_list, tab_accounts = st.tabs(
-    ["Đơn hàng", "Combo theo tháng", "Phân khúc khách mới", "Tổng quan các cụm", "Danh sách khách hàng",
+    ["Đơn hàng", "Combo theo tháng", "Tạo thử khách mới", "Tổng quan các cụm", "Danh sách khách hàng",
      "Tài khoản khách hàng"])
 
 # ---------- Combo theo tháng: đề xuất từ số lượng món mỗi cụm mua theo ngày thường / cuối tuần ----------
@@ -125,7 +122,7 @@ with tab_combos:
     elif shown_month:
         st.warning(f"Chưa duyệt combo nào của tháng này, khách đang thấy combo tháng {combos.month_label(shown_month)}.")
     else:
-        st.warning("Chưa từng duyệt combo theo tháng, khách đang thấy 8 combo mặc định (áp dụng mọi ngày).")
+        st.warning(f"Chưa từng duyệt combo theo tháng, khách đang thấy {len(DEFAULT_COMBOS)} combo mặc định (áp dụng mọi ngày).")
     st.caption(f"Mỗi tháng hệ thống đề xuất combo từ đơn tháng {combos.month_label(prev)}: mỗi cụm 2 combo ngày thường "
                f"(2 cỡ đơn phổ biến nhất) và 1 combo cuối tuần (cỡ đơn phổ biến nhất), mỗi cỡ cần từ {combos.MIN_ORDERS} đơn. "
                "Ràng buộc: món chính = số người, tối đa 2 loại; thức uống = số người, cùng một loại; món phụ không quá "
@@ -235,57 +232,58 @@ with tab_orders:
                             shared.flash("error", str(e))
                         st.rerun()
 
-# ---------- Phân khúc khách mới ----------
+# ---------- Tạo thử khách mới ----------
 with tab_new:
-    age_min, age_max = int(customers["Age"].min()), int(customers["Age"].max())
-    fam_min, fam_max = int(customers["Family size"].min()), int(customers["Family size"].max())
-
     with st.form("new_customer"):
         col1, col2 = st.columns(2)
         with col1:
-            age = st.number_input("Tuổi (Age)", min_value=10, max_value=90, value=22, step=1)
-            family = st.number_input("Số người trong hộ (Family size)", min_value=1, max_value=20, value=3, step=1)
-            gender = st.selectbox("Giới tính (Gender)", CATEGORY_ORDER["Gender"])
-            marital = st.selectbox("Hôn nhân (Marital Status)", CATEGORY_ORDER["Marital Status"])
+            age = st.number_input("Tuổi", min_value=10, max_value=90, value=22, step=1)
+            income = st.selectbox("Thu nhập mỗi tháng", CATEGORY_ORDER["Nhóm thu nhập"])
+            gender = st.selectbox("Giới tính", CATEGORY_ORDER["Giới tính"])
+            marital = st.selectbox("Hôn nhân", CATEGORY_ORDER["Hôn nhân"])
         with col2:
-            occupation = st.selectbox("Nghề nghiệp (Occupation)", CATEGORY_ORDER["Occupation"])
-            education = st.selectbox("Học vấn (Educational Qualifications)",
-                                     CATEGORY_ORDER["Educational Qualifications"], index=2)
-            output = st.selectbox("Tiếp tục đặt món (Output)", CATEGORY_ORDER["Output"],
-                                  help="Cột Output trong dữ liệu. Đề tài giả định Yes nghĩa là khách tiếp tục đặt món online.")
-            feedback = st.selectbox("Phản hồi (Feedback)", CATEGORY_ORDER["Feedback"])
+            education = st.selectbox("Học vấn", CATEGORY_ORDER["Học vấn"], index=3)
+            attitude = st.slider(f"{ATT} (1–7)", 1.0, 7.0, 4.5, 0.25,
+                                 help="Mức đánh giá tích cực về việc đặt đồ ăn online (trung bình câu Q19–Q21).")
+            intention = st.slider(f"{INT} (1–7)", 1.0, 7.0, 4.75, 0.25,
+                                  help="Ý định tiếp tục đặt đồ ăn online (trung bình câu Q22–Q25).")
+            party = st.number_input("Thường đặt cho mấy người", min_value=1, max_value=20, value=2, step=1,
+                                    help="Chỉ dùng để chọn cỡ combo, không dùng để xếp nhóm.")
         submitted = st.form_submit_button("Xác định cụm", type="primary")
 
     if submitted:
         new_customer = pd.DataFrame([{
-            "Age": age, "Family size": family, "Gender": gender,
-            "Marital Status": marital, "Occupation": occupation,
-            "Educational Qualifications": education, "Output": output, "Feedback": feedback,
+            "Tuổi": min(max(age, AGE_LIMITS[0]), AGE_LIMITS[1]), "Thu nhập": INCOME_GROUPS[income],
+            ATT: attitude, INT: intention, "Giới tính": gender, "Hôn nhân": marital, "Học vấn": education,
         }])
         segment = predict(model, new_customer)[0]
         p = profile.loc[segment]
 
         st.subheader(f"Khách hàng thuộc cụm: {segment}")
-        if not (age_min <= age <= age_max and fam_min <= family <= fam_max):
-            st.warning(f"Giá trị nằm ngoài khoảng dữ liệu huấn luyện (tuổi {age_min}–{age_max}, "
-                       f"số người trong hộ {fam_min}–{fam_max}), kết quả kém tin cậy hơn.")
+        if not AGE_LIMITS[0] <= age <= AGE_LIMITS[1]:
+            st.warning(f"Khảo sát chỉ gồm người {AGE_LIMITS[0]}–{AGE_LIMITS[1]} tuổi; tuổi {age} được tính như "
+                       f"{min(max(age, AGE_LIMITS[0]), AGE_LIMITS[1])}, kết quả kém tin cậy hơn.")
 
         m1, m2, m3, m4 = st.columns(4)
         m1.metric("Quy mô cụm", f"{p['Số khách']} khách", f"{p['Tỷ lệ (%)']}% tổng số", delta_color="off")
-        m2.metric("Tuổi trung bình của cụm", p["Age TB"])
-        m3.metric("Tỷ lệ tiếp tục đặt món của cụm", f"{p['Tiếp tục đặt món (%)']}%")
-        m4.metric("Phản hồi tích cực của cụm", f"{p['Feedback = Positive (%)']}%")
+        m2.metric("Tuổi trung bình của cụm", p["Tuổi TB"])
+        m3.metric("Thu nhập TB của cụm", f"{p['Thu nhập TB (triệu)']} triệu")
+        m4.metric(f"{INT} TB của cụm", p[f"{INT} TB (1–7)"])
 
         st.markdown("**Chiến lược tiếp thị đề xuất**")
         show_strategy(segment)
         st.caption("Các cụm chồng lấn khá nhiều nên kết quả mang tính tham khảo, "
                    "khách ở gần ranh giới có thể phù hợp với cả cụm lân cận.")
 
-        combo = combos.pick_for(segment, family)
-        extra = retention_offer(output, feedback)
-        st.markdown(f"**Combo khuyến mãi cho khách này hôm nay: {combo.name}** "
-                    f"({combos.DAY_LABEL[combo.day_type]}); ưu đãi kèm theo trạng thái của khách: {extra}")
-        show_combos(segment, highlight=combo.combo_id, extra=extra)
+        combo = combos.pick_for(segment, party)
+        # Ưu đãi giữ chân: ý định đặt tiếp dưới 4 coi như không còn đặt, thái độ dưới 4 coi như chưa hài lòng
+        extra = retention_offer("Yes" if intention >= 4 else "No", "Positive" if attitude >= 4 else "Negative")
+        if combo is None:
+            st.info("Hôm nay cụm này chưa có combo đặt được.")
+        else:
+            st.markdown(f"**Combo khuyến mãi cho khách này hôm nay: {combo.name}** "
+                        f"({combos.DAY_LABEL[combo.day_type]})" + (f"; ưu đãi riêng: {extra}" if extra else ""))
+        show_combos(segment, highlight=combo.combo_id if combo else None, extra=extra)
 
 # ---------- Tổng quan các cụm ----------
 with tab_overview:
@@ -294,10 +292,11 @@ with tab_overview:
 
     st.subheader("Đặc điểm từng cụm")
     st.dataframe(profile.astype(str).T, width="stretch")
-    st.caption("Monthly Income không tham gia phân cụm, chỉ dùng để tham khảo khi mô tả cụm.")
+    st.caption(f"Thu nhập tính bằng triệu đồng/tháng (giữa nhóm thu nhập của khảo sát); {ATT} và {INT} "
+               "theo thang 1–7.")
 
     st.subheader("Cơ cấu thuộc tính trong từng cụm")
-    attribute = st.selectbox("Chọn thuộc tính", CAT_COLS + ["Monthly Income"], format_func=label)
+    attribute = st.selectbox("Chọn thuộc tính", ["Nhóm tuổi", "Nhóm thu nhập"] + CAT_COLS, format_func=label)
     st.altair_chart(composition_chart(customers, attribute), width="stretch")
 
     st.subheader("Chiến lược tiếp thị")
@@ -323,9 +322,8 @@ with tab_list:
     chosen = st.multiselect("Lọc theo cụm", SEGMENT_ORDER, default=SEGMENT_ORDER)
     shown = customers[customers["Segment"].isin(chosen)]
     st.write(f"Đang hiển thị {len(shown)} / {len(customers)} khách hàng")
-    columns = ["Segment"] + [c for c in customers.columns
-                             if c not in ("Segment", "Cluster", *HIDDEN_COLS)]
-    table = shown[columns].rename(columns=DISPLAY_NAMES)
+    columns = ["Segment"] + [c for c in customers.columns if c not in ("Segment", "Cluster")]
+    table = shown[columns].rename(columns={"Segment": "Cụm", "Thu nhập": "Thu nhập (triệu)"})
     st.dataframe(table, width="stretch", hide_index=True)
     st.download_button("Tải danh sách đang hiển thị (CSV)",
                        table.to_csv(index=False).encode("utf-8-sig"),
@@ -333,7 +331,6 @@ with tab_list:
 
 # ---------- Tài khoản khách hàng đã đăng ký trong app ----------
 with tab_accounts:
-    L = shared.OPTION_LABELS
     rows = []
     for u in auth.all_customers():
         segment, used = shared.user_segment(u)
@@ -342,14 +339,14 @@ with tab_accounts:
         offer = shared.user_offer(u, segment) if segment else (None, None)
         rows.append({
             "Mã": u["user_id"], "Họ tên": u["name"], "Email": u["email"], "SĐT": u["phone"] or "",
-            "Địa chỉ": address, "Tuổi": u["age"], "Số người": u["family_size"],
-            **{shared.FIELD_LABELS[f]: L[f].get(u[f], "") for f in
-               ("gender", "marital_status", "occupation", "education")},
+            "Địa chỉ": address, "Tuổi": u["age"],
+            **{shared.FIELD_LABELS[f]: u[f] if u[f] in shared.OPTIONS[f] else ""
+               for f in ("income", "gender", "marital_status", "education")},
+            "Thường đặt cho": u["party_size"],
             "Số đơn": b["orders"], "Đơn gần nhất": (b["last_order"] or "")[:10],
-            "Sao TB": b["avg_rating"],
-            f"Còn đặt ({orders.ACTIVE_DAYS} ngày)": L["output"].get(b["output"], ""),
-            "Hài lòng": L["feedback"].get(b["feedback"], ""),
-            "Số thông tin dùng": used, "Nhóm": segment or "Chưa xếp được",
+            f"Đơn {orders.ACTIVE_DAYS} ngày": b["recent_orders"], "Sao TB": b["avg_rating"],
+            ATT: b["attitude"], INT: b["intention"],
+            "Số thông tin dùng": f"{used}/{shared.N_FEATURES}", "Nhóm": segment or "Chưa xếp được",
             "Combo gợi ý": offer[0].name if offer[0] else "", "Ưu đãi riêng": offer[1] or "",
             "Ngày đăng ký": u["created_at"][:10],
         })

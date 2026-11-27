@@ -1,11 +1,12 @@
 """Sinh đơn hàng MÔ PHỎNG cho một tháng, làm dữ liệu tạo combo khi app chưa có đủ đơn thật.
 
-Khách lấy từ bộ dữ liệu đã phân cụm (3000 mẫu, segmentation.train). Mỗi cụm có thói quen riêng
+Khách lấy từ dataset Gen Z Việt Nam đã phân cụm (361 người, segmentation.train). Mỗi cụm có thói quen riêng
 theo ngày thường (T2-T6) và cuối tuần (T7-CN):
 - tỷ lệ đơn cuối tuần, khung giờ đặt;
-- số người ăn trong một đơn (dựa trên số người trong hộ của khách);
-- món chính / món phụ / nước / tráng miệng hay chọn (trọng số) và xác suất gọi kèm.
-Khách có Output = Yes (tiếp tục đặt món) và Feedback = Positive được cho đặt nhiều đơn hơn.
+- số người ăn trong một đơn (phân bố riêng của cụm: sinh viên 1–2 người, người đi làm 2–4 người, khách
+  trung thành 1–3 người, cuối tuần đông hơn), vì dataset không có số người trong hộ;
+- món chính / món thêm / nước / tráng miệng hay chọn (trọng số) và xác suất gọi kèm.
+Khách có Ý định đặt tiếp cao hơn được cho đặt nhiều đơn hơn.
 
 Kết quả: simulated_orders.csv, mỗi dòng là một món trong một đơn. Đây là dữ liệu giả lập để minh họa,
 không phải đơn hàng thật; app ghi rõ nguồn khi dùng.
@@ -25,59 +26,46 @@ OUTPUT = Path(__file__).parent / "simulated_orders.csv"
 SEED = 42
 
 # Thói quen của từng cụm. main/side/drink/dessert: {mã món: trọng số}; *_rate: xác suất mỗi người gọi kèm.
-# share: xác suất mỗi thành viên khác trong hộ cùng ăn trong đơn đó. hours: khung giờ (giờ bắt đầu, giờ kết thúc).
+# sizes: {số người trong đơn: trọng số}. hours: khung giờ (giờ bắt đầu, giờ kết thúc).
 PATTERNS = {
-    "Sinh viên hộ nhỏ": {
+    "Sinh viên thu nhập thấp": {
         "weekend_share": 0.35,
-        "weekday": dict(share=0.10, hours=[(11, 13), (18, 22)],
+        "weekday": dict(sizes={1: 6, 2: 3, 3: 1}, hours=[(11, 13), (18, 22)],
                         main={"C03": 5, "B01": 4, "M01": 3, "G01": 2, "C01": 1},
                         side={"P01": 3, "P03": 1}, side_rate=0.30,
                         drink={"N01": 4, "N05": 2, "N09": 1}, drink_rate=0.85,
                         dessert={"T06": 2, "T05": 1, "T01": 1}, dessert_rate=0.15),
-        "weekend": dict(share=0.35, hours=[(17, 23)],
+        "weekend": dict(sizes={1: 2, 2: 4, 3: 3}, hours=[(17, 23)],
                         main={"B01": 3, "G02": 2, "G01": 3, "M01": 3, "C03": 2},
                         side={"P02": 2, "P01": 2, "P03": 2}, side_rate=0.55,
                         drink={"N01": 3, "N03": 2, "N05": 1}, drink_rate=0.90,
                         dessert={"T03": 2, "T06": 2, "T01": 2}, dessert_rate=0.30),
     },
-    "Sinh viên hộ đông": {
+    "Người đi làm thu nhập khá": {
         "weekend_share": 0.55,
-        "weekday": dict(share=0.30, hours=[(11, 13), (18, 22)],
-                        main={"B01": 3, "M01": 3, "G01": 3, "C03": 2, "C01": 1},
-                        side={"P01": 2, "P03": 2}, side_rate=0.35,
-                        drink={"N01": 4, "N03": 2, "N04": 1}, drink_rate=0.85,
-                        dessert={"T01": 2, "T06": 1}, dessert_rate=0.15),
-        "weekend": dict(share=0.75, hours=[(17, 22)],
-                        main={"G02": 4, "M01": 3, "G01": 2, "G12": 1, "B01": 1},
-                        side={"P03": 3, "P02": 2}, side_rate=0.45,
-                        drink={"N01": 5, "N03": 1, "N04": 1}, drink_rate=0.95,
-                        dessert={"T01": 3, "T03": 1}, dessert_rate=0.25),
+        "weekday": dict(sizes={1: 2, 2: 4, 3: 3, 4: 2}, hours=[(11, 13), (17, 20)],
+                        main={"C01": 4, "C02": 3, "M01": 2, "G01": 2, "M03": 1},
+                        side={"P05": 3, "P01": 2}, side_rate=0.45,
+                        drink={"N05": 3, "N01": 2, "N06": 2, "N09": 1}, drink_rate=0.85,
+                        dessert={"T06": 2, "T02": 1, "T01": 1}, dessert_rate=0.35),
+        "weekend": dict(sizes={2: 3, 3: 4, 4: 4}, hours=[(17, 21)],
+                        main={"G02": 4, "M01": 3, "G11": 2, "G01": 2, "C01": 1},
+                        side={"P02": 3, "P04": 2, "P05": 1}, side_rate=0.45,
+                        drink={"N01": 3, "N02": 2, "N07": 2}, drink_rate=0.85,
+                        dessert={"T06": 4, "T02": 2, "T05": 1}, dessert_rate=0.60),
     },
-    "Người đi làm trẻ": {
-        "weekend_share": 0.30,
-        "weekday": dict(share=0.10, hours=[(11, 13)],
-                        main={"C01": 4, "C02": 3, "M02": 1, "B02": 1},
-                        side={"P05": 4, "P01": 1}, side_rate=0.55,
-                        drink={"N05": 3, "N06": 2, "N09": 1}, drink_rate=0.90,
-                        dessert={"T01": 1}, dessert_rate=0.10),
-        "weekend": dict(share=0.60, hours=[(18, 21)],
-                        main={"G11": 3, "M03": 3, "G01": 1, "B02": 1},
-                        side={"P04": 3, "P02": 1}, side_rate=0.50,
-                        drink={"N07": 3, "N06": 1, "N05": 1}, drink_rate=0.90,
-                        dessert={"T02": 3, "T04": 1}, dessert_rate=0.45),
-    },
-    "Người có gia đình hộ đông": {
-        "weekend_share": 0.65,
-        "weekday": dict(share=0.45, hours=[(17, 20)],
-                        main={"C01": 3, "M01": 3, "G01": 3, "C03": 2},
-                        side={"P01": 2, "P05": 2}, side_rate=0.35,
-                        drink={"N01": 3, "N09": 2, "N06": 1}, drink_rate=0.75,
-                        dessert={"T06": 3, "T05": 1}, dessert_rate=0.40),
-        "weekend": dict(share=0.85, hours=[(17, 20)],
-                        main={"G02": 4, "M01": 3, "G01": 2, "C01": 1},
-                        side={"P02": 3, "P05": 1}, side_rate=0.40,
-                        drink={"N01": 3, "N02": 2, "N09": 1}, drink_rate=0.85,
-                        dessert={"T06": 4, "T05": 1}, dessert_rate=0.70),
+    "Khách trung thành": {
+        "weekend_share": 0.40,
+        "weekday": dict(sizes={1: 5, 2: 4, 3: 1}, hours=[(11, 13), (18, 21)],
+                        main={"C01": 3, "G01": 3, "M03": 2, "B02": 2, "C02": 1},
+                        side={"P05": 3, "P01": 2, "P03": 1}, side_rate=0.55,
+                        drink={"N05": 3, "N04": 2, "N07": 2}, drink_rate=0.90,
+                        dessert={"T03": 2, "T01": 2, "T04": 1}, dessert_rate=0.45),
+        "weekend": dict(sizes={1: 1, 2: 4, 3: 4}, hours=[(17, 22)],
+                        main={"G02": 4, "M03": 3, "G12": 2, "B02": 1},
+                        side={"P03": 3, "P04": 2}, side_rate=0.60,
+                        drink={"N02": 3, "N04": 2, "N07": 2}, drink_rate=0.90,
+                        dessert={"T04": 3, "T02": 2, "T01": 1}, dessert_rate=0.55),
     },
 }
 
@@ -96,7 +84,7 @@ def _pick(rng, weights, n):
 def simulate(n_orders, month, seed=SEED):
     rng = np.random.default_rng(seed)
     customers = seg.train().customers.reset_index(drop=True)
-    weight = 1 + 0.8 * (customers["Output"] == "Yes") + 0.3 * (customers["Feedback"] == "Positive")
+    weight = customers[seg.INT] - 2   # ý định đặt tiếp 3..7 -> trọng số 1..5
     picks = rng.choice(len(customers), size=n_orders, p=(weight / weight.sum()).to_numpy())
 
     year, mon = map(int, month.split("-"))
@@ -110,8 +98,9 @@ def simulate(n_orders, month, seed=SEED):
         pat = PATTERNS[segment]
         day_type = "weekend" if rng.random() < pat["weekend_share"] else "weekday"
         p = pat[day_type]
-        family = int(c["Family size"])
-        people = 1 + int(rng.binomial(family - 1, p["share"])) if family > 1 else 1
+        sizes = list(p["sizes"])
+        weights = np.array(list(p["sizes"].values()), dtype=float)
+        people = int(rng.choice(sizes, p=weights / weights.sum()))
 
         d = by_type[day_type][rng.integers(len(by_type[day_type]))]
         start, end = p["hours"][rng.integers(len(p["hours"]))]
@@ -125,7 +114,7 @@ def simulate(n_orders, month, seed=SEED):
                 items[code] = items.get(code, 0) + 1
         for code, qty in items.items():
             rows.append({"order_id": f"S{i:06d}", "customer": int(idx), "segment": segment,
-                         "family_size": family, "created_at": created.isoformat(" "),
+                         "party_size": people, "created_at": created.isoformat(" "),
                          "day_type": day_type, "item_id": code, "quantity": qty})
     return pd.DataFrame(rows)
 

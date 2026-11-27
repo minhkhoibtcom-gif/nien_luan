@@ -6,12 +6,14 @@ Quy tắc giống web bán sữa La Che Fresca:
 - Sai mật khẩu MAX_ATTEMPTS lần liên tiếp thì khóa tạm LOCK_MINUTES phút.
 - Thông báo lỗi đăng nhập chung chung, không cho biết email có tồn tại hay không.
 - Số điện thoại (nếu nhập) gồm 10 chữ số, bắt đầu bằng 0.
-Các thông tin hồ sơ (địa chỉ và 8 thuộc tính của mô hình phân khúc) đều không bắt buộc.
+- Giữ đăng nhập SESSION_DAYS ngày: mã phiên ngẫu nhiên nằm trong cookie trình duyệt, database chỉ lưu bản băm.
+Các thông tin hồ sơ (địa chỉ, thông tin cho mô hình phân khúc, số người thường đặt) đều không bắt buộc.
 """
 import hashlib
 import hmac
 import os
 import re
+import secrets
 from datetime import datetime, timedelta
 
 import db
@@ -19,11 +21,13 @@ import db
 MAX_ATTEMPTS = 5
 LOCK_MINUTES = 15
 PASSWORD_MIN, PASSWORD_MAX = 8, 72
+SESSION_DAYS = 7
 
 # Cột hồ sơ được sửa trong trang Tài khoản (đều không bắt buộc)
 CONTACT_FIELDS = ["name", "phone", "address_line", "address_commune", "address_province"]
-# 6 thuộc tính khách tự khai; Output và Feedback của mô hình lấy từ đơn hàng và đánh giá (orders.py)
-SURVEY_FIELDS = ["age", "family_size", "gender", "marital_status", "occupation", "education"]
+# Khách tự khai: 5 thuộc tính của mô hình (Thái độ và Ý định đặt tiếp lấy từ đánh giá và đơn hàng, orders.py)
+# và party_size (thường đặt cho mấy người, chỉ dùng để chọn cỡ combo)
+SURVEY_FIELDS = ["age", "income", "gender", "marital_status", "education", "party_size"]
 
 class AuthError(Exception):
     """Lỗi hiển thị được cho người dùng (dữ liệu không hợp lệ, sai mật khẩu...)."""
@@ -161,3 +165,37 @@ def ensure_admin(email, password, name="Quản trị viên"):
             "INSERT INTO users (name, email, password_hash, role, created_at) VALUES (?, ?, ?, 'admin', ?)"
             " ON CONFLICT DO NOTHING",
             (name, email.strip().lower(), hash_password(password), _now().isoformat(" ")))
+
+
+# ---------- Phiên đăng nhập (giữ đăng nhập khi tải lại trang) ----------
+
+def _token_hash(token):
+    return hashlib.sha256(token.encode()).hexdigest()
+
+
+def create_session(user_id):
+    """Tạo mã phiên mới cho user, trả về mã gốc (để ghi vào cookie). Xóa luôn các phiên đã hết hạn."""
+    token = secrets.token_urlsafe(32)
+    now = _now()
+    with _connect() as conn:
+        conn.execute("DELETE FROM sessions WHERE expires_at < ?", (now.isoformat(" "),))
+        conn.execute("INSERT INTO sessions (token_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)",
+                     (_token_hash(token), user_id, now.isoformat(" "),
+                      (now + timedelta(days=SESSION_DAYS)).isoformat(" ")))
+    return token
+
+
+def session_user(token):
+    """user_id của mã phiên còn hạn, không có thì None."""
+    if not token or len(token) > 100:
+        return None
+    with _connect() as conn:
+        row = conn.execute("SELECT user_id FROM sessions WHERE token_hash = ? AND expires_at >= ?",
+                           (_token_hash(token), _now().isoformat(" "))).fetchone()
+    return row[0] if row else None
+
+
+def delete_session(token):
+    if token:
+        with _connect() as conn:
+            conn.execute("DELETE FROM sessions WHERE token_hash = ?", (_token_hash(token),))

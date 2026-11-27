@@ -18,7 +18,7 @@ with st.container(key="hero"):
     with left:
         ui.html_block('<span class="lcf-badge">Gà giòn · Mì Ý · Burger · Giao nhanh</span>'
                       '<h1>Đồ ăn nhanh nóng hổi,<br>combo hợp túi tiền cho mọi nhà</h1>'
-                      '<p class="lcf-lead">Cho chúng tôi biết đôi chút về bạn (tuổi, số người trong gia đình...), '
+                      '<p class="lcf-lead">Cho chúng tôi biết đôi chút về bạn (tuổi, thu nhập...), '
                       'FASTBITE sẽ gợi ý combo khuyến mãi hợp với bạn nhất.</p>')
         b1, b2, _ = st.columns([1.3, 1.3, 2])
         if user is None:
@@ -53,13 +53,13 @@ if user is None or not shared.is_admin(user):
             c1, c2 = st.columns([5, 1.4], vertical_alignment="center")
             if user is None:
                 c1.markdown("**Nhận combo khuyến mãi dành riêng cho bạn**  \n"
-                            "Đăng ký tài khoản và điền vài thông tin (tuổi, số người trong gia đình...), "
-                            "chúng tôi sẽ gợi ý combo hợp với bạn và gia đình.")
+                            "Đăng ký tài khoản và điền vài thông tin (tuổi, thu nhập...), "
+                            "chúng tôi sẽ gợi ý combo hợp với bạn.")
                 if c2.button("Đăng ký", key="cta_register", type="primary", width="stretch"):
                     st.switch_page(PAGES["register"])
             else:
                 c1.markdown("**Nhận combo khuyến mãi dành riêng cho bạn**  \n"
-                            "Điền tuổi hoặc số người trong gia đình (và các thông tin khác nếu muốn) "
+                            "Điền tuổi hoặc thu nhập (và các thông tin khác nếu muốn) "
                             "trong trang Tài khoản để nhận gợi ý.")
                 if c2.button("Điền thông tin", key="cta_profile", type="primary", width="stretch"):
                     st.switch_page(PAGES["account"])

@@ -23,7 +23,7 @@ with right:
             submitted = st.form_submit_button("Đăng ký", type="primary", width="stretch")
         if submitted:
             try:
-                st.session_state["user_id"] = auth.register(name, email, password, confirm, phone)
+                shared.login_user(auth.register(name, email, password, confirm, phone))
                 shared.flash("success", "Đăng ký thành công! Hãy điền thêm vài thông tin để nhận gợi ý combo.")
                 st.switch_page(PAGES["account"])
             except auth.AuthError as e:

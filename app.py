@@ -31,6 +31,7 @@ cart = st.Page("views/cart.py", title="Giỏ hàng", icon=":material/shopping_ca
 shared.PAGES.update(home=home, login=login, register=register, account=account, admin=admin, cart=cart)
 
 user = shared.current_user()
+shared.sync_cookie()
 # Luôn đăng ký đủ các trang (menu ẩn, thanh trên cùng tự vẽ) để st.switch_page tới được mọi trang;
 # quyền xem do từng trang kiểm tra (shared.require_login / require_admin).
 page = st.navigation([home, login, register, account, admin, cart], position="hidden")

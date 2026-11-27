@@ -58,10 +58,10 @@ def main():
 
     lines = [
         "TÂM CỤM QUA TỪNG VÒNG LẶP CỦA K-PROTOTYPES",
-        f"Dữ liệu: {seg.DATA_FILE.name} ({len(model.customers)} mẫu sau làm sạch)",
+        f"Dữ liệu: {seg.DATA_FILE.name} ({len(model.customers)} mẫu)",
         f"Tham số: K = {seg.K}, init = 'Cao', n_init = {len(runs)}, random_state = 42, "
         f"gamma = {kp.gamma:.3f}",
-        "Biến số (Age, Family size) được chuẩn hóa khi huấn luyện; bảng dưới ghi giá trị "
+        f"Biến số ({', '.join(seg.NUM_COLS)}) được chuẩn hóa khi huấn luyện; bảng dưới ghi giá trị "
         "ở thang đo gốc, kèm giá trị chuẩn hóa trong ngoặc.",
         "Vòng 0 là tâm ban đầu sau bước khởi tạo. moves = số điểm đổi cụm trong vòng đó; "
         "thuật toán dừng khi moves = 0 hoặc cost không giảm.",

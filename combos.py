@@ -11,8 +11,8 @@ Quy trình mỗi tháng M:
    - Thức uống: đúng bằng số người và cùng một loại (loại được mua nhiều nhất).
    - Món thêm (khoai, súp): số phần trung bình mỗi đơn, làm tròn, tối đa 2 loại; Cơm trắng và Mì Ý thêm
      không bao giờ có trong combo (menu.NOT_IN_COMBO).
-   - Món phụ (tráng miệng): số phần trung bình làm tròn, không quá số người, tối đa 2 loại; 2 cụm sinh viên
-     (thu nhập thấp) không có món phụ.
+   - Món phụ (tráng miệng): số phần trung bình làm tròn, không quá số người, tối đa 2 loại; cụm Sinh viên
+     thu nhập thấp không có món phụ.
 3. Giá combo = giá lẻ giảm 10%, làm tròn xuống giá đuôi 5.000₫ / 9.000₫. Lưu thành đề xuất (status = proposed).
 4. Admin duyệt (có thể sửa giá) -> active. Combo ngày thường đặt được MỌI NGÀY (cả cuối tuần); combo cuối tuần
    chỉ đặt được Thứ 7-CN (ngày thường vẫn xem được). Sang tháng mới cần đề xuất + duyệt lại; chưa duyệt thì
@@ -26,7 +26,7 @@ from pathlib import Path
 import pandas as pd
 
 import auth
-from menu import DEFAULT_COMBOS, NOT_IN_COMBO, Combo, list_price, load_menu, pick_default_combo
+from menu import DEFAULT_COMBOS, NOT_IN_COMBO, Combo, combo_people, list_price, load_menu, pick_default_combo
 
 SIMULATED_FILE = Path(__file__).parent / "simulated_orders.csv"
 MIN_ORDERS = 20
@@ -36,22 +36,19 @@ COMBOS_PER_DAY = {"weekday": 2, "weekend": 1}
 DAY_LABEL = {"weekday": "Combo ngày thường (áp dụng mọi ngày)", "weekend": "Combo cuối tuần (Thứ 7–CN)",
              "all": "Mọi ngày"}
 DAY_SHORT = {"weekday": "Mọi ngày", "weekend": "Thứ 7–CN", "all": "Mọi ngày"}
-SEGMENT_CODE = {"Sinh viên hộ nhỏ": "SVN", "Sinh viên hộ đông": "SVD",
-                "Người đi làm trẻ": "DLT", "Người có gia đình hộ đông": "GD"}
-SEGMENT_NAME = {"Sinh viên hộ nhỏ": "Sinh Viên", "Sinh viên hộ đông": "Hội Bạn",
-                "Người đi làm trẻ": "Dân Văn Phòng", "Người có gia đình hộ đông": "Cả Nhà"}
-LOW_INCOME = {"Sinh viên hộ nhỏ", "Sinh viên hộ đông"}  # ~62% chưa có thu nhập: combo không có món phụ
+SEGMENT_CODE = {"Sinh viên thu nhập thấp": "SV", "Người đi làm thu nhập khá": "DL", "Khách trung thành": "TT"}
+SEGMENT_NAME = {"Sinh viên thu nhập thấp": "Sinh Viên", "Người đi làm thu nhập khá": "Gia Đình",
+                "Khách trung thành": "Thân Quen"}
+LOW_INCOME = {"Sinh viên thu nhập thấp"}  # 93% thu nhập dưới 10 triệu: combo không có món phụ
 DISCOUNT = 0.10  # mọi combo giảm 10% so với giá lẻ, rồi làm tròn xuống giá đuôi 5k / 9k (charm_price)
 SEGMENT_OFFER = {
-    "Sinh viên hộ nhỏ": "Giảm thêm khi có thẻ sinh viên, miễn phí giao hàng.",
-    "Sinh viên hộ đông": "",
-    "Người đi làm trẻ": "Cam kết giao đúng giờ.",
-    "Người có gia đình hộ đông": "Tặng voucher 50.000₫ cho đơn sau, hoàn tiền nếu giao trễ.",
+    "Sinh viên thu nhập thấp": "Giảm thêm khi có thẻ sinh viên, miễn phí giao hàng.",
+    "Người đi làm thu nhập khá": "Cam kết giao đúng giờ, tặng voucher 50.000₫ cho đơn sau.",
+    "Khách trung thành": "",
 }
-ICON = {("Sinh viên hộ nhỏ", "weekday"): "🎒", ("Sinh viên hộ nhỏ", "weekend"): "🍔",
-        ("Sinh viên hộ đông", "weekday"): "👥", ("Sinh viên hộ đông", "weekend"): "🎉",
-        ("Người đi làm trẻ", "weekday"): "💼", ("Người đi làm trẻ", "weekend"): "🌙",
-        ("Người có gia đình hộ đông", "weekday"): "🏠", ("Người có gia đình hộ đông", "weekend"): "👨‍👩‍👧‍👦"}
+ICON = {("Sinh viên thu nhập thấp", "weekday"): "🎒", ("Sinh viên thu nhập thấp", "weekend"): "👥",
+        ("Người đi làm thu nhập khá", "weekday"): "🌙", ("Người đi làm thu nhập khá", "weekend"): "👨‍👩‍👧‍👦",
+        ("Khách trung thành", "weekday"): "⭐", ("Khách trung thành", "weekend"): "🎉"}
 
 
 # ---------- Ngày / tháng ----------
@@ -334,18 +331,14 @@ def for_segment(segment, today=None):
     return [c for c in displayed(today)[0] if c.segment == segment]
 
 
-def pick_for(segment, family_size=None, today=None):
+def pick_for(segment, party_size=None, today=None):
     """Combo gợi ý cho khách hôm nay: trong các combo của cụm đặt được hôm nay, chọn combo có số người gần
-    số người trong hộ nhất (bỏ trống thì lấy combo nhỏ nhất); cuối tuần ưu tiên combo cuối tuần khi bằng nhau."""
+    số người khách thường đặt nhất (bỏ trống thì lấy combo nhỏ nhất); cuối tuần ưu tiên combo cuối tuần khi bằng nhau."""
     combos, month = displayed(today)
     if month is None:
-        return pick_default_combo(segment, family_size)
+        return pick_default_combo(segment, party_size)
     mine = [c for c in combos if c.segment == segment and is_available(c, today)]
     if not mine:
         return None
-
-    def people(c):
-        return int(c.people.split()[0]) if c.people[:1].isdigit() else 1
-
-    target = family_size or min(people(c) for c in mine)
-    return min(mine, key=lambda c: (abs(people(c) - target), c.day_type != "weekend"))
+    target = party_size or min(combo_people(c) for c in mine)
+    return min(mine, key=lambda c: (abs(combo_people(c) - target), c.day_type != "weekend"))

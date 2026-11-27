@@ -1,6 +1,6 @@
 """Xuất mô hình phân khúc ra JSON để chương trình khác (web PHP) tự xếp khách vào cụm.
 
-Xếp cụm của K-Prototypes chỉ cần: tham số chuẩn hóa, gamma và 4 tâm cụm.
+Xếp cụm của K-Prototypes chỉ cần: tham số chuẩn hóa, gamma và K tâm cụm (K = 3).
 Khoảng cách từ khách x đến tâm c (giống kmodes.KPrototypes.predict):
     d = sum((x_num_chuẩn_hóa - c_num)^2) + gamma * (số thuộc tính phân loại khác c_cat)
 Khách thuộc cụm có d nhỏ nhất (bằng nhau thì lấy cụm có chỉ số nhỏ hơn).

@@ -1,12 +1,13 @@
-"""So sánh K-Prototypes với K-Means, K-Modes và Hierarchical trên cùng dataset 3000 mẫu.
+"""So sánh K-Prototypes với K-Means, K-Modes và Hierarchical trên cùng dataset Gen Z Việt Nam (361 người).
 
 Chạy:  venv\\Scripts\\python compare_clustering.py
 Kết quả: figures/so_sanh/*.png và so_sanh_chi_so.csv
 
-Cách đưa dữ liệu hỗn hợp (2 cột số + 6 cột phân loại) vào từng thuật toán:
+Cách đưa dữ liệu hỗn hợp (4 cột số + 3 cột phân loại) vào từng thuật toán:
 - K-Prototypes: cột số chuẩn hóa z-score + cột phân loại giữ nguyên (giống segmentation.py).
 - K-Means: cột số z-score + one-hot cột phân loại (K-Means chỉ làm việc với số).
-- K-Modes: chỉ làm việc với dữ liệu phân loại nên Age, Family size được chia thành 4 nhóm theo tứ phân vị.
+- K-Modes: chỉ làm việc với dữ liệu phân loại nên 4 cột số (tuổi, thu nhập, thái độ, ý định đặt tiếp)
+  được chia thành tối đa 4 nhóm theo tứ phân vị.
 - Hierarchical: average linkage trên ma trận khoảng cách Gower (Gower xử lý được dữ liệu hỗn hợp;
   Ward không dùng được vì Ward cần khoảng cách Euclid).
 
@@ -159,7 +160,7 @@ def plot_metrics_at_k(table):
         ax.tick_params(axis="x", rotation=20)
         ax.grid(axis="x", visible=False)
     fig.suptitle(f"So sánh 4 thuật toán tại K = {K}", fontweight="bold")
-    save(fig, "2_chi_so_tai_K4.png")
+    save(fig, f"2_chi_so_tai_K{K}.png")
 
 
 def plot_famd(X, labels):
@@ -253,22 +254,23 @@ def plot_sizes(labels):
 
 
 def plot_profiles(data, labels):
-    """Age và Family size trung bình của từng cụm: cụm có ý nghĩa kinh doanh hay không."""
+    """Thu nhập và ý định đặt tiếp trung bình của từng cụm: cụm có ý nghĩa kinh doanh hay không."""
+    x_col, y_col = "Thu nhập", "Ý định đặt tiếp"
     fig, axes = plt.subplots(1, 4, figsize=(17, 4), sharex=True, sharey=True)
     for ax, algo in zip(axes, ALGOS):
         g = data.assign(c=labels[algo]).groupby("c")[NUM_COLS].agg(["mean", "size"])
         for c in g.index:
-            ax.scatter(g.loc[c, ("Age", "mean")], g.loc[c, ("Family size", "mean")],
-                       s=120 + g.loc[c, ("Age", "size")] / 2.5, color=CLUSTER_COLORS[c], alpha=.75, edgecolor="white")
-            ax.annotate(str(c), (g.loc[c, ("Age", "mean")], g.loc[c, ("Family size", "mean")]),
+            ax.scatter(g.loc[c, (x_col, "mean")], g.loc[c, (y_col, "mean")],
+                       s=120 + g.loc[c, (x_col, "size")] * 2, color=CLUSTER_COLORS[c], alpha=.75, edgecolor="white")
+            ax.annotate(str(c), (g.loc[c, (x_col, "mean")], g.loc[c, (y_col, "mean")]),
                         ha="center", va="center", color="white", fontweight="bold")
-        ax.set(title=algo, xlabel="Tuổi trung bình")
+        ax.set(title=algo, xlabel="Thu nhập trung bình (triệu/tháng)")
         ax.title.set_color(COLOR[algo])
         ax.margins(.15)
-    axes[0].set_ylabel("Số người trong hộ trung bình")
-    fig.suptitle(f"Tâm cụm theo tuổi và số người trong hộ (kích thước bong bóng = số khách, K = {K})",
+    axes[0].set_ylabel("Ý định đặt tiếp trung bình (1–7)")
+    fig.suptitle(f"Tâm cụm theo thu nhập và ý định đặt tiếp (kích thước bong bóng = số khách, K = {K})",
                  fontweight="bold")
-    save(fig, "8_tam_cum_tuoi_ho.png")
+    save(fig, "8_tam_cum_thu_nhap_y_dinh.png")
 
 
 def plot_dendrogram(Z):

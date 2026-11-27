@@ -20,7 +20,7 @@ with right:
             submitted = st.form_submit_button("Đăng nhập", type="primary", width="stretch")
         if submitted:
             try:
-                st.session_state["user_id"] = auth.login(email, password)
+                shared.login_user(auth.login(email, password))
                 user = auth.get_user(st.session_state["user_id"])
                 shared.flash("success", f"Xin chào {user['name']}!")
                 st.switch_page(PAGES["admin"] if user["role"] == "admin" else PAGES["home"])

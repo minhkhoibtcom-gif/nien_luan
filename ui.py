@@ -204,10 +204,11 @@ def brand_button():
 
 
 
-def hero(title, text, badges=()):
-    """Banner tiêu đề của trang (dùng cho trang quản trị, tài khoản)."""
+def hero(title, text="", badges=()):
+    """Banner tiêu đề của trang (dùng cho trang quản trị, tài khoản); bỏ trống text thì chỉ có tiêu đề."""
     tags = "".join(f'<span class="lcf-badge">{esc(b)}</span>' for b in badges)
-    html_block(f'<div class="lcf-hero">{tags}<h1>{esc(title)}</h1><p>{esc(text)}</p></div>')
+    para = f"<p>{esc(text)}</p>" if text else ""
+    html_block(f'<div class="lcf-hero">{tags}<h1>{esc(title)}</h1>{para}</div>')
 
 
 def hero_art():

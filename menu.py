@@ -48,38 +48,42 @@ class Combo:
 
 
 DEFAULT_COMBOS = [
-    Combo("CB01", "SV Tiết Kiệm", "Sinh viên hộ nhỏ", "1 người",
+    Combo("CB01", "SV Tiết Kiệm", "Sinh viên thu nhập thấp", "1 người",
           (("C03", 1), ("N01", 1)), 39000,
-          "Giảm thêm khi có thẻ sinh viên, miễn phí giao đơn từ 39.000₫.",
-          "Nhóm đông nhất, đa số chưa có thu nhập: suất nhỏ, giá thấp nhất.", "🎒"),
-    Combo("CB02", "SV Đôi Bạn", "Sinh viên hộ nhỏ", "2–3 người",
-          (("B01", 2), ("P02", 1), ("N01", 2)), 95000,
           "Giảm thêm khi có thẻ sinh viên, miễn phí giao hàng.",
-          "Hộ 2–3 người, chưa có thu nhập: giảm sâu nhất.", "🍔"),
-    Combo("CB03", "Hội Bạn 4 Người", "Sinh viên hộ đông", "4 người",
-          (("G04", 1), ("M01", 2), ("P03", 2), ("N01", 4)), 245000,
+          "Trẻ nhất, đa số thu nhập dưới 10 triệu: suất nhỏ, giá thấp nhất, không có món phụ.", "🎒"),
+    Combo("CB02", "SV Đôi Bạn", "Sinh viên thu nhập thấp", "2 người",
+          (("B01", 2), ("P02", 1), ("N01", 2)), 105000,
+          "Giảm thêm khi có thẻ sinh viên, miễn phí giao hàng.",
+          "Đi cùng bạn: món chính rẻ, chia chung một phần khoai.", "🍔"),
+    Combo("CB03", "Hội Bạn 3 Người", "Sinh viên thu nhập thấp", "3 người",
+          (("B01", 1), ("M01", 1), ("C03", 1), ("P03", 1), ("N01", 3)), 149000,
+          "Giảm thêm khi có thẻ sinh viên, miễn phí giao hàng.",
+          "Nhóm bạn độc thân ăn chung: giá mỗi người thấp.", "👥"),
+    Combo("CB04", "Tối Cặp Đôi", "Người đi làm thu nhập khá", "2 người",
+          (("G12", 1), ("M03", 1), ("P04", 1), ("N07", 2), ("T02", 1)), 179000,
+          "Cam kết giao đúng giờ, tặng voucher 50.000₫ cho đơn sau.",
+          "Thu nhập cao nhất, đa số đã kết hôn nhưng ít gắn bó: bữa tối cho 2 người kèm ưu đãi quay lại.", "🌙"),
+    Combo("CB05", "Cả Nhà 3 Người", "Người đi làm thu nhập khá", "3 người",
+          (("G04", 1), ("M01", 2), ("P02", 1), ("N01", 3), ("T06", 3)), 239000,
+          "Cam kết giao đúng giờ, tặng voucher 50.000₫ cho đơn sau.",
+          "Gia đình nhỏ: gà chia chung, có món phụ cho cả nhà.", "🏠"),
+    Combo("CB06", "Cả Nhà 4 Người", "Người đi làm thu nhập khá", "4 người",
+          (("G06", 1), ("M01", 2), ("P02", 2), ("N01", 4), ("T06", 4)), 335000,
+          "Cam kết giao đúng giờ, tặng voucher 50.000₫ cho đơn sau.",
+          "Bữa tối và cuối tuần của gia đình: combo lớn kèm cam kết giao đúng giờ.", "👨‍👩‍👧‍👦"),
+    Combo("CB07", "Trưa Quen Thuộc", "Khách trung thành", "1 người",
+          (("C01", 1), ("P05", 1), ("N05", 1), ("T03", 1)), 85000,
           "",
-          "Trung thành và hài lòng nhất (tiếp tục đặt món cao nhất): ăn chung, giá mỗi người thấp.", "👥"),
-    Combo("CB04", "Hội Bạn 6 Người", "Sinh viên hộ đông", "5–6 người",
-          (("G06", 1), ("M01", 3), ("P02", 2), ("N01", 6)), 349000,
+          "Thái độ và ý định đặt tiếp cao nhất: giữ món quen, thêm món phụ thay vì giảm sâu.", "⭐"),
+    Combo("CB08", "Đôi Bạn Thân", "Khách trung thành", "2 người",
+          (("G02", 1), ("M01", 1), ("P01", 1), ("N04", 2), ("T01", 1)), 139000,
           "",
-          "Hộ 5–6 người: phần ăn chia sẻ, giá mỗi người thấp.", "🎉"),
-    Combo("CB05", "Trưa Văn Phòng", "Người đi làm trẻ", "1 người",
-          (("C01", 1), ("P05", 1), ("N05", 1)), 75000,
-          "Cam kết giao đúng giờ.",
-          "Có thu nhập, cần tiện lợi: giảm nhẹ, ưu tiên giao đúng giờ.", "💼"),
-    Combo("CB06", "Tối Cặp Đôi", "Người đi làm trẻ", "2–3 người",
-          (("G12", 1), ("M03", 2), ("P04", 1), ("N07", 2), ("T02", 1)), 219000,
-          "Món cao cấp hơn, giảm vừa phải.",
-          "Đa số thu nhập khá, hơn nửa đã kết hôn: bữa tối cho 2 người.", "🌙"),
-    Combo("CB07", "Cả Nhà 4 Người", "Người có gia đình hộ đông", "3–4 người",
-          (("G04", 1), ("M01", 2), ("P02", 2), ("N01", 4), ("T06", 4)), 269000,
-          "Đặt trước bữa tối và cuối tuần, tặng voucher 50.000₫ cho đơn sau, hoàn tiền nếu giao trễ.",
-          "Thu nhập khá nhưng tỷ lệ quay lại thấp nhất: ưu đãi kéo khách quay lại.", "🏠"),
-    Combo("CB08", "Cả Nhà 5–6 Người", "Người có gia đình hộ đông", "5–6 người",
-          (("G06", 1), ("M01", 3), ("P02", 2), ("N01", 5), ("T06", 5)), 369000,
-          "Đặt trước bữa tối và cuối tuần, tặng voucher 50.000₫ cho đơn sau, hoàn tiền nếu giao trễ.",
-          "Hộ đông nhất, quay lại ít nhất: combo lớn kèm voucher và cam kết chất lượng.", "👨‍👩‍👧‍👦"),
+          "Khách quen đặt cho 2 người: món được ưa chuộng kèm tráng miệng.", "💛"),
+    Combo("CB09", "Nhóm Nhỏ 3 Người", "Khách trung thành", "3 người",
+          (("G04", 1), ("M03", 1), ("P03", 2), ("N02", 3), ("T04", 2)), 265000,
+          "",
+          "Nhóm nhỏ cuối tuần: đủ món chính, món thêm và món phụ.", "🎉"),
 ]
 MAIN_CATEGORIES = ("Gà giòn", "Mì Ý", "Cơm", "Burger")  # món chính: dùng để ước số người của một đơn
 
@@ -105,16 +109,17 @@ def combo_lines(combo, menu):
     return [f"{qty} {names[item]}" for item, qty in combo.items]
 
 
-def pick_default_combo(segment, family_size=None):
-    """Combo mặc định của khách: theo nhóm và số người trong hộ (bỏ trống thì lấy cỡ phổ biến của nhóm)."""
-    ids = {
-        "Sinh viên hộ nhỏ": "CB01" if family_size == 1 else "CB02",
-        "Sinh viên hộ đông": "CB04" if family_size is not None and family_size >= 5 else "CB03",
-        "Người đi làm trẻ": ("CB05" if family_size == 1 else
-                              "CB07" if family_size is not None and family_size >= 4 else "CB06"),
-        "Người có gia đình hộ đông": "CB07" if family_size is not None and family_size <= 4 else "CB08",
-    }
-    return next(c for c in DEFAULT_COMBOS if c.combo_id == ids[segment])
+def combo_people(combo):
+    """Số người của combo từ chuỗi "2 người" (không có số thì coi là 1)."""
+    return int(combo.people.split()[0]) if combo.people[:1].isdigit() else 1
+
+
+def pick_default_combo(segment, party_size=None):
+    """Combo mặc định của khách: trong nhóm, chọn combo có số người gần số người khách thường đặt nhất
+    (bỏ trống thì lấy combo nhỏ nhất)."""
+    mine = [c for c in DEFAULT_COMBOS if c.segment == segment]
+    target = party_size or min(combo_people(c) for c in mine)
+    return min(mine, key=lambda c: abs(combo_people(c) - target))
 
 
 def retention_offer(output=None, feedback=None):

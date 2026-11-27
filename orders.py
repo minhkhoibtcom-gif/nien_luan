@@ -6,10 +6,11 @@
   Khách hủy được đơn đang chờ xác nhận; admin chuyển trạng thái.
 - Đánh giá: 1-5 sao cho cả đơn (dịch vụ), hiện ngay sau khi đặt; bỏ qua thì đánh giá sau trong "Đơn hàng của tôi".
 
-Hai thuộc tính của mô hình được suy ra ở đây thay vì hỏi khách:
-- Output (tiếp tục đặt món online): có đơn chưa hủy trong ACTIVE_DAYS ngày gần nhất -> Yes, từng đặt nhưng lâu hơn -> No,
-  chưa đặt đơn nào -> None (bỏ qua khi xếp nhóm).
-- Feedback: điểm đánh giá trung bình >= POSITIVE_STARS -> Positive, thấp hơn -> Negative, chưa đánh giá -> None.
+Hai thuộc tính của mô hình được suy ra ở đây thay vì hỏi khách (thang 1–7 như khảo sát, None = bỏ qua khi xếp nhóm):
+- Thái độ: số sao đánh giá trung bình, đổi từ thang 1–5 sang 1–7 (1 + (sao - 1) x 1,5); chưa đánh giá -> None.
+- Ý định đặt tiếp: số đơn chưa hủy trong ACTIVE_DAYS ngày gần nhất: 0 đơn -> 3, 1 đơn -> 4,5, từ 2 đơn -> 6;
+  chưa đặt đơn nào -> None. Giả định của đề tài: còn đặt đều nghĩa là có ý định tiếp tục đặt.
+Ngoài ra Output (còn đặt trong 30 ngày) và Feedback (sao TB >= POSITIVE_STARS) dùng để chọn ưu đãi giữ chân khách.
 """
 import re
 from datetime import datetime, timedelta
@@ -22,6 +23,8 @@ from menu import load_menu
 
 ACTIVE_DAYS = 30
 POSITIVE_STARS = 4
+INTENTION_BY_RECENT = {0: 3.0, 1: 4.5}   # số đơn trong ACTIVE_DAYS ngày -> Ý định đặt tiếp; từ 2 đơn -> 6
+INTENTION_FREQUENT = 6.0
 MAX_QTY = 100
 
 STATUS_LABEL = {"pending": "Chờ xác nhận", "shipping": "Đang giao", "completed": "Hoàn tất", "cancelled": "Đã hủy"}
@@ -289,17 +292,33 @@ def rate_order(user_id, order_id, stars, comment=""):
 
 # ---------- Hành vi -> thuộc tính của mô hình ----------
 
+def stars_to_attitude(avg_stars):
+    """Sao trung bình 1–5 -> điểm Thái độ 1–7."""
+    return None if avg_stars is None else round(1 + (float(avg_stars) - 1) * 1.5, 2)
+
+
+def recent_to_intention(total_orders, recent_orders):
+    """Số đơn trong ACTIVE_DAYS ngày -> điểm Ý định đặt tiếp 1–7 (chưa từng đặt -> None)."""
+    if not total_orders:
+        return None
+    return INTENTION_BY_RECENT.get(recent_orders, INTENTION_FREQUENT)
+
+
 def behavior(user_id, today=None):
-    """Số đơn, đơn gần nhất, sao trung bình, Output và Feedback suy ra cho mô hình (None = bỏ qua)."""
+    """Số đơn, đơn gần nhất, sao trung bình và các thuộc tính suy ra cho mô hình (None = bỏ qua)."""
     today = today or _now()
+    since = (today - timedelta(days=ACTIVE_DAYS)).isoformat(" ")
     with auth.connect() as conn:
-        n, last = conn.execute("SELECT COUNT(*), MAX(created_at) FROM orders "
-                               "WHERE user_id = ? AND status <> 'cancelled'", (user_id,)).fetchone()
+        n, last, recent = conn.execute(
+            "SELECT COUNT(*), MAX(created_at), SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) FROM orders "
+            "WHERE user_id = ? AND status <> 'cancelled'", (since, user_id)).fetchone()
         avg, rated = conn.execute("SELECT AVG(rating), COUNT(rating) FROM orders WHERE user_id = ?",
                                   (user_id,)).fetchone()
-    output = None
-    if n:
-        output = "Yes" if datetime.fromisoformat(last) >= today - timedelta(days=ACTIVE_DAYS) else "No"
+    recent = int(recent or 0)
+    output = None if not n else ("Yes" if recent else "No")
     feedback = None if not rated else ("Positive" if avg >= POSITIVE_STARS else "Negative")
-    return {"orders": n, "last_order": last, "avg_rating": round(avg, 1) if avg else None,
-            "rated": rated, "output": output, "feedback": feedback}
+    return {"orders": n, "last_order": last, "recent_orders": recent,
+            "avg_rating": round(float(avg), 1) if avg else None, "rated": rated,
+            "attitude": stars_to_attitude(avg) if rated else None,
+            "intention": recent_to_intention(n, recent),
+            "output": output, "feedback": feedback}
