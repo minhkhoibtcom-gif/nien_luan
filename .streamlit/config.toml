@@ -9,6 +9,9 @@ linkColor = "#d62828"
 borderColor = "#f3d6b0"
 baseRadius = "12px"
 chartCategoricalColors = ["#d62828", "#f6aa1c", "#2a9d8f", "#264653", "#e76f51"]
+# Nunito: nét tròn, thân thiện, hỗ trợ đầy đủ dấu tiếng Việt; chữ cơ bản 17px (mặc định 16px), mọi cỡ rem trong ui.py to theo
+font = "Nunito:https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap"
+baseFontSize = 17
 
 [browser]
 gatherUsageStats = false
