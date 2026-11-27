@@ -9,8 +9,10 @@ linkColor = "#d62828"
 borderColor = "#f3d6b0"
 baseRadius = "12px"
 chartCategoricalColors = ["#d62828", "#f6aa1c", "#2a9d8f", "#264653", "#e76f51"]
-# Nunito: nét tròn, thân thiện, hỗ trợ đầy đủ dấu tiếng Việt; chữ cơ bản 17px (mặc định 16px), mọi cỡ rem trong ui.py to theo
-font = "Nunito:https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap"
+# Giống web Jollibee: chữ thường Roboto; tiêu đề MergeBlack là font riêng của Jollibee nên dùng Baloo 2 (rất đậm,
+# nét tròn, miễn phí trên Google Fonts) thay thế. Cả hai có đủ dấu tiếng Việt. Chữ cơ bản 17px (mặc định 16px).
+font = "Roboto:https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap"
+headingFont = "'Baloo 2':https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap"
 baseFontSize = 17
 
 [browser]

@@ -53,7 +53,7 @@ if navbar is not None:
         # 3 nhóm: logo | liên kết | lời chào + nút; mỗi nhóm rộng vừa nội dung nên chữ không bị cắt
         if ui.brand_button():
             st.switch_page(home)
-        with st.container(horizontal=True, width="content", vertical_alignment="center", gap="medium"):
+        with st.container(horizontal=True, width="content", vertical_alignment="center", gap="small"):
             st.page_link(home, label="Trang chủ", icon=":material/home:")
             if user is not None:
                 st.page_link(cart, label=f"Giỏ hàng ({sum(shared.cart().values())})", icon=":material/shopping_cart:")

@@ -39,8 +39,17 @@ header[data-testid="stHeader"], [data-testid="stDecoration"] {{ display: none; }
   background: linear-gradient(135deg, #fff8ec 0%, {CREAM} 50%, #ffffff 100%);
   border: 1px solid rgba(214, 40, 40, .15); border-radius: 14px; padding: .55rem 1rem;
 }}
-.st-key-navbar [data-testid="stPageLink"] a {{ font-weight: 600; white-space: nowrap; }}
-.st-key-navbar [data-testid="stPageLink"] a p {{ color: {INK}; white-space: nowrap; }}
+.st-key-navbar [data-testid="stPageLink"] a {{ font-weight: 600; white-space: nowrap; padding: .25rem .55rem; }}
+.st-key-navbar [data-testid="stPageLink"] a p {{ color: {INK}; white-space: nowrap; font-size: .95rem; }}
+/* Nút Đăng xuất / Đăng ký gọn lại cho vừa một hàng */
+.st-key-navbar [data-testid="stButton"] button:not(.st-key-brand button) {{
+  min-height: 2.1rem; padding: .2rem .9rem; white-space: nowrap;
+}}
+.st-key-navbar [data-testid="stButton"] button p {{ font-size: .95rem; white-space: nowrap; }}
+/* Màn hình rộng: logo | liên kết | lời chào luôn trên một hàng; màn hình hẹp vẫn được xuống dòng */
+@media (min-width: 1000px) {{ .st-key-navbar {{ flex-wrap: nowrap; }} }}
+/* Dưới 1200px không đủ chỗ cho lời chào: ẩn đi, giữ nút Đăng xuất */
+@media (max-width: 1199px) {{ .st-key-navbar [data-testid="stElementContainer"]:has(.lcf-hello) {{ display: none; }} }}
 .st-key-navbar [data-testid="stPageLink"] a:hover p {{ color: {RED}; }}
 .st-key-navbar [data-testid="stMarkdownContainer"] p {{ margin: 0; }}
 /* Logo + tên cửa hàng là một nút: bấm vào về trang chủ */
@@ -53,7 +62,10 @@ header[data-testid="stHeader"], [data-testid="stDecoration"] {{ display: none; }
 .lcf-brand-row {{ display: flex; align-items: center; gap: .6rem; }}
 .lcf-brand-row img {{ width: 40px; height: 40px; border-radius: 10px; object-fit: cover; }}
 .lcf-brand {{ color: {RED}; font-size: 1.35rem; font-weight: 800; line-height: 1; white-space: nowrap; letter-spacing: .5px; }}
-.lcf-hello {{ font-weight: 600; color: {INK}; white-space: nowrap; }}
+.lcf-hello {{ font-weight: 600; color: {INK}; white-space: nowrap; font-size: .95rem; }}
+/* Chữ kiểu tiêu đề (font headingFont trong config.toml): logo, tiêu đề mục, tên món, giá, logo chân trang */
+.st-key-brand button p, .lcf-brand, .lcf-section-title, .lcf-card-name, .lcf-price, .lcf-f-brand b,
+.lcf-auth-hero h1 {{ font-family: "Baloo 2", sans-serif !important; }}
 
 /* Banner */
 .st-key-hero, .lcf-hero {{
