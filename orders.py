@@ -13,6 +13,7 @@ Hai thuộc tính của mô hình được suy ra ở đây thay vì hỏi khác
 Ngoài ra Output (còn đặt trong 30 ngày) và Feedback (sao TB >= POSITIVE_STARS) dùng để chọn ưu đãi giữ chân khách.
 """
 import re
+from collections import defaultdict
 from datetime import datetime, timedelta
 
 import math
@@ -304,6 +305,18 @@ def recent_to_intention(total_orders, recent_orders):
     return INTENTION_BY_RECENT.get(recent_orders, INTENTION_FREQUENT)
 
 
+def _summarize(n, last, recent, avg, rated):
+    """Gom số liệu đơn hàng của một khách thành dict hành vi (dùng chung cho behavior và behavior_all)."""
+    n, recent, rated = int(n or 0), int(recent or 0), int(rated or 0)
+    output = None if not n else ("Yes" if recent else "No")
+    feedback = None if not rated else ("Positive" if avg >= POSITIVE_STARS else "Negative")
+    return {"orders": n, "last_order": last, "recent_orders": recent,
+            "avg_rating": round(float(avg), 1) if avg else None, "rated": rated,
+            "attitude": stars_to_attitude(avg) if rated else None,
+            "intention": recent_to_intention(n, recent),
+            "output": output, "feedback": feedback}
+
+
 def behavior(user_id, today=None):
     """Số đơn, đơn gần nhất, sao trung bình và các thuộc tính suy ra cho mô hình (None = bỏ qua)."""
     today = today or _now()
@@ -314,11 +327,19 @@ def behavior(user_id, today=None):
             "WHERE user_id = ? AND status <> 'cancelled'", (since, user_id)).fetchone()
         avg, rated = conn.execute("SELECT AVG(rating), COUNT(rating) FROM orders WHERE user_id = ?",
                                   (user_id,)).fetchone()
-    recent = int(recent or 0)
-    output = None if not n else ("Yes" if recent else "No")
-    feedback = None if not rated else ("Positive" if avg >= POSITIVE_STARS else "Negative")
-    return {"orders": n, "last_order": last, "recent_orders": recent,
-            "avg_rating": round(float(avg), 1) if avg else None, "rated": rated,
-            "attitude": stars_to_attitude(avg) if rated else None,
-            "intention": recent_to_intention(n, recent),
-            "output": output, "feedback": feedback}
+    return _summarize(n, last, recent, avg, rated)
+
+
+def behavior_all(today=None):
+    """behavior() của mọi khách trong 1 truy vấn: {user_id: dict}; khách chưa có đơn nhận dict rỗng (0 đơn)."""
+    today = today or _now()
+    since = (today - timedelta(days=ACTIVE_DAYS)).isoformat(" ")
+    with auth.connect() as conn:
+        rows = conn.execute(
+            "SELECT user_id, SUM(CASE WHEN status <> 'cancelled' THEN 1 ELSE 0 END),"
+            " MAX(CASE WHEN status <> 'cancelled' THEN created_at END),"
+            " SUM(CASE WHEN status <> 'cancelled' AND created_at >= ? THEN 1 ELSE 0 END),"
+            " AVG(rating), COUNT(rating) FROM orders GROUP BY user_id", (since,)).fetchall()
+    result = defaultdict(lambda: _summarize(0, None, 0, None, 0))
+    result.update({row[0]: _summarize(*row[1:]) for row in rows})
+    return result

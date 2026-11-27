@@ -136,15 +136,16 @@ def user_values(user, behavior=None):
     return values
 
 
-def user_segment(user):
-    """(tên cụm hoặc None, số thông tin đã dùng) cho khách; ô bỏ trống được bỏ qua."""
-    return predict_partial(load_model(), user_values(user))
+def user_segment(user, behavior=None):
+    """(tên cụm hoặc None, số thông tin đã dùng) cho khách; ô bỏ trống được bỏ qua.
+    behavior: kết quả orders.behavior đã tính sẵn (trang quản trị), để khỏi truy vấn lại."""
+    return predict_partial(load_model(), user_values(user, behavior))
 
 
-def user_offer(user, segment):
+def user_offer(user, segment, behavior=None):
     """(combo chính, ưu đãi riêng hoặc None) cho khách đã có nhóm: cỡ combo theo số người khách thường đặt,
     ưu đãi theo việc còn đặt món trong 30 ngày và mức hài lòng."""
-    b = orders.behavior(user["user_id"])
+    b = behavior or orders.behavior(user["user_id"])
     return combos.pick_for(segment, user.get("party_size")), retention_offer(b["output"], b["feedback"])
 
 

@@ -9,7 +9,7 @@ import db
 import orders
 import shared
 import ui
-from menu import DEFAULT_COMBOS, MENU_SOURCE, combo_lines, list_price, retention_offer
+from menu import DEFAULT_COMBOS, combo_lines, list_price, retention_offer
 from segmentation import (AGE_LIMITS, ATT, CAT_COLS, CATEGORY_ORDER, INCOME_GROUPS, INT, SEGMENT_ORDER,
                           STRATEGIES, predict, segment_profile)
 
@@ -123,11 +123,6 @@ with tab_combos:
         st.warning(f"Chưa duyệt combo nào của tháng này, khách đang thấy combo tháng {combos.month_label(shown_month)}.")
     else:
         st.warning(f"Chưa từng duyệt combo theo tháng, khách đang thấy {len(DEFAULT_COMBOS)} combo mặc định (áp dụng mọi ngày).")
-    st.caption(f"Mỗi tháng hệ thống đề xuất combo từ đơn tháng {combos.month_label(prev)}: mỗi cụm 2 combo ngày thường "
-               f"(2 cỡ đơn phổ biến nhất) và 1 combo cuối tuần (cỡ đơn phổ biến nhất), mỗi cỡ cần từ {combos.MIN_ORDERS} đơn. "
-               "Ràng buộc: món chính = số người, tối đa 2 loại; thức uống = số người, cùng một loại; món phụ không quá "
-               "số người, 2 cụm sinh viên không có món phụ; Cơm trắng và Mì Ý thêm không vào combo. "
-               "Combo ngày thường đặt được mọi ngày, combo cuối tuần chỉ Thứ 7–CN.")
 
     lines = combos.order_lines(prev)
     summary = combos.cell_summary(lines)
@@ -292,8 +287,6 @@ with tab_overview:
 
     st.subheader("Đặc điểm từng cụm")
     st.dataframe(profile.astype(str).T, width="stretch")
-    st.caption(f"Thu nhập tính bằng triệu đồng/tháng (giữa nhóm thu nhập của khảo sát); {ATT} và {INT} "
-               "theo thang 1–7.")
 
     st.subheader("Cơ cấu thuộc tính trong từng cụm")
     attribute = st.selectbox("Chọn thuộc tính", ["Nhóm tuổi", "Nhóm thu nhập"] + CAT_COLS, format_func=label)
@@ -305,8 +298,6 @@ with tab_overview:
             show_strategy(segment)
 
     st.subheader("Combo khuyến mãi đang áp dụng theo cụm")
-    st.caption(f"{MENU_SOURCE} Giá lẻ của combo tính tự động từ menu.csv. Quản lý combo theo tháng ở tab "
-               "\"Combo theo tháng\".")
     menu = shared.menu()
     st.dataframe(pd.DataFrame([{
         "Cụm": c.segment, "Combo": c.name, "Áp dụng": combos.DAY_SHORT[c.day_type], "Phục vụ": c.people,
@@ -332,11 +323,12 @@ with tab_list:
 # ---------- Tài khoản khách hàng đã đăng ký trong app ----------
 with tab_accounts:
     rows = []
+    behaviors = orders.behavior_all()  # 1 truy vấn cho mọi khách thay vì 2 truy vấn x 3 lần mỗi khách
     for u in auth.all_customers():
-        segment, used = shared.user_segment(u)
+        b = behaviors[u["user_id"]]
+        segment, used = shared.user_segment(u, b)
         address = ", ".join(x for x in (u["address_line"], u["address_commune"], u["address_province"]) if x)
-        b = orders.behavior(u["user_id"])
-        offer = shared.user_offer(u, segment) if segment else (None, None)
+        offer = shared.user_offer(u, segment, b) if segment else (None, None)
         rows.append({
             "Mã": u["user_id"], "Họ tên": u["name"], "Email": u["email"], "SĐT": u["phone"] or "",
             "Địa chỉ": address, "Tuổi": u["age"],
