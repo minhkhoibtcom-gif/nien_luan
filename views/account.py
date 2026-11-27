@@ -10,7 +10,6 @@ import orders
 import shared
 import ui
 import combos
-from segmentation import AGE_LIMITS
 
 user = shared.require_login()
 
@@ -84,27 +83,15 @@ with left:
                 except auth.AuthError as e:
                     st.error(str(e))
 
-segment, used = shared.user_segment(user)
+segment, _ = shared.user_segment(user)
+combo, extra = shared.user_offer(user, segment) if segment else (None, None)
 with right:
-    with st.container(key="segment_card"):
-        st.markdown("#### Nhóm khách hàng của bạn")
-        if segment is None:
+    # Đã xếp được nhóm thì không hiện thẻ; chưa đủ thông tin thì nhắc khách điền tuổi hoặc thu nhập
+    if segment is None:
+        with st.container(key="segment_card"):
+            st.markdown("#### Nhóm khách hàng của bạn")
             st.info("Chưa xếp được nhóm. Hãy điền tuổi hoặc thu nhập (và các thông tin khác nếu muốn) "
                     "rồi bấm Lưu thông tin.")
-        else:
-            st.markdown(f'<span class="lcf-badge" style="font-size:1rem">{ui.esc(segment)}</span>',
-                        unsafe_allow_html=True)
-            combo, extra = shared.user_offer(user, segment)
-            st.markdown(f"**Combo gợi ý hôm nay: {combo.name}** ({combo.people}, áp dụng {'Thứ 7–CN' if combo.day_type == 'weekend' else 'mọi ngày'})")
-            if extra:
-                st.markdown(f"Ưu đãi riêng: {extra}")
-            st.caption(f"Dựa trên {used}/{shared.N_FEATURES} thông tin (hồ sơ, lịch sử đặt món và đánh giá). "
-                       "Điền càng đủ, gợi ý càng sát.")
-            if user["age"] is not None and not AGE_LIMITS[0] <= user["age"] <= AGE_LIMITS[1]:
-                st.warning(f"Dữ liệu khảo sát chỉ gồm người {AGE_LIMITS[0]}–{AGE_LIMITS[1]} tuổi nên tuổi của bạn "
-                           "được tính như tuổi gần nhất trong khoảng đó; gợi ý chỉ mang tính tham khảo.")
-        if user["profile_updated_at"]:
-            st.caption(f"Cập nhật lần cuối: {user['profile_updated_at']}")
 
     # ---------- Đơn hàng của tôi ----------
     st.markdown("#### Đơn hàng của tôi")

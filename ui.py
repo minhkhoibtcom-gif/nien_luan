@@ -116,11 +116,28 @@ div[data-testid="stMetricValue"] {{ color: {RED_DARK}; }}
 .lcf-badge.lcf-day {{ background: #eef1f6; color: #555; }}
 .lcf-badge.lcf-day-on {{ background: #e3f6e8; color: #1b7a3a; }}
 /* Thẻ trong cột Streamlit: cao bằng nhau để nút Thêm vào giỏ thẳng hàng */
-.lcf-card.lcf-combo {{ min-height: 500px; margin-bottom: .5rem; }}
-.lcf-card.lcf-item {{ min-height: 300px; margin-bottom: .5rem; }}
+.lcf-card.lcf-combo, .lcf-card.lcf-item {{ margin-bottom: .5rem; }}
+/* Các cột trong một hàng cao bằng nhau; cho thẻ giãn hết phần còn lại của cột (mọi lớp bọc của Streamlit giữa
+   cột và thẻ đều thành flex dọc) nên nút Thêm vào giỏ luôn nằm ở đáy, thẳng hàng dù thẻ nhiều hay ít dòng. */
+[data-testid="stElementContainer"]:has(.lcf-card),
+[data-testid="stElementContainer"]:has(.lcf-card) div:has(.lcf-card) {{
+  flex: 1 1 auto; display: flex; flex-direction: column;
+}}
+.lcf-card.lcf-combo, .lcf-card.lcf-item {{ flex: 1 1 auto; }}
 .lcf-card img {{ width: 100%; height: 160px; object-fit: cover; background: #fff; }}
 .lcf-emoji {{ height: 160px; display: flex; align-items: center; justify-content: center; font-size: 4rem;
   background: linear-gradient(135deg, {CREAM} 0%, #fff8ec 100%); }}
+/* Ảnh combo theo cụm: màu nền riêng + nhãn tên cụm ở góc */
+.lcf-pic {{ position: relative; }}
+.lcf-pic .lcf-emoji {{ background: var(--seg-bg); }}
+.lcf-seg-tag {{
+  position: absolute; top: .6rem; left: .6rem; background: #fff; color: var(--seg-ink);
+  border: 1.5px solid var(--seg-ink); border-radius: 999px; padding: .1rem .6rem;
+  font-size: .78rem; font-weight: 700; white-space: nowrap;
+}}
+.lcf-seg-sv {{ --seg-bg: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); --seg-ink: #1565c0; }}
+.lcf-seg-work {{ --seg-bg: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%); --seg-ink: #c45100; }}
+.lcf-seg-loyal {{ --seg-bg: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%); --seg-ink: #ad1457; }}
 .lcf-card-body {{ padding: .8rem 1rem 1rem; display: flex; flex-direction: column; gap: .3rem; flex: 1; }}
 .lcf-card-name {{ font-weight: 700; color: {INK}; font-size: 1rem; line-height: 1.3; }}
 .lcf-card-meta {{ color: #6c757d; font-size: .82rem; }}
@@ -261,9 +278,22 @@ def auth_hero():
                f'<h1>{SITE_NAME}</h1><p>{SLOGAN}</p></div>')
 
 
-def _picture(code, icon):
+# Mỗi cụm một màu nền + nhãn ở góc ảnh combo, nhìn là biết combo của cụm nào: (nhãn, biểu tượng, lớp CSS)
+SEGMENT_STYLE = {
+    "Sinh viên thu nhập thấp": ("Sinh viên", "🎓", "lcf-seg-sv"),
+    "Người đi làm thu nhập khá": ("Người đi làm", "💼", "lcf-seg-work"),
+    "Khách trung thành": ("Khách trung thành", "⭐", "lcf-seg-loyal"),
+}
+
+
+def _picture(code, icon, segment=None):
+    """Ảnh món/combo (assets/products/<mã>.*), không có ảnh thì dùng emoji; combo có nền và nhãn theo cụm."""
     img = data_uri(image_path(code))
-    return f'<img src="{img}" alt="">' if img else f'<div class="lcf-emoji">{icon}</div>'
+    pic = f'<img src="{img}" alt="">' if img else f'<div class="lcf-emoji">{icon}</div>'
+    if segment not in SEGMENT_STYLE:
+        return pic
+    label, seg_icon, cls = SEGMENT_STYLE[segment]
+    return f'<div class="lcf-pic {cls}">{pic}<span class="lcf-seg-tag">{seg_icon} {esc(label)}</span></div>'
 
 
 def _card_grid(entries, columns, key_prefix, on_add):
@@ -313,7 +343,7 @@ def combo_cards(combo_list, menu, highlight=None, extra_offer=None, columns=4, k
             f'<span class="lcf-badge lcf-day{" lcf-day-on" if ok else ""}">{esc(combos.DAY_SHORT[c.day_type])}'
             f'{" · hôm nay" if ok and c.day_type == "weekend" else ""}</span>')
         entries.append((c.combo_id, f"Combo {c.name}",
-            f'<div class="{cls}">{_picture(c.combo_id, c.icon)}<div class="lcf-card-body">'
+            f'<div class="{cls}">{_picture(c.combo_id, c.icon, c.segment)}<div class="lcf-card-body">'
             f'<div><span class="lcf-badge">{esc(c.people)}</span>{day}</div>'
             f'<div class="lcf-card-name">Combo {esc(c.name)}</div><ul>{lines}</ul>'
             f'{offer}'
