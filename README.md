@@ -26,7 +26,7 @@ Phân khúc khách hàng bằng thuật toán **K-Prototypes** (3 cụm) trên d
 | `.streamlit/config.toml` | Cấu hình giao diện |
 | `start.bat`, `stop.bat` | Bật / tắt app demo trên Windows |
 | `ui.py` | Giao diện cửa hàng FASTBITE: tông đỏ – vàng, thanh trên cùng, banner, thẻ món, thẻ combo, chân trang |
-| `menu.csv` | Thực đơn 36 món, 4 nhóm: Món chính (gà giòn, mì Ý, cơm, burger), Món thêm (khoai, súp, cơm trắng, Mì Ý thêm 7.000₫), Món phụ (tráng miệng), Thức uống; giá lẻ tham khảo từ jollibee.com.vn (16/11/2026) |
+| `menu.csv` | Thực đơn 66 món, 4 nhóm: Món chính (gà giòn, mì Ý, cơm, burger), Món thêm (khoai, súp, cơm trắng, Mì Ý thêm 7.000₫), Món phụ (tráng miệng), Thức uống; 36 món và giá lẻ tham khảo từ jollibee.com.vn (16/11/2026), 30 món còn lại là món giả định |
 | `menu.py` | Thực đơn, lớp Combo, 9 combo mặc định (dùng khi chưa duyệt combo tháng), ưu đãi theo trạng thái khách |
 | `combos.py` | Combo theo tháng: đề xuất từ số lượng món mỗi cụm mua vào ngày thường / cuối tuần tháng trước, duyệt, combo đang áp dụng |
 | `simulate_orders.py`, `simulated_orders.csv` | Sinh 10.000 đơn mô phỏng (tháng 10/2026) làm dữ liệu tạo combo tháng đầu |

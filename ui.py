@@ -48,8 +48,10 @@ header[data-testid="stHeader"], [data-testid="stDecoration"] {{ display: none; }
 .st-key-navbar [data-testid="stButton"] button p {{ font-size: .95rem; white-space: nowrap; }}
 /* Màn hình rộng: logo | liên kết | lời chào luôn trên một hàng; màn hình hẹp vẫn được xuống dòng */
 @media (min-width: 1000px) {{ .st-key-navbar {{ flex-wrap: nowrap; }} }}
-/* Dưới 1200px không đủ chỗ cho lời chào: ẩn đi, giữ nút Đăng xuất */
-@media (max-width: 1199px) {{ .st-key-navbar [data-testid="stElementContainer"]:has(.lcf-hello) {{ display: none; }} }}
+/* Màn hình dưới 1200px không đủ chỗ cho 5 liên kết: ẩn icon (cả khung bọc icon) của các liên kết */
+@media (max-width: 1199px) {{
+  .st-key-navbar [data-testid="stPageLink"] a > span:has([data-testid="stIconMaterial"]) {{ display: none; }}
+}}
 .st-key-navbar [data-testid="stPageLink"] a:hover p {{ color: {RED}; }}
 .st-key-navbar [data-testid="stMarkdownContainer"] p {{ margin: 0; }}
 /* Logo + tên cửa hàng là một nút: bấm vào về trang chủ */
@@ -62,7 +64,6 @@ header[data-testid="stHeader"], [data-testid="stDecoration"] {{ display: none; }
 .lcf-brand-row {{ display: flex; align-items: center; gap: .6rem; }}
 .lcf-brand-row img {{ width: 40px; height: 40px; border-radius: 10px; object-fit: cover; }}
 .lcf-brand {{ color: {RED}; font-size: 1.35rem; font-weight: 800; line-height: 1; white-space: nowrap; letter-spacing: .5px; }}
-.lcf-hello {{ font-weight: 600; color: {INK}; white-space: nowrap; font-size: .95rem; }}
 /* Chữ kiểu tiêu đề (font headingFont trong config.toml): logo, tiêu đề mục, tên món, giá, logo chân trang */
 .st-key-brand button p, .lcf-brand, .lcf-section-title, .lcf-card-name, .lcf-price, .lcf-f-brand b,
 .lcf-auth-hero h1 {{ font-family: "Baloo 2", sans-serif !important; }}
@@ -127,17 +128,11 @@ div[data-testid="stMetricValue"] {{ color: {RED_DARK}; }}
 .lcf-card img {{ width: 100%; height: 160px; object-fit: cover; background: #fff; }}
 .lcf-emoji {{ height: 160px; display: flex; align-items: center; justify-content: center; font-size: 4rem;
   background: linear-gradient(135deg, {CREAM} 0%, #fff8ec 100%); }}
-/* Ảnh combo theo cụm: màu nền riêng + nhãn tên cụm ở góc */
-.lcf-pic {{ position: relative; }}
+/* Ảnh combo theo cụm: mỗi cụm một màu nền */
 .lcf-pic .lcf-emoji {{ background: var(--seg-bg); }}
-.lcf-seg-tag {{
-  position: absolute; top: .6rem; left: .6rem; background: #fff; color: var(--seg-ink);
-  border: 1.5px solid var(--seg-ink); border-radius: 999px; padding: .1rem .6rem;
-  font-size: .78rem; font-weight: 700; white-space: nowrap;
-}}
-.lcf-seg-sv {{ --seg-bg: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); --seg-ink: #1565c0; }}
-.lcf-seg-work {{ --seg-bg: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%); --seg-ink: #c45100; }}
-.lcf-seg-loyal {{ --seg-bg: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%); --seg-ink: #ad1457; }}
+.lcf-seg-sv {{ --seg-bg: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); }}
+.lcf-seg-work {{ --seg-bg: linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%); }}
+.lcf-seg-loyal {{ --seg-bg: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%); }}
 .lcf-card-body {{ padding: .8rem 1rem 1rem; display: flex; flex-direction: column; gap: .3rem; flex: 1; }}
 .lcf-card-name {{ font-weight: 700; color: {INK}; font-size: 1rem; line-height: 1.3; }}
 .lcf-card-meta {{ color: #6c757d; font-size: .82rem; }}
@@ -278,22 +273,21 @@ def auth_hero():
                f'<h1>{SITE_NAME}</h1><p>{SLOGAN}</p></div>')
 
 
-# Mỗi cụm một màu nền + nhãn ở góc ảnh combo, nhìn là biết combo của cụm nào: (nhãn, biểu tượng, lớp CSS)
-SEGMENT_STYLE = {
-    "Sinh viên thu nhập thấp": ("Sinh viên", "🎓", "lcf-seg-sv"),
-    "Người đi làm thu nhập khá": ("Người đi làm", "💼", "lcf-seg-work"),
-    "Khách trung thành": ("Khách trung thành", "⭐", "lcf-seg-loyal"),
+# Mỗi cụm một màu nền ảnh combo, nhìn là biết combo của cụm nào
+SEGMENT_CLASS = {
+    "Sinh viên thu nhập thấp": "lcf-seg-sv",
+    "Người đi làm thu nhập khá": "lcf-seg-work",
+    "Khách trung thành": "lcf-seg-loyal",
 }
 
 
 def _picture(code, icon, segment=None):
-    """Ảnh món/combo (assets/products/<mã>.*), không có ảnh thì dùng emoji; combo có nền và nhãn theo cụm."""
+    """Ảnh món/combo (assets/products/<mã>.*), không có ảnh thì dùng emoji; combo có màu nền theo cụm."""
     img = data_uri(image_path(code))
     pic = f'<img src="{img}" alt="">' if img else f'<div class="lcf-emoji">{icon}</div>'
-    if segment not in SEGMENT_STYLE:
+    if segment not in SEGMENT_CLASS:
         return pic
-    label, seg_icon, cls = SEGMENT_STYLE[segment]
-    return f'<div class="lcf-pic {cls}">{pic}<span class="lcf-seg-tag">{seg_icon} {esc(label)}</span></div>'
+    return f'<div class="lcf-pic {SEGMENT_CLASS[segment]}">{pic}</div>'
 
 
 def _card_grid(entries, columns, key_prefix, on_add):

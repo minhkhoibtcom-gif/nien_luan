@@ -1,6 +1,6 @@
 """Thực đơn, lớp Combo và combo mặc định.
 
-Thực đơn (menu.csv): món ăn và giá lẻ tham khảo từ jollibee.com.vn ngày 16/11/2026.
+Thực đơn (menu.csv): 36 món và giá lẻ tham khảo từ jollibee.com.vn ngày 16/11/2026, thêm 30 món giả định.
 FASTBITE là tên cửa hàng giả định của đồ án, không liên quan tới Jollibee.
 
 Combo chính thức được tạo mỗi tháng từ đơn hàng tháng trước, theo cụm x ngày thường/cuối tuần (combos.py),
@@ -19,7 +19,7 @@ HERE = Path(__file__).parent
 MENU_FILE = HERE / "menu.csv"
 IMAGE_DIR = HERE / "assets" / "products"
 IMAGE_EXTS = (".png", ".jpg", ".jpeg", ".webp")
-MENU_SOURCE = "Thực đơn và giá lẻ tham khảo từ jollibee.com.vn (16/11/2026)."
+MENU_SOURCE = "Thực đơn tham khảo từ jollibee.com.vn (16/11/2026), có thêm món giả định."
 
 CATEGORY_ICON = {
     "Gà giòn": "🍗", "Mì Ý": "🍝", "Cơm": "🍚", "Burger": "🍔",

@@ -27,14 +27,16 @@ login = st.Page("views/login.py", title="Đăng nhập", icon=":material/login:"
 register = st.Page("views/register.py", title="Đăng ký", icon=":material/person_add:", url_path="dang-ky")
 account = st.Page("views/account.py", title="Tài khoản", icon=":material/person:", url_path="tai-khoan")
 admin = st.Page("views/admin.py", title="Quản trị", icon=":material/monitoring:", url_path="quan-tri")
+products = st.Page("views/products.py", title="Sản phẩm", icon=":material/restaurant_menu:", url_path="san-pham")
 cart = st.Page("views/cart.py", title="Giỏ hàng", icon=":material/shopping_cart:", url_path="gio-hang")
-shared.PAGES.update(home=home, login=login, register=register, account=account, admin=admin, cart=cart)
+shared.PAGES.update(home=home, login=login, register=register, account=account, admin=admin, cart=cart,
+                    products=products)
 
 user = shared.current_user()
 shared.sync_cookie()
 # Luôn đăng ký đủ các trang (menu ẩn, thanh trên cùng tự vẽ) để st.switch_page tới được mọi trang;
 # quyền xem do từng trang kiểm tra (shared.require_login / require_admin).
-page = st.navigation([home, login, register, account, admin, cart], position="hidden")
+page = st.navigation([home, products, login, register, account, admin, cart], position="hidden")
 
 auth_page = page.url_path in (login.url_path, register.url_path)
 navbar = (st.container(key="navbar", horizontal=True, horizontal_alignment="distribute",
@@ -55,6 +57,7 @@ if navbar is not None:
             st.switch_page(home)
         with st.container(horizontal=True, width="content", vertical_alignment="center", gap="small"):
             st.page_link(home, label="Trang chủ", icon=":material/home:")
+            st.page_link(products, label="Sản phẩm", icon=":material/restaurant_menu:")
             if user is not None:
                 st.page_link(cart, label=f"Giỏ hàng ({sum(shared.cart().values())})", icon=":material/shopping_cart:")
                 st.page_link(account, label="Tài khoản", icon=":material/person:")
@@ -66,9 +69,8 @@ if navbar is not None:
                 if st.button("Đăng ký", type="primary"):
                     st.switch_page(register)
             else:
-                st.markdown(f'<span class="lcf-hello">Xin chào, {ui.esc(user["name"])}</span>',
-                            unsafe_allow_html=True, width="content")
-                if st.button("Đăng xuất"):
+                # Header có 5 liên kết nên không còn chỗ cho lời chào: tên khách hiện khi rê chuột vào nút
+                if st.button("Đăng xuất", help=f"Đang đăng nhập: {user['name']}"):
                     shared.logout()
                     st.switch_page(home)
 
